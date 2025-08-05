@@ -31,6 +31,7 @@ protocol ServiceContainer {
     var shazamService: ShazamServiceProtocol { get }
     var openAIService: OpenAIServiceProtocol { get }
     var storageService: StorageServiceProtocol { get }
+    var permissionService: PermissionServiceProtocol { get }
 }
 
 @MainActor
@@ -42,6 +43,7 @@ final class DefaultServiceContainer: ServiceContainer {
     lazy var storageService: StorageServiceProtocol = StorageService(
         modelContext: Container.shared.modelContainer.mainContext
     )
+    lazy var permissionService: PermissionServiceProtocol = PermissionService()
     
     private init() {}
 }

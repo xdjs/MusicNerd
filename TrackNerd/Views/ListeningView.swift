@@ -9,6 +9,10 @@ import SwiftUI
 
 struct ListeningView: View {
     @State private var isListening = false
+    @State private var permissionStatus: PermissionStatus = .notDetermined
+    @State private var showingPermissionAlert = false
+    
+    private let services = DefaultServiceContainer.shared
     
     var body: some View {
         NavigationView {
@@ -32,11 +36,8 @@ struct ListeningView: View {
                     // Main Listen Button
                     VStack(spacing: CGFloat.MusicNerd.lg) {
                         MusicNerdButton(
-                            title: isListening ? "Listening..." : "Start Listening",
-                            action: {
-                                isListening.toggle()
-                                // TODO: Integrate with ShazamKit
-                            },
+                            title: buttonTitle,
+                            action: handleListenTap,
                             style: .primary,
                             size: .large,
                             isLoading: isListening,
@@ -103,6 +104,59 @@ struct ListeningView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .animation(.easeInOut(duration: 0.3), value: isListening)
+        .onAppear {
+            checkPermissionStatus()
+        }
+        .alert("Microphone Access Required", isPresented: $showingPermissionAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Settings") {
+                openAppSettings()
+            }
+        } message: {
+            Text("TrackNerd needs microphone access to identify songs. Please enable it in Settings.")
+        }
+    }
+    
+    private var buttonTitle: String {
+        switch permissionStatus {
+        case .notDetermined:
+            return "Start Listening"
+        case .granted:
+            return isListening ? "Listening..." : "Start Listening"
+        case .denied, .restricted:
+            return "Enable Microphone"
+        }
+    }
+    
+    private func checkPermissionStatus() {
+        permissionStatus = services.permissionService.checkMicrophonePermission()
+    }
+    
+    private func handleListenTap() {
+        Task {
+            await requestPermissionAndListen()
+        }
+    }
+    
+    private func requestPermissionAndListen() async {
+        do {
+            permissionStatus = try await services.permissionService.requestMicrophonePermission()
+            if permissionStatus == .granted {
+                isListening.toggle()
+                // TODO: Integrate with ShazamKit
+            }
+        } catch {
+            await MainActor.run {
+                showingPermissionAlert = true
+            }
+        }
+    }
+    
+    private func openAppSettings() {
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+        UIApplication.shared.open(settingsUrl)
     }
 }
 
