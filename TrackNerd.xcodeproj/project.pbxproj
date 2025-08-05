@@ -35,9 +35,22 @@
 		2FA74ED82E41884700575EFD /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2FF7CD9E2E42AA69005AA02A /* Exceptions for "TrackNerd" folder in "TrackNerd" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2FA74DF62E41832E00575EFD /* TrackNerd */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2FA74DF92E41832E00575EFD /* TrackNerd */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2FF7CD9E2E42AA69005AA02A /* Exceptions for "TrackNerd" folder in "TrackNerd" target */,
+			);
 			path = TrackNerd;
 			sourceTree = "<group>";
 		};
@@ -417,6 +430,7 @@
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrackNerd/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -446,6 +460,7 @@
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrackNerd/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
