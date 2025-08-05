@@ -3,7 +3,7 @@ import Foundation
 struct AppConfiguration {
     
     struct API {
-        static let baseURL = "https://api.tracknerd.com"
+        static let baseURL = "https://api.TrackNerd.com"
         static let enrichEndpoint = "/enrich"
         static let timeoutInterval: TimeInterval = 30.0
         static let maxRetryAttempts = 3
