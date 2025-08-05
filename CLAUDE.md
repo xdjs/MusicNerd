@@ -94,3 +94,6 @@ Currently beginning Phase 3 (Music Recognition Core) - Phases 1 (Foundation & Ar
 - Network access (for OpenAI enrichment)
 - ShazamKit framework
 - Planned: OpenAI API integration via proxy server
+
+## Development Memories
+- Do not automatically run UI tests

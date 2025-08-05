@@ -63,15 +63,6 @@ protocol StorageServiceProtocol: AnyObject {
     func delete(_ match: SongMatch) async -> Result<Void>
 }
 
-class ShazamService: ShazamServiceProtocol {
-    func startListening() async -> Result<SongMatch> {
-        fatalError("Not implemented")
-    }
-    
-    func stopListening() {
-        
-    }
-}
 
 class OpenAIService: OpenAIServiceProtocol {
     func enrichSong(_ match: SongMatch) async -> Result<EnrichmentData> {
