@@ -9,6 +9,14 @@ import SwiftUI
 
 @main
 struct TrackNerdApp: App {
+    
+    init() {
+        // Disable animations during UI testing for faster and more reliable tests
+        if ProcessInfo.processInfo.arguments.contains("--uitesting") {
+            UIView.setAnimationsEnabled(false)
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

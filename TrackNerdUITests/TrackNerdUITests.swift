@@ -23,19 +23,53 @@ final class TrackNerdUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testAppLaunchAndInitialState() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--uitesting")
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        
+        XCTAssertTrue(app.exists, "App should exist after launch")
+        XCTAssertEqual(app.state, .runningForeground, "App should be running in foreground")
+        
+        let musicNerdText = app.staticTexts["Music Nerd"]
+        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Music Nerd title should be visible")
+        XCTAssertTrue(musicNerdText.isHittable, "Music Nerd title should be accessible")
+        
+        let musicIcon = app.images["music.note"]
+        XCTAssertTrue(musicIcon.waitForExistence(timeout: 5.0), "Music note icon should be visible")
+    }
+    
+    @MainActor
+    func testBasicNavigationStructure() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--uitesting")
+        app.launch()
+        
+        XCTAssertTrue(app.windows.firstMatch.exists, "Main window should exist")
+        
+        let mainView = app.otherElements.firstMatch
+        XCTAssertTrue(mainView.exists, "Main view should be present")
+        
+        XCTAssertGreaterThan(app.children(matching: .any).count, 0, "App should have UI elements")
+        
+        let accessibilityElements = app.descendants(matching: .any).allElementsBoundByAccessibilityElement
+        XCTAssertGreaterThan(accessibilityElements.count, 0, "App should have accessible elements")
+        
+        // Test that key sections are present
+        let recentMatchesText = app.staticTexts["Recent Matches"]
+        XCTAssertTrue(recentMatchesText.waitForExistence(timeout: 5.0), "Recent Matches section should be present")
+        
+        let actionsText = app.staticTexts["Actions"]
+        XCTAssertTrue(actionsText.waitForExistence(timeout: 5.0), "Actions section should be present")
     }
 
     @MainActor
     func testLaunchPerformance() throws {
         // This measures how long it takes to launch your application.
         measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
+            let app = XCUIApplication()
+            app.launchArguments.append("--uitesting")
+            app.launch()
         }
     }
 }

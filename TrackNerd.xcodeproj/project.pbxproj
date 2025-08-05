@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 2FA74ED82E41884700575EFD /* CLAUDE.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2FA74E052E41833000575EFD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,8 @@
 		2FA74DF72E41832E00575EFD /* TrackNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E042E41833000575EFD /* TrackNerdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2FA74E972E41850100575EFD /* TrackNerdMVP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TrackNerdMVP.md; sourceTree = "<group>"; };
+		2FA74ED82E41884700575EFD /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +81,8 @@
 		2FA74DEE2E41832E00575EFD = {
 			isa = PBXGroup;
 			children = (
+				2FA74ED82E41884700575EFD /* CLAUDE.md */,
+				2FA74E962E4184F600575EFD /* plans */,
 				2FA74DF92E41832E00575EFD /* TrackNerd */,
 				2FA74E072E41833000575EFD /* TrackNerdTests */,
 				2FA74E112E41833000575EFD /* TrackNerdUITests */,
@@ -90,6 +98,14 @@
 				2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2FA74E962E4184F600575EFD /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				2FA74E972E41850100575EFD /* TrackNerdMVP.md */,
+			);
+			path = plans;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,6 +228,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +422,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -433,6 +451,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -454,7 +473,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xdjs.TrackNerdTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -473,7 +492,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xdjs.TrackNerdTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -491,6 +510,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xdjs.TrackNerdUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -508,6 +528,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xdjs.TrackNerdUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
