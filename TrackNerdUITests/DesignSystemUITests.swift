@@ -20,10 +20,14 @@ final class DesignSystemUITests: XCTestCase {
         // Test that the app launches with proper color contrast
         XCTAssertTrue(app.exists, "App should launch successfully")
         
-        // Test that text elements are visible (good contrast)
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Music Nerd title should be visible with proper contrast")
-        XCTAssertTrue(musicNerdText.isHittable, "Text should be accessible")
+        // Test that tab bar and navigation elements are visible (good contrast)
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5.0), "Tab bar should be visible with proper contrast")
+        
+        // Test that main text in listening view is visible
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Main title should be visible with proper contrast")
+        XCTAssertTrue(whatPlayingText.isHittable, "Text should be accessible")
     }
     
     func testBrandColorConsistency() throws {
@@ -43,9 +47,9 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertGreaterThan(textElements.count, 0, "Should have text elements with typography applied")
         
         // Test that key text elements are readable and accessible
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0))
-        XCTAssertTrue(musicNerdText.isHittable, "Main title should be accessible")
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
+        XCTAssertTrue(whatPlayingText.isHittable, "Main title should be accessible")
         
         let recentMatchesText = app.staticTexts["Recent Matches"]
         if recentMatchesText.exists {
@@ -55,11 +59,11 @@ final class DesignSystemUITests: XCTestCase {
     
     func testTextReadability() throws {
         // Test that text elements are properly sized and readable
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0))
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
         
         // Text should have reasonable frame dimensions
-        let frame = musicNerdText.frame
+        let frame = whatPlayingText.frame
         XCTAssertGreaterThan(frame.width, 0)
         XCTAssertGreaterThan(frame.height, 0)
     }
@@ -81,9 +85,9 @@ final class DesignSystemUITests: XCTestCase {
     
     func testImageElements() throws {
         // Test that image elements are properly displayed
-        let musicIcons = app.images["music.note"]
-        let firstIcon = musicIcons.firstMatch
-        XCTAssertTrue(firstIcon.waitForExistence(timeout: 5.0), "Music note icon should be present")
+        let waveformIcons = app.images["waveform.circle"]
+        let firstIcon = waveformIcons.firstMatch
+        XCTAssertTrue(firstIcon.waitForExistence(timeout: 5.0), "Waveform icon should be present")
         
         // Test first icon dimensions
         let imageFrame = firstIcon.frame
@@ -94,8 +98,8 @@ final class DesignSystemUITests: XCTestCase {
     // MARK: - Spacing and Layout Tests
     func testLayoutSpacing() throws {
         // Test that elements have proper spacing
-        let textElement = app.staticTexts["Music Nerd"]
-        let imageElements = app.images["music.note"]
+        let textElement = app.staticTexts["What's Playing?"]
+        let imageElements = app.images["waveform.circle"]
         
         XCTAssertTrue(textElement.waitForExistence(timeout: 5.0))
         XCTAssertTrue(imageElements.firstMatch.waitForExistence(timeout: 5.0))
@@ -113,11 +117,11 @@ final class DesignSystemUITests: XCTestCase {
         let mainWindow = app.windows.firstMatch
         XCTAssertTrue(mainWindow.waitForExistence(timeout: 5.0), "Main window should exist")
         
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0))
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
         
         let screenFrame = mainWindow.frame
-        let textFrame = musicNerdText.frame
+        let textFrame = whatPlayingText.frame
         
         // Content should not touch screen edges (basic margin test)
         XCTAssertGreaterThan(textFrame.minX, 0, "Text should have left margin")
@@ -128,11 +132,11 @@ final class DesignSystemUITests: XCTestCase {
     // MARK: - Accessibility Tests
     func testVoiceOverSupport() throws {
         // Test that elements support VoiceOver
-        let textElement = app.staticTexts["Music Nerd"]
+        let textElement = app.staticTexts["What's Playing?"]
         XCTAssertTrue(textElement.waitForExistence(timeout: 5.0))
         XCTAssertTrue(textElement.isHittable, "Text should be accessible to VoiceOver")
         
-        let imageElements = app.images["music.note"]
+        let imageElements = app.images["waveform.circle"]
         let firstImage = imageElements.firstMatch
         XCTAssertTrue(firstImage.waitForExistence(timeout: 5.0))
         // Note: SF Symbol images in ScrollViews may not always be hittable in UI tests
@@ -160,9 +164,9 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(app.exists)
         
         // Content should still be visible and properly laid out
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Content should be visible in portrait")
-        XCTAssertTrue(musicNerdText.isHittable, "Content should be accessible in portrait")
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Content should be visible in portrait")
+        XCTAssertTrue(whatPlayingText.isHittable, "Content should be accessible in portrait")
     }
     
     func testLandscapeLayout() throws {
@@ -175,9 +179,9 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(app.exists)
         
         // Content should still be visible and properly laid out
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Content should be visible in landscape")
-        XCTAssertTrue(musicNerdText.isHittable, "Content should be accessible in landscape")
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Content should be visible in landscape")
+        XCTAssertTrue(whatPlayingText.isHittable, "Content should be accessible in landscape")
         
         // Reset orientation
         XCUIDevice.shared.orientation = .portrait
@@ -189,8 +193,8 @@ final class DesignSystemUITests: XCTestCase {
         let startTime = Date()
         
         // Perform basic interactions
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 2.0), "UI should load quickly")
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 2.0), "UI should load quickly")
         
         let loadTime = Date().timeIntervalSince(startTime)
         XCTAssertLessThan(loadTime, 3.0, "UI should load within 3 seconds")
@@ -216,8 +220,8 @@ final class DesignSystemUITests: XCTestCase {
         // For now, test that the app continues to work regardless of system appearance
         XCTAssertTrue(app.exists, "App should work in all appearance modes")
         
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Text should be visible in all appearance modes")
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Text should be visible in all appearance modes")
     }
     
     // MARK: - Visual Regression Prevention
@@ -226,15 +230,15 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(app.exists)
         
         // Key elements should be present
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        let musicImages = app.images["music.note"]
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let waveformImages = app.images["waveform.circle"]
         
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Main text should be present")
-        XCTAssertTrue(musicImages.firstMatch.waitForExistence(timeout: 5.0), "Main image should be present")
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Main text should be present")
+        XCTAssertTrue(waveformImages.firstMatch.waitForExistence(timeout: 5.0), "Main image should be present")
         
         // Elements should be in expected positions relative to each other
-        let textFrame = musicNerdText.frame
-        let imageFrame = musicImages.firstMatch.frame
+        let textFrame = whatPlayingText.frame
+        let imageFrame = waveformImages.firstMatch.frame
         
         // Image should be above text in the current layout
         XCTAssertLessThan(imageFrame.midY, textFrame.midY, "Image should be above text")
@@ -242,17 +246,17 @@ final class DesignSystemUITests: XCTestCase {
     
     func testLayoutConsistency() throws {
         // Test that layout is consistent across app launches
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0))
-        let initialFrame = musicNerdText.frame
+        let whatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
+        let initialFrame = whatPlayingText.frame
         
         // Terminate and relaunch app
         app.terminate()
         app.launch()
         
-        let relaunchtMusicText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(relaunchtMusicText.waitForExistence(timeout: 5.0))
-        let relaunchtFrame = relaunchtMusicText.frame
+        let relaunchtWhatPlayingText = app.staticTexts["What's Playing?"]
+        XCTAssertTrue(relaunchtWhatPlayingText.waitForExistence(timeout: 5.0))
+        let relaunchtFrame = relaunchtWhatPlayingText.frame
         
         // Frame should be reasonably similar (allowing for minor differences)
         XCTAssertEqual(initialFrame.width, relaunchtFrame.width, accuracy: 5.0)
@@ -262,15 +266,15 @@ final class DesignSystemUITests: XCTestCase {
     // MARK: - Design System Component Tests
     func testButtonElements() throws {
         // Test that buttons are present and accessible
-        let startListeningButton = app.buttons["Start Listening"]
-        XCTAssertTrue(startListeningButton.waitForExistence(timeout: 5.0), "Start Listening button should be present")
-        XCTAssertTrue(startListeningButton.isHittable, "Button should be tappable")
+        let listenButton = app.buttons.matching(identifier: "listen-button").firstMatch
+        XCTAssertTrue(listenButton.waitForExistence(timeout: 5.0), "Listen button should be present")
+        XCTAssertTrue(listenButton.isHittable, "Button should be tappable")
         
-        let historyButton = app.buttons["History"]
-        XCTAssertTrue(historyButton.waitForExistence(timeout: 5.0), "History button should be present")
+        let historyTab = app.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 5.0), "History tab should be present")
         
-        let settingsButton = app.buttons["Settings"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 5.0), "Settings button should be present")
+        let settingsTab = app.buttons["Settings"]
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5.0), "Settings tab should be present")
     }
     
     func testCardElements() throws {
@@ -288,24 +292,21 @@ final class DesignSystemUITests: XCTestCase {
     
     func testInteractiveElements() throws {
         // Test basic button interaction
-        let startListeningButton = app.buttons["Start Listening"]
-        XCTAssertTrue(startListeningButton.waitForExistence(timeout: 5.0), "Start Listening button should exist")
-        XCTAssertTrue(startListeningButton.isHittable, "Start Listening button should be tappable")
-        
-        // Verify the button text initially
-        XCTAssertTrue(startListeningButton.label.contains("Start Listening"), "Button should have correct initial label")
+        let listenButton = app.buttons.matching(identifier: "listen-button").firstMatch
+        XCTAssertTrue(listenButton.waitForExistence(timeout: 5.0), "Listen button should exist")
+        XCTAssertTrue(listenButton.isHittable, "Listen button should be tappable")
         
         // Test button tap - this should work regardless of loading state behavior
-        startListeningButton.tap()
+        listenButton.tap()
         
         // After tapping, button should still exist and be tappable
-        XCTAssertTrue(startListeningButton.exists, "Button should still exist after tap")
+        XCTAssertTrue(listenButton.exists, "Button should still exist after tap")
         
         // Test second tap to ensure button remains functional
-        startListeningButton.tap()
+        listenButton.tap()
         
         // Button should still be present and functional
-        XCTAssertTrue(startListeningButton.exists, "Button should remain functional after multiple taps")
-        XCTAssertTrue(startListeningButton.isHittable, "Button should remain tappable")
+        XCTAssertTrue(listenButton.exists, "Button should remain functional after multiple taps")
+        XCTAssertTrue(listenButton.isHittable, "Button should remain tappable")
     }
 }

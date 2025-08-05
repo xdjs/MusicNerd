@@ -8,148 +8,49 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var isLoading = false
+    @State private var selectedTab: Tab = .listen
+    
+    enum Tab: String, CaseIterable {
+        case listen = "Listen"
+        case history = "History"
+        case settings = "Settings"
+        
+        var systemImage: String {
+            switch self {
+            case .listen:
+                return "waveform"
+            case .history:
+                return "clock"
+            case .settings:
+                return "gear"
+            }
+        }
+    }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: CGFloat.MusicNerd.lg) {
-                // Header Section
-                VStack(spacing: CGFloat.MusicNerd.md) {
-                    Image(systemName: "music.note")
-                        .font(.system(size: 60))
-                        .foregroundColor(Color.MusicNerd.primary)
-                    
-                    Text("Music Nerd")
-                        .musicNerdStyle(.displayLarge())
-                    
-                    Text("Discover the stories behind your music")
-                        .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
-                        .multilineTextAlignment(.center)
+        TabView(selection: $selectedTab) {
+            ListeningView()
+                .tabItem {
+                    Label(Tab.listen.rawValue, systemImage: Tab.listen.systemImage)
                 }
-                .padding(.top, CGFloat.MusicNerd.xl)
-                
-                // Example Cards Section
-                VStack(spacing: CGFloat.MusicNerd.md) {
-                    Text("Recent Matches")
-                        .musicNerdStyle(.headlineLarge())
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    // Sample Song Match Cards
-                    SongMatchCard(
-                        match: SongMatch(
-                            title: "Bohemian Rhapsody",
-                            artist: "Queen",
-                            enrichmentData: EnrichmentData(
-                                artistBio: "British rock band formed in London in 1970"
-                            )
-                        )
-                    ) {
-                        // Handle tap
-                    }
-                    
-                    SongMatchCard(
-                        match: SongMatch(
-                            title: "Hotel California",
-                            artist: "Eagles"
-                        )
-                    ) {
-                        // Handle tap
-                    }
-                    
-                    LoadingCard()
+                .tag(Tab.listen)
+                .accessibilityIdentifier("listen-tab")
+            
+            HistoryView()
+                .tabItem {
+                    Label(Tab.history.rawValue, systemImage: Tab.history.systemImage)
                 }
-                
-                // Example Buttons Section
-                VStack(spacing: CGFloat.MusicNerd.md) {
-                    Text("Actions")
-                        .musicNerdStyle(.headlineLarge())
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    MusicNerdButton(
-                        title: "Start Listening",
-                        action: {
-                            isLoading.toggle()
-                        },
-                        style: .primary,
-                        size: .large,
-                        isLoading: isLoading,
-                        icon: "waveform"
-                    )
-                    
-                    HStack(spacing: CGFloat.MusicNerd.sm) {
-                        MusicNerdButton(
-                            title: "History",
-                            action: {},
-                            style: .secondary,
-                            size: .medium,
-                            icon: "clock"
-                        )
-                        
-                        MusicNerdButton(
-                            title: "Settings",
-                            action: {},
-                            style: .outline,
-                            size: .medium,
-                            icon: "gear"
-                        )
-                    }
+                .tag(Tab.history)
+                .accessibilityIdentifier("history-tab")
+            
+            SettingsView()
+                .tabItem {
+                    Label(Tab.settings.rawValue, systemImage: Tab.settings.systemImage)
                 }
-                
-                // Example Loading States Section
-                if isLoading {
-                    VStack(spacing: CGFloat.MusicNerd.md) {
-                        Text("Listening...")
-                            .musicNerdStyle(.headlineMedium())
-                        
-                        LoadingStateView(
-                            message: "Identifying music...",
-                            loadingType: .waveform
-                        )
-                        .frame(height: 100)
-                    }
-                    .transition(.opacity)
-                }
-                
-                // Example Card Styles
-                VStack(spacing: CGFloat.MusicNerd.md) {
-                    Text("Card Examples")
-                        .musicNerdStyle(.headlineLarge())
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    MusicNerdCard(style: .default) {
-                        VStack(alignment: .leading, spacing: CGFloat.MusicNerd.sm) {
-                            Text("Default Card")
-                                .musicNerdStyle(.titleMedium())
-                            Text("This is a default card with subtle shadow")
-                                .musicNerdStyle(.bodyMedium(color: Color.MusicNerd.textSecondary))
-                        }
-                    }
-                    
-                    MusicNerdCard(style: .elevated) {
-                        VStack(alignment: .leading, spacing: CGFloat.MusicNerd.sm) {
-                            Text("Elevated Card")
-                                .musicNerdStyle(.titleMedium())
-                            Text("This card has more pronounced shadow")
-                                .musicNerdStyle(.bodyMedium(color: Color.MusicNerd.textSecondary))
-                        }
-                    }
-                    
-                    MusicNerdCard(style: .outline) {
-                        VStack(alignment: .leading, spacing: CGFloat.MusicNerd.sm) {
-                            Text("Outline Card")
-                                .musicNerdStyle(.titleMedium())
-                            Text("This card has a pink border")
-                                .musicNerdStyle(.bodyMedium(color: Color.MusicNerd.textSecondary))
-                        }
-                    }
-                }
-                
-                Spacer(minLength: CGFloat.MusicNerd.xl)
-            }
-            .padding(CGFloat.MusicNerd.screenMargin)
+                .tag(Tab.settings)
+                .accessibilityIdentifier("settings-tab")
         }
-        .background(Color.MusicNerd.background)
-        .animation(.easeInOut(duration: 0.3), value: isLoading)
+        .accentColor(Color.MusicNerd.primary)
     }
 }
 

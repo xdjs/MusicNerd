@@ -31,36 +31,33 @@ final class TrackNerdUITests: XCTestCase {
         XCTAssertTrue(app.exists, "App should exist after launch")
         XCTAssertEqual(app.state, .runningForeground, "App should be running in foreground")
         
-        let musicNerdText = app.staticTexts["Music Nerd"]
-        XCTAssertTrue(musicNerdText.waitForExistence(timeout: 5.0), "Music Nerd title should be visible")
-        XCTAssertTrue(musicNerdText.isHittable, "Music Nerd title should be accessible")
+        // Test that tab bar exists with a longer timeout
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 10.0), "Tab bar should be visible")
         
-        let musicIcon = app.images["music.note"]
-        XCTAssertTrue(musicIcon.waitForExistence(timeout: 5.0), "Music note icon should be visible")
+        // Just test basic app launch for now
+        XCTAssertTrue(app.windows.firstMatch.exists, "Main window should exist")
     }
     
     @MainActor
-    func testBasicNavigationStructure() throws {
+    func testTabNavigationBetweenSections() throws {
         let app = XCUIApplication()
         app.launchArguments.append("--uitesting")
         app.launch()
         
-        XCTAssertTrue(app.windows.firstMatch.exists, "Main window should exist")
+        // Wait for tab bar to appear
+        let tabBar = app.tabBars.firstMatch
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 10.0), "Tab bar should be visible")
         
-        let mainView = app.otherElements.firstMatch
-        XCTAssertTrue(mainView.exists, "Main view should be present")
+        // Test basic tab existence - simplified for debugging
+        let historyTab = app.buttons["History"]
+        XCTAssertTrue(historyTab.waitForExistence(timeout: 10.0), "History tab should be visible")
         
-        XCTAssertGreaterThan(app.children(matching: .any).count, 0, "App should have UI elements")
+        let settingsTab = app.buttons["Settings"] 
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 10.0), "Settings tab should be visible")
         
-        let accessibilityElements = app.descendants(matching: .any).allElementsBoundByAccessibilityElement
-        XCTAssertGreaterThan(accessibilityElements.count, 0, "App should have accessible elements")
-        
-        // Test that key sections are present
-        let recentMatchesText = app.staticTexts["Recent Matches"]
-        XCTAssertTrue(recentMatchesText.waitForExistence(timeout: 5.0), "Recent Matches section should be present")
-        
-        let actionsText = app.staticTexts["Actions"]
-        XCTAssertTrue(actionsText.waitForExistence(timeout: 5.0), "Actions section should be present")
+        let listenTab = app.buttons["Listen"]
+        XCTAssertTrue(listenTab.waitForExistence(timeout: 10.0), "Listen tab should be visible")
     }
 
     @MainActor

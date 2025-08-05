@@ -1,0 +1,111 @@
+//
+//  ListeningView.swift
+//  TrackNerd
+//
+//  Created by Carl Tydingco on 8/5/25.
+//
+
+import SwiftUI
+
+struct ListeningView: View {
+    @State private var isListening = false
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: CGFloat.MusicNerd.lg) {
+                    // Header Section
+                    VStack(spacing: CGFloat.MusicNerd.md) {
+                        Image(systemName: "waveform.circle")
+                            .font(.system(size: 80))
+                            .foregroundColor(Color.MusicNerd.primary)
+                        
+                        Text("What's Playing?")
+                            .musicNerdStyle(.displayLarge())
+                        
+                        Text("Tap to identify any song around you")
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, CGFloat.MusicNerd.xl)
+                    
+                    // Main Listen Button
+                    VStack(spacing: CGFloat.MusicNerd.lg) {
+                        MusicNerdButton(
+                            title: isListening ? "Listening..." : "Start Listening",
+                            action: {
+                                isListening.toggle()
+                                // TODO: Integrate with ShazamKit
+                            },
+                            style: .primary,
+                            size: .large,
+                            isLoading: isListening,
+                            icon: isListening ? "waveform" : "mic"
+                        )
+                        .accessibilityIdentifier("listen-button")
+                        
+                        if isListening {
+                            LoadingStateView(
+                                message: "Listening for music...",
+                                loadingType: .waveform
+                            )
+                            .frame(height: 120)
+                            .transition(.opacity)
+                        }
+                    }
+                    
+                    // Recent Matches Section
+                    VStack(spacing: CGFloat.MusicNerd.md) {
+                        HStack {
+                            Text("Recent Matches")
+                                .musicNerdStyle(.headlineLarge())
+                            
+                            Spacer()
+                            
+                            Button("See All") {
+                                // TODO: Navigate to history
+                            }
+                            .foregroundColor(Color.MusicNerd.primary)
+                            .accessibilityIdentifier("see-all-button")
+                        }
+                        
+                        // Sample matches (will be replaced with real data)
+                        SongMatchCard(
+                            match: SongMatch(
+                                title: "Bohemian Rhapsody",
+                                artist: "Queen",
+                                enrichmentData: EnrichmentData(
+                                    artistBio: "British rock band formed in London in 1970"
+                                )
+                            )
+                        ) {
+                            // TODO: Navigate to match detail
+                        }
+                        .accessibilityIdentifier("recent-match-0")
+                        
+                        SongMatchCard(
+                            match: SongMatch(
+                                title: "Hotel California",
+                                artist: "Eagles"
+                            )
+                        ) {
+                            // TODO: Navigate to match detail
+                        }
+                        .accessibilityIdentifier("recent-match-1")
+                    }
+                    
+                    Spacer(minLength: CGFloat.MusicNerd.xl)
+                }
+                .padding(CGFloat.MusicNerd.screenMargin)
+            }
+            .background(Color.MusicNerd.background)
+            .navigationTitle("Listen")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .animation(.easeInOut(duration: 0.3), value: isListening)
+    }
+}
+
+#Preview {
+    ListeningView()
+}
