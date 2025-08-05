@@ -63,30 +63,7 @@ Build an iOS app under the Music Nerd brand that:
 
 ---
 
-### 🔌 Phase 3: Backend Services & Integration
-- [ ] **OpenAI Proxy Server**:
-  - [ ] Create `/enrich` endpoint (title + artist → enrichment)
-  - [ ] Design GPT prompts for artist bios, song trivia, related content
-  - [ ] Add response caching and rate limiting
-  - [ ] Deploy and test endpoint
-- [ ] **iOS Network Layer**:
-  - [ ] `APIService` with proper error handling
-  - [ ] `OpenAIService` to call enrichment endpoint
-  - [ ] Network reachability monitoring
-  - [ ] Retry logic and timeout handling
-- [ ] **Unit Testing:**
-  - [ ] Test API service request/response parsing
-  - [ ] Test network error handling and retry logic
-  - [ ] Test reachability monitoring
-  - [ ] Mock OpenAI service responses for testing
-- [ ] **UI Testing:**
-  - [ ] Test network error states in UI
-  - [ ] Test loading indicators during API calls
-  - [ ] Test offline mode behavior
-
----
-
-### 🎙 Phase 4: Music Recognition Core
+### 🎙 Phase 3: Music Recognition Core
 - [ ] **Permissions & Setup**:
   - [ ] Request microphone permission with proper messaging
   - [ ] Add Info.plist descriptions for privacy
@@ -110,6 +87,29 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Test listening state animations
   - [ ] Test recognition success/failure UI states
   - [ ] Test results display with sample data
+
+---
+
+### 🔌 Phase 4: Backend Services & Integration
+- [ ] **OpenAI Proxy Server**:
+  - [ ] Create `/enrich` endpoint (title + artist → enrichment)
+  - [ ] Design GPT prompts for artist bios, song trivia, related content
+  - [ ] Add response caching and rate limiting
+  - [ ] Deploy and test endpoint
+- [ ] **iOS Network Layer**:
+  - [ ] `APIService` with proper error handling
+  - [ ] `OpenAIService` to call enrichment endpoint
+  - [ ] Network reachability monitoring
+  - [ ] Retry logic and timeout handling
+- [ ] **Unit Testing:**
+  - [ ] Test API service request/response parsing
+  - [ ] Test network error handling and retry logic
+  - [ ] Test reachability monitoring
+  - [ ] Mock OpenAI service responses for testing
+- [ ] **UI Testing:**
+  - [ ] Test network error states in UI
+  - [ ] Test loading indicators during API calls
+  - [ ] Test offline mode behavior
 
 ---
 
@@ -164,35 +164,7 @@ Build an iOS app under the Music Nerd brand that:
 
 ---
 
-### 🧪 Phase 7: Comprehensive Testing & Quality Assurance
-- [ ] **Unit Testing Consolidation**:
-  - [ ] Achieve 80%+ code coverage across all services
-  - [ ] Comprehensive service layer tests (ShazamKit, OpenAI, Storage)
-  - [ ] Model validation and utility function tests
-  - [ ] Mock implementations for all external dependencies
-  - [ ] Edge case and error condition testing
-- [ ] **UI Testing Consolidation**:
-  - [ ] Complete user journey automation (recognition → enrichment → history)
-  - [ ] Cross-device UI testing (iPhone, iPad, different sizes)
-  - [ ] Accessibility testing with VoiceOver
-  - [ ] Performance UI testing (smooth scrolling, animations)
-- [ ] **Integration Testing**:
-  - [ ] End-to-end recognition flow with real audio
-  - [ ] Network layer integration with staging/production APIs
-  - [ ] Data persistence integration across app sessions
-- [ ] **Performance & Stress Testing**:
-  - [ ] Memory usage during extended audio capture
-  - [ ] Battery impact assessment over time
-  - [ ] Large dataset handling (1000+ matches)
-  - [ ] Concurrent recognition attempts
-- [ ] **Security & Privacy Testing**:
-  - [ ] Audio data handling and disposal
-  - [ ] Network request security validation
-  - [ ] User data privacy compliance
-
----
-
-### 🚀 Phase 8: Polish & App Store Preparation  
+### 🚀 Phase 7: Polish & App Store Preparation
 - [ ] **UI Polish**:
   - [ ] Responsive design for all device sizes
   - [ ] Dark mode support
@@ -233,12 +205,12 @@ Build an iOS app under the Music Nerd brand that:
   - ✅ All 27 UI tests passing after navigation update
   - ✅ Unit tests fixed and passing
 
-**Currently:** Ready to begin Phase 3: Backend Services & Integration
+**Currently:** Ready to begin Phase 3: Music Recognition Core
 
 **Immediate Priorities:**
-1. Begin Phase 3: Backend Services & Integration
-2. Create OpenAI proxy server with `/enrich` endpoint
-3. Implement iOS network layer (`APIService`, `OpenAIService`)
+1. Begin Phase 3: Music Recognition Core
+2. Request microphone permissions and add privacy descriptions
+3. Implement ShazamKit integration with `ShazamService`
 
 **Development Philosophy:**
 - Build solid architectural foundation before adding features
