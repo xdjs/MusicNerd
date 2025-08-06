@@ -13,6 +13,7 @@ struct SettingsView: View {
     @State private var saveToAppleMusic = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var showingSampleDurationPicker = false
+    @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     
     private let settings = AppSettings.shared
     
@@ -85,7 +86,7 @@ struct SettingsView: View {
                         
                         Spacer()
                         
-                        Button(AppSettings.formatDuration(settings.sampleDuration)) {
+                        Button(AppSettings.formatDuration(sampleDuration)) {
                             showingSampleDurationPicker = true
                         }
                         .foregroundColor(Color.MusicNerd.primary)
@@ -209,6 +210,21 @@ struct SettingsView: View {
                         hasSeenOnboarding = false
                     }
                     .accessibilityIdentifier("show-onboarding-button")
+                    
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                            .foregroundColor(Color.MusicNerd.primary)
+                            .frame(width: 24)
+                        
+                        Text("Reset Settings to Defaults")
+                            .musicNerdStyle(.bodyLarge())
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        settings.resetToDefaults()
+                        sampleDuration = AppSettings.shared.sampleDuration
+                    }
+                    .accessibilityIdentifier("reset-settings-button")
                 } header: {
                     Text("Debug")
                         .musicNerdStyle(.titleSmall(color: Color.MusicNerd.textSecondary))
@@ -221,9 +237,10 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showingSampleDurationPicker) {
                 SampleDurationPickerView(
-                    selectedDuration: settings.sampleDuration,
+                    selectedDuration: sampleDuration,
                     onSelection: { duration in
                         settings.sampleDuration = duration
+                        sampleDuration = duration
                         showingSampleDurationPicker = false
                     }
                 )

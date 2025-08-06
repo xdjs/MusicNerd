@@ -23,6 +23,12 @@ class AppSettings {
     }
     
     private init() {}
+    
+    // MARK: - Debug Methods
+    
+    func resetToDefaults() {
+        userDefaults.removeObject(forKey: Keys.sampleDuration)
+    }
 }
 
 // MARK: - Sample Duration Options
