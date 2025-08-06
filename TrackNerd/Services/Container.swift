@@ -30,6 +30,7 @@ final class Container: ObservableObject {
 protocol ServiceContainer {
     var shazamService: ShazamServiceProtocol { get }
     var openAIService: OpenAIServiceProtocol { get }
+    var musicNerdService: MusicNerdServiceProtocol { get }
     var storageService: StorageServiceProtocol { get }
     var permissionService: PermissionServiceProtocol { get }
 }
@@ -40,6 +41,7 @@ final class DefaultServiceContainer: ServiceContainer {
     
     lazy var shazamService: ShazamServiceProtocol = ShazamService()
     lazy var openAIService: OpenAIServiceProtocol = OpenAIService()
+    lazy var musicNerdService: MusicNerdServiceProtocol = MusicNerdService()
     lazy var storageService: StorageServiceProtocol = StorageService(
         modelContext: Container.shared.modelContainer.mainContext
     )
