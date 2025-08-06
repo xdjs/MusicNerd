@@ -6,11 +6,36 @@ final class SongMatch {
     var id: UUID
     var title: String
     var artist: String
-    var artworkURL: String?
+    var album: String?
+    var albumArtURL: String?
     var appleMusicID: String?
+    var shazamID: String?
     var matchedAt: Date
     var enrichmentData: EnrichmentData?
     
+    init(
+        id: UUID = UUID(),
+        title: String,
+        artist: String,
+        album: String? = nil,
+        albumArtURL: String? = nil,
+        appleMusicID: String? = nil,
+        shazamID: String? = nil,
+        matchedAt: Date = Date(),
+        enrichmentData: EnrichmentData? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.artist = artist
+        self.album = album
+        self.albumArtURL = albumArtURL
+        self.appleMusicID = appleMusicID
+        self.shazamID = shazamID
+        self.matchedAt = matchedAt
+        self.enrichmentData = enrichmentData
+    }
+    
+    // Legacy init for backward compatibility
     init(
         title: String,
         artist: String,
@@ -21,8 +46,10 @@ final class SongMatch {
         self.id = UUID()
         self.title = title
         self.artist = artist
-        self.artworkURL = artworkURL
+        self.album = nil
+        self.albumArtURL = artworkURL
         self.appleMusicID = appleMusicID
+        self.shazamID = nil
         self.matchedAt = Date()
         self.enrichmentData = enrichmentData
     }

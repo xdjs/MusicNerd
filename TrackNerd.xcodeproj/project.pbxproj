@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 2FA74ED82E41884700575EFD /* CLAUDE.md */; };
+		2FF7CDAA2E42BB89005AA02A /* Unit Tests Only.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,11 +34,25 @@
 		2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E972E41850100575EFD /* TrackNerdMVP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TrackNerdMVP.md; sourceTree = "<group>"; };
 		2FA74ED82E41884700575EFD /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
+		2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Unit Tests Only.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2FF7CD9E2E42AA69005AA02A /* Exceptions for "TrackNerd" folder in "TrackNerd" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2FA74DF62E41832E00575EFD /* TrackNerd */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2FA74DF92E41832E00575EFD /* TrackNerd */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2FF7CD9E2E42AA69005AA02A /* Exceptions for "TrackNerd" folder in "TrackNerd" target */,
+			);
 			path = TrackNerd;
 			sourceTree = "<group>";
 		};
@@ -81,6 +96,7 @@
 		2FA74DEE2E41832E00575EFD = {
 			isa = PBXGroup;
 			children = (
+				2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */,
 				2FA74ED82E41884700575EFD /* CLAUDE.md */,
 				2FA74E962E4184F600575EFD /* plans */,
 				2FA74DF92E41832E00575EFD /* TrackNerd */,
@@ -228,6 +244,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2FF7CDAA2E42BB89005AA02A /* Unit Tests Only.xctestplan in Resources */,
 				2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -417,6 +434,9 @@
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrackNerd/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Track Nerd";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -446,6 +466,9 @@
 				DEVELOPMENT_TEAM = H74QAT4L98;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TrackNerd/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Track Nerd";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -6,7 +6,7 @@ TrackNerd is an iOS app that combines ShazamKit music recognition with OpenAI-po
 ## Architecture
 - **Language**: Swift
 - **Framework**: SwiftUI
-- **Platform**: iOS 17.0+
+- **Platform**: iOS 18.2+
 - **Project Structure**:
   - `/Views` - SwiftUI view components
   - `/ViewModels` - MVVM view models
@@ -81,7 +81,7 @@ xcodebuild test \
 - UI tests: `TrackNerdUITests/`
 
 ## Development Status
-Currently in Phase 1 (Project Setup) - basic SwiftUI project with branding assets configured. Next phase involves implementing ShazamKit integration for music recognition.
+Currently beginning Phase 3 (Music Recognition Core) - Phases 1 (Foundation & Architecture) and 2 (UI/UX Foundation) are complete. Current phase involves implementing ShazamKit integration for real-time music recognition.
 
 ## Key Files
 - `TrackNerdApp.swift` - Main app entry point
@@ -89,8 +89,13 @@ Currently in Phase 1 (Project Setup) - basic SwiftUI project with branding asset
 - `plans/TrackNerdMVP.md` - Detailed project roadmap and phase breakdown
 
 ## Requirements
-- iOS 17.0+
+- iOS 18.2+
 - Microphone permissions (for ShazamKit)
 - Network access (for OpenAI enrichment)
 - ShazamKit framework
 - Planned: OpenAI API integration via proxy server
+
+## Development Memories
+- Do not automatically run UI tests
+- Before committing files, update the project plan, if there is one, and if necessary mark any tasks completed.
+- Do not commit unless instructed to

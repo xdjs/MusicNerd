@@ -13,7 +13,7 @@ final class SongMatchTests: XCTestCase {
         
         XCTAssertEqual(match.title, "Bohemian Rhapsody")
         XCTAssertEqual(match.artist, "Queen")
-        XCTAssertEqual(match.artworkURL, "https://example.com/artwork.jpg")
+        XCTAssertEqual(match.albumArtURL, "https://example.com/artwork.jpg")
         XCTAssertEqual(match.appleMusicID, "12345")
         XCTAssertNotNil(match.id)
         XCTAssertNil(match.enrichmentData)
