@@ -47,16 +47,24 @@ class MusicNerdService: MusicNerdServiceProtocol {
             let jsonData = try JSONEncoder().encode(requestBody)
             request.httpBody = jsonData
             
-            logWithTimestamp("Searching for artist: '\(name)' at \(url)")
+            logWithTimestamp("=== SEARCH ARTIST REQUEST ===")
+            logWithTimestamp("URL: \(url)")
+            logWithTimestamp("Method: POST")
+            logWithTimestamp("Headers: \(request.allHTTPHeaderFields ?? [:])")
+            logWithTimestamp("Body: \(String(data: jsonData, encoding: .utf8) ?? "Unable to decode body")")
             
             let (data, response) = try await session.data(for: request)
+            
+            logWithTimestamp("=== SEARCH ARTIST RESPONSE ===")
+            logWithTimestamp("Raw response data: \(String(data: data, encoding: .utf8) ?? "Unable to decode response")")
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 logWithTimestamp("Invalid response type")
                 return .failure(.networkError(.invalidResponse))
             }
             
-            logWithTimestamp("Search response status: \(httpResponse.statusCode)")
+            logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
+            logWithTimestamp("Response Headers: \(httpResponse.allHeaderFields)")
             
             if httpResponse.statusCode == 200 {
                 let searchResponse = try decoder.decode(SearchArtistsResponse.self, from: data)
@@ -74,12 +82,16 @@ class MusicNerdService: MusicNerdServiceProtocol {
                 
                 return .success(selectedArtist)
             } else {
+                logWithTimestamp("=== SEARCH ARTIST ERROR ===")
+                logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
+                logWithTimestamp("Error response data: \(String(data: data, encoding: .utf8) ?? "Unable to decode error response")")
+                
                 // Try to parse error response
                 if let errorResponse = try? decoder.decode(MusicNerdAPIError.self, from: data) {
-                    logWithTimestamp("API error: \(errorResponse.error)")
+                    logWithTimestamp("Parsed API error: \(errorResponse.error)")
                     return .failure(.musicNerdError(.apiError(errorResponse.error)))
                 } else {
-                    logWithTimestamp("HTTP error: \(httpResponse.statusCode)")
+                    logWithTimestamp("Could not parse error response, treating as HTTP error")
                     return .failure(.networkError(.serverError(httpResponse.statusCode)))
                 }
             }
@@ -105,16 +117,23 @@ class MusicNerdService: MusicNerdServiceProtocol {
         request.httpMethod = "GET"
         
         do {
-            logWithTimestamp("Fetching bio for artist ID: \(artistId)")
+            logWithTimestamp("=== GET ARTIST BIO REQUEST ===")
+            logWithTimestamp("URL: \(url)")
+            logWithTimestamp("Method: GET")
+            logWithTimestamp("Artist ID: \(artistId)")
             
             let (data, response) = try await session.data(for: request)
+            
+            logWithTimestamp("=== GET ARTIST BIO RESPONSE ===")
+            logWithTimestamp("Raw response data: \(String(data: data, encoding: .utf8) ?? "Unable to decode response")")
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 logWithTimestamp("Invalid response type for bio request")
                 return .failure(.networkError(.invalidResponse))
             }
             
-            logWithTimestamp("Bio response status: \(httpResponse.statusCode)")
+            logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
+            logWithTimestamp("Response Headers: \(httpResponse.allHeaderFields)")
             
             if httpResponse.statusCode == 200 {
                 let bioResponse = try decoder.decode(ArtistBioResponse.self, from: data)
@@ -127,11 +146,15 @@ class MusicNerdService: MusicNerdServiceProtocol {
                     return .failure(.musicNerdError(.noBioAvailable))
                 }
             } else {
+                logWithTimestamp("=== GET ARTIST BIO ERROR ===")
+                logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
+                logWithTimestamp("Error response data: \(String(data: data, encoding: .utf8) ?? "Unable to decode error response")")
+                
                 if let errorResponse = try? decoder.decode(MusicNerdAPIError.self, from: data) {
-                    logWithTimestamp("Bio API error: \(errorResponse.error)")
+                    logWithTimestamp("Parsed Bio API error: \(errorResponse.error)")
                     return .failure(.musicNerdError(.apiError(errorResponse.error)))
                 } else {
-                    logWithTimestamp("Bio HTTP error: \(httpResponse.statusCode)")
+                    logWithTimestamp("Could not parse bio error response, treating as HTTP error")
                     return .failure(.networkError(.serverError(httpResponse.statusCode)))
                 }
             }
@@ -157,16 +180,24 @@ class MusicNerdService: MusicNerdServiceProtocol {
         request.httpMethod = "GET"
         
         do {
-            logWithTimestamp("Fetching \(type.rawValue) fun fact for artist ID: \(artistId)")
+            logWithTimestamp("=== GET FUN FACT REQUEST ===")
+            logWithTimestamp("URL: \(url)")
+            logWithTimestamp("Method: GET")
+            logWithTimestamp("Artist ID: \(artistId)")
+            logWithTimestamp("Fun Fact Type: \(type.rawValue)")
             
             let (data, response) = try await session.data(for: request)
+            
+            logWithTimestamp("=== GET FUN FACT RESPONSE ===")
+            logWithTimestamp("Raw response data: \(String(data: data, encoding: .utf8) ?? "Unable to decode response")")
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 logWithTimestamp("Invalid response type for fun facts request")
                 return .failure(.networkError(.invalidResponse))
             }
             
-            logWithTimestamp("Fun facts response status: \(httpResponse.statusCode)")
+            logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
+            logWithTimestamp("Response Headers: \(httpResponse.allHeaderFields)")
             
             if httpResponse.statusCode == 200 {
                 let funFactsResponse = try decoder.decode(FunFactsResponse.self, from: data)
@@ -179,11 +210,15 @@ class MusicNerdService: MusicNerdServiceProtocol {
                     return .failure(.musicNerdError(.noFunFactAvailable))
                 }
             } else {
+                logWithTimestamp("=== GET FUN FACT ERROR ===")
+                logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
+                logWithTimestamp("Error response data: \(String(data: data, encoding: .utf8) ?? "Unable to decode error response")")
+                
                 if let errorResponse = try? decoder.decode(MusicNerdAPIError.self, from: data) {
-                    logWithTimestamp("Fun facts API error: \(errorResponse.error)")
+                    logWithTimestamp("Parsed Fun Facts API error: \(errorResponse.error)")
                     return .failure(.musicNerdError(.apiError(errorResponse.error)))
                 } else {
-                    logWithTimestamp("Fun facts HTTP error: \(httpResponse.statusCode)")
+                    logWithTimestamp("Could not parse fun facts error response, treating as HTTP error")
                     return .failure(.networkError(.serverError(httpResponse.statusCode)))
                 }
             }
