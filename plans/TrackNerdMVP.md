@@ -86,7 +86,7 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Sample duration picker UI in Settings
   - [x] UserDefaults-based settings persistence
   - [x] User-friendly duration descriptions and recommendations
-  - [ ] Debug toggle to display sample duration in main UI
+  - [x] Debug toggle to display sample duration in main UI
 - [x] **Production Readiness**:
   - [x] Professional debug logging with timestamps
   - [x] Comprehensive error handling and user-friendly messages

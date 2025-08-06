@@ -9,6 +9,7 @@ class AppSettings {
     // MARK: - Settings Keys
     private enum Keys {
         static let sampleDuration = "sample_duration"
+        static let showDebugInfo = "show_debug_info"
     }
     
     // MARK: - Sample Duration Setting
@@ -22,12 +23,23 @@ class AppSettings {
         }
     }
     
+    // MARK: - Debug Settings
+    var showDebugInfo: Bool {
+        get {
+            userDefaults.bool(forKey: Keys.showDebugInfo)
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.showDebugInfo)
+        }
+    }
+    
     private init() {}
     
     // MARK: - Debug Methods
     
     func resetToDefaults() {
         userDefaults.removeObject(forKey: Keys.sampleDuration)
+        userDefaults.removeObject(forKey: Keys.showDebugInfo)
     }
 }
 
