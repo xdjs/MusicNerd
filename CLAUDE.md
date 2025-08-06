@@ -97,3 +97,5 @@ Currently beginning Phase 3 (Music Recognition Core) - Phases 1 (Foundation & Ar
 
 ## Development Memories
 - Do not automatically run UI tests
+- Before committing files, update the project plan, if there is one, and if necessary mark any tasks completed.
+- Do not commit unless instructed to

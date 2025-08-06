@@ -12,6 +12,9 @@ struct SettingsView: View {
     @State private var autoEnrichment = true
     @State private var saveToAppleMusic = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @State private var showingSampleDurationPicker = false
+    
+    private let settings = AppSettings.shared
     
     var body: some View {
         NavigationView {
@@ -66,6 +69,27 @@ struct SettingsView: View {
                         
                         Toggle("", isOn: $saveToAppleMusic)
                             .accessibilityIdentifier("apple-music-toggle")
+                    }
+                    
+                    HStack {
+                        Image(systemName: "timer")
+                            .foregroundColor(Color.MusicNerd.primary)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sample Duration")
+                                .musicNerdStyle(.bodyLarge())
+                            Text("How long to listen before identifying")
+                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        }
+                        
+                        Spacer()
+                        
+                        Button(AppSettings.formatDuration(settings.sampleDuration)) {
+                            showingSampleDurationPicker = true
+                        }
+                        .foregroundColor(Color.MusicNerd.primary)
+                        .accessibilityIdentifier("sample-duration-button")
                     }
                 } header: {
                     Text("Recognition")
@@ -195,6 +219,15 @@ struct SettingsView: View {
             .background(Color.MusicNerd.background)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showingSampleDurationPicker) {
+                SampleDurationPickerView(
+                    selectedDuration: settings.sampleDuration,
+                    onSelection: { duration in
+                        settings.sampleDuration = duration
+                        showingSampleDurationPicker = false
+                    }
+                )
+            }
         }
     }
 }
