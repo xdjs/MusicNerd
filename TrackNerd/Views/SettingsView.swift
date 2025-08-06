@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var showingSampleDurationPicker = false
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
+    @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
     
     private let settings = AppSettings.shared
     
@@ -198,6 +199,27 @@ struct SettingsView: View {
                 #if DEBUG
                 Section {
                     HStack {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(Color.MusicNerd.primary)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Show Debug Info")
+                                .musicNerdStyle(.bodyLarge())
+                            Text("Display sample duration in main UI")
+                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        }
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: $showDebugInfo)
+                            .accessibilityIdentifier("debug-info-toggle")
+                            .onChange(of: showDebugInfo) { _, newValue in
+                                settings.showDebugInfo = newValue
+                            }
+                    }
+                    
+                    HStack {
                         Image(systemName: "eye")
                             .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
@@ -223,6 +245,7 @@ struct SettingsView: View {
                     .onTapGesture {
                         settings.resetToDefaults()
                         sampleDuration = AppSettings.shared.sampleDuration
+                        showDebugInfo = AppSettings.shared.showDebugInfo
                     }
                     .accessibilityIdentifier("reset-settings-button")
                 } header: {

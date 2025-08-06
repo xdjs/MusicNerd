@@ -14,8 +14,11 @@ struct ListeningView: View {
     @State private var recognitionState: RecognitionState = .idle
     @State private var lastMatch: SongMatch?
     @State private var errorMessage: String?
+    @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
+    @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     
     private let services = DefaultServiceContainer.shared
+    private let settings = AppSettings.shared
     
     var body: some View {
         NavigationView {
@@ -33,6 +36,19 @@ struct ListeningView: View {
                         Text("Tap to identify any song around you")
                             .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                             .multilineTextAlignment(.center)
+                        
+                        // Debug info display
+                        #if DEBUG
+                        if showDebugInfo {
+                            Text("Sample Duration: \(AppSettings.formatDuration(sampleDuration))")
+                                .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                                .padding(.horizontal, CGFloat.MusicNerd.md)
+                                .padding(.vertical, CGFloat.MusicNerd.xs)
+                                .background(Color.MusicNerd.accent.opacity(0.1))
+                                .cornerRadius(CGFloat.BorderRadius.xs)
+                                .accessibilityIdentifier("debug-sample-duration")
+                        }
+                        #endif
                     }
                     .padding(.top, CGFloat.MusicNerd.xl)
                     
@@ -50,11 +66,15 @@ struct ListeningView: View {
                         
                         if isListening {
                             VStack(spacing: CGFloat.MusicNerd.md) {
+                                // Placeholder artwork during listening
+                                AlbumArtworkView(url: nil, size: 120)
+                                    .transition(.scale.combined(with: .opacity))
+                                
                                 LoadingStateView(
                                     message: loadingMessage,
                                     loadingType: .waveform
                                 )
-                                .frame(height: 120)
+                                .frame(height: 60)
                                 .transition(.opacity)
                                 
                                 if let errorMessage = errorMessage {
@@ -132,8 +152,16 @@ struct ListeningView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: isListening)
         .animation(.easeInOut(duration: 0.3), value: lastMatch)
+        .animation(.easeInOut(duration: 0.2), value: showDebugInfo)
         .onAppear {
             checkPermissionStatus()
+            updateDebugSettings()
+        }
+        .onChange(of: settings.showDebugInfo) { _, newValue in
+            showDebugInfo = newValue
+        }
+        .onChange(of: settings.sampleDuration) { _, newValue in
+            sampleDuration = newValue
         }
         .alert("Microphone Access Required", isPresented: $showingPermissionAlert) {
             Button("Cancel", role: .cancel) { }
@@ -184,6 +212,11 @@ struct ListeningView: View {
     
     private func checkPermissionStatus() {
         permissionStatus = services.permissionService.checkMicrophonePermission()
+    }
+    
+    private func updateDebugSettings() {
+        showDebugInfo = settings.showDebugInfo
+        sampleDuration = settings.sampleDuration
     }
     
     private func handleListenTap() {
