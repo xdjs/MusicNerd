@@ -78,12 +78,15 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Listening animation (waveform/pulse)
   - [x] Recognition results display
   - [x] Real-time state updates during recognition flow
+  - [x] Display album cover art when match is found
+  - [x] Show placeholder cover art during listening/recognition
   - [ ] Enhanced audio visualization during capture (deferred to future release)
 - [x] **Settings & Configuration**:
   - [x] Configurable sample duration (3, 5, 10, 15, 20 seconds)
   - [x] Sample duration picker UI in Settings
   - [x] UserDefaults-based settings persistence
   - [x] User-friendly duration descriptions and recommendations
+  - [ ] Debug toggle to display sample duration in main UI
 - [x] **Production Readiness**:
   - [x] Professional debug logging with timestamps
   - [x] Comprehensive error handling and user-friendly messages

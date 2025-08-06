@@ -50,11 +50,15 @@ struct ListeningView: View {
                         
                         if isListening {
                             VStack(spacing: CGFloat.MusicNerd.md) {
+                                // Placeholder artwork during listening
+                                AlbumArtworkView(url: nil, size: 120)
+                                    .transition(.scale.combined(with: .opacity))
+                                
                                 LoadingStateView(
                                     message: loadingMessage,
                                     loadingType: .waveform
                                 )
-                                .frame(height: 120)
+                                .frame(height: 60)
                                 .transition(.opacity)
                                 
                                 if let errorMessage = errorMessage {

@@ -92,15 +92,11 @@ struct SongMatchCard: View {
     var body: some View {
         MusicNerdCard(style: .default) {
             HStack(spacing: CGFloat.MusicNerd.md) {
-                // Artwork placeholder
-                RoundedRectangle(cornerRadius: CGFloat.BorderRadius.image)
-                    .fill(Color.MusicNerd.accent.opacity(0.3))
-                    .frame(width: 60, height: 60)
-                    .overlay(
-                        Image(systemName: "music.note")
-                            .foregroundColor(Color.MusicNerd.primary)
-                            .font(.title2)
-                    )
+                // Album artwork
+                AlbumArtworkView(
+                    url: match.albumArtURL,
+                    size: 60
+                )
                 
                 VStack(alignment: .leading, spacing: CGFloat.MusicNerd.xs) {
                     Text(match.title)
@@ -205,6 +201,41 @@ extension View {
     }
 }
 
+// MARK: - Album Artwork View
+struct AlbumArtworkView: View {
+    let url: String?
+    let size: CGFloat
+    
+    var body: some View {
+        Group {
+            if let urlString = url, let imageURL = URL(string: urlString) {
+                AsyncImage(url: imageURL) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    artworkPlaceholder
+                }
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: CGFloat.BorderRadius.image))
+            } else {
+                artworkPlaceholder
+            }
+        }
+    }
+    
+    private var artworkPlaceholder: some View {
+        RoundedRectangle(cornerRadius: CGFloat.BorderRadius.image)
+            .fill(Color.MusicNerd.accent.opacity(0.3))
+            .frame(width: size, height: size)
+            .overlay(
+                Image(systemName: "music.note")
+                    .foregroundColor(Color.MusicNerd.primary)
+                    .font(.title2)
+            )
+    }
+}
+
 // MARK: - Preview
 #Preview("Music Nerd Cards") {
     ScrollView {
@@ -246,6 +277,7 @@ extension View {
                     match: SongMatch(
                         title: "Bohemian Rhapsody",
                         artist: "Queen",
+                        albumArtURL: "https://i.scdn.co/image/ab67616d0000b273e319baafd16e84f0408af2a0",
                         enrichmentData: EnrichmentData(artistBio: "British rock band")
                     )
                 )
