@@ -22,7 +22,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_BasicProperties() {
         let artist = MusicNerdArtist(
-            id: 1,
+            id: "1",
             name: "Test Artist",
             spotify: "test-spotify-id",
             instagram: "test-instagram",
@@ -36,7 +36,7 @@ final class MusicNerdModelsTests: XCTestCase {
             website: "https://test.com"
         )
         
-        XCTAssertEqual(artist.id, 1)
+        XCTAssertEqual(artist.id, "1")
         XCTAssertEqual(artist.name, "Test Artist")
         XCTAssertEqual(artist.displayName, "Test Artist")
         XCTAssertTrue(artist.hasData)
@@ -44,7 +44,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_HasDataWithBio() {
         let artist = MusicNerdArtist(
-            id: 1,
+            id: "1",
             name: "Test Artist",
             spotify: nil,
             instagram: nil,
@@ -63,7 +63,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_HasDataWithSocialMedia() {
         let artist = MusicNerdArtist(
-            id: 1,
+            id: "1",
             name: "Test Artist",
             spotify: "spotify-id",
             instagram: nil,
@@ -82,7 +82,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_NoDataWhenEmpty() {
         let artist = MusicNerdArtist(
-            id: 1,
+            id: "1",
             name: "Test Artist",
             spotify: nil,
             instagram: nil,
@@ -101,7 +101,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_Codable() throws {
         let originalArtist = MusicNerdArtist(
-            id: 123,
+            id: "123",
             name: "Codable Test",
             spotify: "spotify123",
             instagram: "insta123",
@@ -131,7 +131,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testSearchArtistsResponse_Codable() throws {
         let artist = MusicNerdArtist(
-            id: 1,
+            id: "1",
             name: "Test Artist",
             spotify: nil,
             instagram: nil,

@@ -11,7 +11,7 @@ struct SearchArtistsResponse: Codable {
 }
 
 struct MusicNerdArtist: Codable, Identifiable {
-    let id: Int
+    let id: String
     let name: String
     let spotify: String?
     let instagram: String?

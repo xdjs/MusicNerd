@@ -67,8 +67,72 @@ protocol StorageServiceProtocol: AnyObject {
 
 
 class OpenAIService: OpenAIServiceProtocol {
+    private let musicNerdService: MusicNerdServiceProtocol
+    
+    init(musicNerdService: MusicNerdServiceProtocol = MusicNerdService()) {
+        self.musicNerdService = musicNerdService
+    }
+    
     func enrichSong(_ match: SongMatch) async -> Result<EnrichmentData> {
-        fatalError("Not implemented")
+        logWithTimestamp("Starting enrichment for: '\(match.title)' by '\(match.artist)'")
+        
+        // Step 1: Search for artist in MusicNerd database
+        let searchResult = await musicNerdService.searchArtist(name: match.artist)
+        
+        switch searchResult {
+        case .success(let musicNerdArtist):
+            logWithTimestamp("Found MusicNerd artist: '\(musicNerdArtist.name)' (ID: \(musicNerdArtist.id))")
+            
+            // Step 2: Get enrichment data concurrently
+            async let bioResult = musicNerdService.getArtistBio(artistId: musicNerdArtist.id)
+            async let funFactResult = musicNerdService.getFunFact(artistId: musicNerdArtist.id, type: .surprise)
+            
+            // Wait for both requests to complete
+            let bio = await bioResult
+            let funFact = await funFactResult
+            
+            // Step 3: Build enrichment data from results
+            let artistBio = try? bio.get()
+            let songFunFact = try? funFact.get()
+            
+            let enrichmentData = EnrichmentData(
+                artistBio: artistBio,
+                songTrivia: nil,
+                funFact: songFunFact,
+                relatedArtists: [],
+                relatedSongs: [],
+                genres: [],
+                releaseYear: nil,
+                albumName: match.album
+            )
+            
+            logWithTimestamp("Enrichment completed - Bio: \(artistBio != nil ? "✓" : "✗"), Fun Fact: \(songFunFact != nil ? "✓" : "✗")")
+            return .success(enrichmentData)
+            
+        case .failure(let error):
+            logWithTimestamp("Artist not found in MusicNerd database: \(error.localizedDescription)")
+            
+            // Return minimal enrichment data when artist not found
+            let enrichmentData = EnrichmentData(
+                artistBio: nil,
+                songTrivia: nil,
+                funFact: nil,
+                relatedArtists: [],
+                relatedSongs: [],
+                genres: [],
+                releaseYear: nil,
+                albumName: match.album
+            )
+            
+            return .success(enrichmentData)
+        }
+    }
+    
+    // MARK: - Logging Helper
+    
+    private func logWithTimestamp(_ message: String) {
+        let timestamp = DateFormatter.logFormatter.string(from: Date())
+        print("[\(timestamp)] OpenAIService: \(message)")
     }
 }
 

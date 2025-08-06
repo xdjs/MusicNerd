@@ -44,7 +44,7 @@ final class MusicNerdServiceTests: XCTestCase {
     }
     
     func testGetArtistBio_WithInvalidId_ShouldReturnError() async {
-        let result = await musicNerdService.getArtistBio(artistId: -1)
+        let result = await musicNerdService.getArtistBio(artistId: "invalid")
         
         switch result {
         case .success:
@@ -64,7 +64,7 @@ final class MusicNerdServiceTests: XCTestCase {
     }
     
     func testGetFunFact_WithInvalidId_ShouldReturnError() async {
-        let result = await musicNerdService.getFunFact(artistId: -1, type: .lore)
+        let result = await musicNerdService.getFunFact(artistId: "invalid", type: .lore)
         
         switch result {
         case .success:

@@ -2,8 +2,8 @@ import Foundation
 
 protocol MusicNerdServiceProtocol: AnyObject {
     func searchArtist(name: String) async -> Result<MusicNerdArtist>
-    func getArtistBio(artistId: Int) async -> Result<String>
-    func getFunFact(artistId: Int, type: FunFactType) async -> Result<String>
+    func getArtistBio(artistId: String) async -> Result<String>
+    func getFunFact(artistId: String, type: FunFactType) async -> Result<String>
 }
 
 enum FunFactType: String, CaseIterable {
@@ -92,7 +92,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
     
     // MARK: - Get Artist Bio
     
-    func getArtistBio(artistId: Int) async -> Result<String> {
+    func getArtistBio(artistId: String) async -> Result<String> {
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.artistBioEndpoint)/\(artistId)"
         
@@ -144,7 +144,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
     
     // MARK: - Get Fun Fact
     
-    func getFunFact(artistId: Int, type: FunFactType) async -> Result<String> {
+    func getFunFact(artistId: String, type: FunFactType) async -> Result<String> {
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.funFactsEndpoint)/\(type.rawValue)?id=\(artistId)"
         
