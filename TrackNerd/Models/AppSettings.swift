@@ -10,6 +10,7 @@ class AppSettings {
     private enum Keys {
         static let sampleDuration = "sample_duration"
         static let showDebugInfo = "show_debug_info"
+        static let useProductionServer = "use_production_server"
     }
     
     // MARK: - Sample Duration Setting
@@ -33,6 +34,22 @@ class AppSettings {
         }
     }
     
+    // MARK: - Server Settings
+    var useProductionServer: Bool {
+        get {
+            // Default to production server in release builds, dev server in debug builds
+            let defaultValue = !AppConfiguration.isDebugBuild
+            return userDefaults.object(forKey: Keys.useProductionServer) as? Bool ?? defaultValue
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.useProductionServer)
+        }
+    }
+    
+    var currentServerURL: String {
+        return useProductionServer ? AppConfiguration.API.productionBaseURL : AppConfiguration.API.developmentBaseURL
+    }
+    
     private init() {}
     
     // MARK: - Debug Methods
@@ -40,6 +57,7 @@ class AppSettings {
     func resetToDefaults() {
         userDefaults.removeObject(forKey: Keys.sampleDuration)
         userDefaults.removeObject(forKey: Keys.showDebugInfo)
+        userDefaults.removeObject(forKey: Keys.useProductionServer)
     }
 }
 

@@ -3,9 +3,23 @@ import Foundation
 struct AppConfiguration {
     
     struct API {
-        static let baseURL = "https://api.TrackNerd.com"
-        static let enrichEndpoint = "/enrich"
-        static let timeoutInterval: TimeInterval = 30.0
+        // MusicNerd server endpoints for enrichment
+        static let productionBaseURL = "https://api.musicnerd.xyz"
+        static let developmentBaseURL = "http://localhost:3000"
+        
+        static var baseURL: String {
+            // Use AppSettings to determine which server to use
+            // This allows runtime switching in debug builds
+            return AppSettings.shared.currentServerURL
+        }
+        
+        // MusicNerd API endpoints
+        static let searchArtistsEndpoint = "/api/searchArtists"
+        static let artistBioEndpoint = "/api/artistBio"
+        static let funFactsEndpoint = "/api/funFacts"
+        
+        // Timeout settings based on MusicNerdNG analysis (15-25s)
+        static let timeoutInterval: TimeInterval = 25.0
         static let maxRetryAttempts = 3
         static let rateLimitDelay: TimeInterval = 1.0
     }

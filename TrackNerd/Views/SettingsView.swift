@@ -15,6 +15,7 @@ struct SettingsView: View {
     @State private var showingSampleDurationPicker = false
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
+    @State private var useProductionServer: Bool = AppSettings.shared.useProductionServer
     
     private let settings = AppSettings.shared
     
@@ -220,6 +221,27 @@ struct SettingsView: View {
                     }
                     
                     HStack {
+                        Image(systemName: "server.rack")
+                            .foregroundColor(Color.MusicNerd.primary)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Use Production Server")
+                                .musicNerdStyle(.bodyLarge())
+                            Text(useProductionServer ? "Using: api.musicnerd.xyz" : "Using: localhost:3000")
+                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        }
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: $useProductionServer)
+                            .accessibilityIdentifier("production-server-toggle")
+                            .onChange(of: useProductionServer) { _, newValue in
+                                settings.useProductionServer = newValue
+                            }
+                    }
+                    
+                    HStack {
                         Image(systemName: "eye")
                             .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
@@ -246,6 +268,7 @@ struct SettingsView: View {
                         settings.resetToDefaults()
                         sampleDuration = AppSettings.shared.sampleDuration
                         showDebugInfo = AppSettings.shared.showDebugInfo
+                        useProductionServer = AppSettings.shared.useProductionServer
                     }
                     .accessibilityIdentifier("reset-settings-button")
                 } header: {

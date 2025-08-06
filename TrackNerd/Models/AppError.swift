@@ -6,6 +6,7 @@ enum AppError: LocalizedError, Equatable {
     case storageError(StorageError)
     case enrichmentError(EnrichmentError)
     case permissionError(PermissionError)
+    case musicNerdError(MusicNerdError)
     case unknown(String)
     
     var errorDescription: String? {
@@ -19,6 +20,8 @@ enum AppError: LocalizedError, Equatable {
         case .enrichmentError(let error):
             return error.localizedDescription
         case .permissionError(let error):
+            return error.localizedDescription
+        case .musicNerdError(let error):
             return error.localizedDescription
         case .unknown(let message):
             return message
@@ -36,6 +39,8 @@ enum AppError: LocalizedError, Equatable {
         case .enrichmentError(let error):
             return error.recoverySuggestion
         case .permissionError(let error):
+            return error.recoverySuggestion
+        case .musicNerdError(let error):
             return error.recoverySuggestion
         case .unknown:
             return "Please try again or contact support if the problem persists."
@@ -215,6 +220,39 @@ enum PermissionError: LocalizedError, Equatable {
             return "Microphone access is restricted by device policy."
         case .microphoneNotDetermined:
             return "Please allow microphone access to identify music."
+        }
+    }
+}
+
+enum MusicNerdError: LocalizedError, Equatable {
+    case artistNotFound
+    case noBioAvailable
+    case noFunFactAvailable
+    case apiError(String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .artistNotFound:
+            return "Artist not found"
+        case .noBioAvailable:
+            return "No biography available"
+        case .noFunFactAvailable:
+            return "No fun facts available"
+        case .apiError(let message):
+            return "API error: \(message)"
+        }
+    }
+    
+    var recoverySuggestion: String? {
+        switch self {
+        case .artistNotFound:
+            return "Try searching for a different artist or check the spelling."
+        case .noBioAvailable:
+            return "This artist may not have biographical information available."
+        case .noFunFactAvailable:
+            return "Fun facts may not be available for this artist."
+        case .apiError:
+            return "Please try again later."
         }
     }
 }

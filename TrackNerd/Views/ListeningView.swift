@@ -16,6 +16,7 @@ struct ListeningView: View {
     @State private var errorMessage: String?
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
+    @State private var isEnriching: Bool = false
     
     private let services = DefaultServiceContainer.shared
     private let settings = AppSettings.shared
@@ -97,6 +98,26 @@ struct ListeningView: View {
                                     // TODO: Navigate to match detail
                                 }
                                 .accessibilityIdentifier("recognition-result")
+                                
+                                // Enrichment Status
+                                if isEnriching {
+                                    HStack(spacing: CGFloat.MusicNerd.xs) {
+                                        ProgressView()
+                                            .scaleEffect(0.8)
+                                        Text("Getting music nerd insights...")
+                                            .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                                    }
+                                    .transition(.opacity)
+                                } else if match.hasEnrichment {
+                                    HStack(spacing: CGFloat.MusicNerd.xs) {
+                                        Image(systemName: "sparkles")
+                                            .foregroundColor(Color.MusicNerd.primary)
+                                            .font(.caption)
+                                        Text("Enhanced with music nerd insights!")
+                                            .musicNerdStyle(.caption(color: Color.MusicNerd.primary))
+                                    }
+                                    .transition(.opacity)
+                                }
                             }
                             .transition(.scale.combined(with: .opacity))
                         }
@@ -255,6 +276,12 @@ struct ListeningView: View {
                         case .success(let match):
                             lastMatch = match
                             recognitionState = .success(match)
+                            
+                            // Automatically start enrichment in background
+                            Task {
+                                await enrichSongMatch(match)
+                            }
+                            
                         case .failure(let error):
                             recognitionState = .failure(error)
                             errorMessage = error.localizedDescription
@@ -267,6 +294,48 @@ struct ListeningView: View {
                 showingPermissionAlert = true
             }
         }
+    }
+    
+    @MainActor
+    private func enrichSongMatch(_ match: SongMatch) async {
+        // Only enrich if not already enriched
+        guard match.enrichmentData == nil else {
+            print("Song already has enrichment data, skipping.")
+            return
+        }
+        
+        isEnriching = true
+        print("Starting enrichment for: '\(match.title)' by '\(match.artist)'")
+        
+        let enrichmentResult = await services.openAIService.enrichSong(match)
+        
+        switch enrichmentResult {
+        case .success(let enrichmentData):
+            print("Enrichment successful - updating song match")
+            
+            // Update the match with enrichment data
+            match.enrichmentData = enrichmentData
+            
+            // Save the enriched match
+            let saveResult = await services.storageService.save(match)
+            switch saveResult {
+            case .success:
+                print("Enriched song match saved successfully")
+                
+                // Update UI to reflect enrichment
+                if lastMatch?.id == match.id {
+                    lastMatch = match
+                }
+                
+            case .failure(let error):
+                print("Failed to save enriched song match: \(error.localizedDescription)")
+            }
+            
+        case .failure(let error):
+            print("Enrichment failed: \(error.localizedDescription)")
+        }
+        
+        isEnriching = false
     }
     
     private func openAppSettings() {
