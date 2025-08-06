@@ -116,24 +116,33 @@ Build an iOS app under the Music Nerd brand that:
 ---
 
 ### 🔌 Phase 4: Backend Services & Integration
-- [ ] **OpenAI Proxy Server**:
-  - [ ] Create `/enrich` endpoint (title + artist → enrichment)
-  - [ ] Design GPT prompts for artist bios, song trivia, related content
-  - [ ] Add response caching and rate limiting
-  - [ ] Deploy and test endpoint
+- [ ] **Leverage MusicNerdNG OpenAI APIs**:
+  - [ ] Use existing public `/api/searchArtists` endpoint to find artist by name
+  - [ ] Use existing public `/api/artistBio/[id]` endpoint for AI-generated artist biographies
+  - [ ] Use existing public `/api/funFacts/[type]` endpoint for song/artist trivia
+  - [ ] Implement two-step flow: search by name → get bio/facts by ID
+  - [ ] No proxy server needed - direct API consumption
 - [ ] **iOS Network Layer**:
-  - [ ] `APIService` with proper error handling
-  - [ ] `OpenAIService` to call enrichment endpoint
+  - [ ] `APIService` with proper error handling and timeouts (15-25s per MusicNerdNG)
+  - [ ] `MusicNerdService` to call existing OpenAI-powered endpoints
   - [ ] Network reachability monitoring
-  - [ ] Retry logic and timeout handling
+  - [ ] Retry logic for failed requests
+  - [ ] Handle artist search disambiguation (multiple results)
+- [ ] **Integration Strategy**:
+  - [ ] Map ShazamKit metadata (artist name) to MusicNerdNG search
+  - [ ] Handle cases where artist is not found in MusicNerdNG database
+  - [ ] Cache enrichment data locally to avoid repeated API calls
+  - [ ] Fallback gracefully when MusicNerdNG APIs are unavailable
 - [ ] **Unit Testing:**
-  - [ ] Test API service request/response parsing
+  - [ ] Test artist name search and ID resolution
+  - [ ] Test bio and fun facts API response parsing
   - [ ] Test network error handling and retry logic
-  - [ ] Test reachability monitoring
-  - [ ] Mock OpenAI service responses for testing
+  - [ ] Test caching behavior
+  - [ ] Mock MusicNerdNG API responses for testing
 - [ ] **UI Testing:**
   - [ ] Test network error states in UI
   - [ ] Test loading indicators during API calls
+  - [ ] Test artist not found scenarios
   - [ ] Test offline mode behavior
 
 ---
