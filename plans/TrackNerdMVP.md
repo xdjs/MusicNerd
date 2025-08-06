@@ -117,6 +117,7 @@ Build an iOS app under the Music Nerd brand that:
 
 ### 🔌 Phase 4: Backend Services & Integration
 - [ ] **Leverage MusicNerdNG OpenAI APIs**:
+  - [ ] Configure app to point to development vs production MusicNerd server endpoints
   - [ ] Use existing public `/api/searchArtists` endpoint to find artist by name
   - [ ] Use existing public `/api/artistBio/[id]` endpoint for AI-generated artist biographies
   - [ ] Use existing public `/api/funFacts/[type]` endpoint for song/artist trivia

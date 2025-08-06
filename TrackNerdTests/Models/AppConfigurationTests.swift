@@ -4,14 +4,24 @@ import XCTest
 final class AppConfigurationTests: XCTestCase {
     
     func testAPIConfiguration() {
-        XCTAssertEqual(AppConfiguration.API.baseURL, "https://api.TrackNerd.com")
-        XCTAssertEqual(AppConfiguration.API.enrichEndpoint, "/enrich")
-        XCTAssertEqual(AppConfiguration.API.timeoutInterval, 30.0)
+        // Test MusicNerd endpoints
+        XCTAssertEqual(AppConfiguration.API.productionBaseURL, "https://api.musicnerd.xyz")
+        XCTAssertEqual(AppConfiguration.API.developmentBaseURL, "http://localhost:3000")
+        XCTAssertEqual(AppConfiguration.API.searchArtistsEndpoint, "/api/searchArtists")
+        XCTAssertEqual(AppConfiguration.API.artistBioEndpoint, "/api/artistBio")
+        XCTAssertEqual(AppConfiguration.API.funFactsEndpoint, "/api/funFacts")
+        
+        // Test timeout updated for MusicNerdNG (15-25s)
+        XCTAssertEqual(AppConfiguration.API.timeoutInterval, 25.0)
         XCTAssertEqual(AppConfiguration.API.maxRetryAttempts, 3)
         XCTAssertEqual(AppConfiguration.API.rateLimitDelay, 1.0)
         
         XCTAssertGreaterThan(AppConfiguration.API.timeoutInterval, 0)
         XCTAssertGreaterThan(AppConfiguration.API.maxRetryAttempts, 0)
+        
+        // Test baseURL returns a valid URL
+        let baseURL = AppConfiguration.API.baseURL
+        XCTAssertTrue(baseURL == AppConfiguration.API.productionBaseURL || baseURL == AppConfiguration.API.developmentBaseURL)
     }
     
     func testShazamConfiguration() {
