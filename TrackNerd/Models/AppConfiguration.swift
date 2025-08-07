@@ -89,11 +89,7 @@ struct AppConfiguration {
 
 extension AppConfiguration {
     static var isDebugBuild: Bool {
-        #if DEBUG
         return true
-        #else
-        return false
-        #endif
     }
     
     static var appVersion: String {
