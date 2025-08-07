@@ -101,10 +101,11 @@ struct HistoryView: View {
                                 action: {
                                     // TODO: Navigate to listening tab
                                 },
-                                style: .primary,
+                                style: .secondary,
                                 size: .medium,
                                 icon: "waveform"
                             )
+                            .disabled(true)
                             .accessibilityIdentifier("start-listening-button")
                         }
                         
@@ -135,7 +136,8 @@ struct HistoryView: View {
                     Button("Export") {
                         // TODO: Implement export functionality
                     }
-                    .foregroundColor(Color.MusicNerd.primary)
+                    .foregroundColor(Color.MusicNerd.textSecondary)
+                    .disabled(true)
                     .accessibilityIdentifier("export-button")
                 }
             }
