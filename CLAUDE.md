@@ -31,7 +31,41 @@ open TrackNerd.xcodeproj
 xcodebuild -project TrackNerd.xcodeproj -scheme TrackNerd -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2' build
 ```
 
-### Testing
+### Fastlane Automation
+
+Fastlane is configured for streamlined build and testing. Available lanes:
+
+#### Build
+```bash
+# Build the app for testing
+fastlane ios build
+```
+
+#### Testing
+```bash
+# Run unit tests only
+fastlane ios test
+
+# Run UI tests only
+fastlane ios ui_test
+
+# Run all tests (unit and UI)
+fastlane ios test_all
+
+# Build and run unit tests (CI pipeline)
+fastlane ios ci
+```
+
+#### Maintenance
+```bash
+# Clean derived data and test results
+fastlane ios clean
+
+# List all available lanes
+fastlane lanes
+```
+
+### Manual Testing
 
 #### Test Setup (Required before all tests)
 ```bash
