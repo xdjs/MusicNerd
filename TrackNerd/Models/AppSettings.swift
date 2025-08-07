@@ -38,8 +38,8 @@ class AppSettings {
     // MARK: - Server Settings
     var useProductionServer: Bool {
         get {
-            // Default to production server in release builds, dev server in debug builds
-            let defaultValue = !AppConfiguration.isDebugBuild
+            // Default to production server
+            let defaultValue = true
             return userDefaults.object(forKey: Keys.useProductionServer) as? Bool ?? defaultValue
         }
         set {

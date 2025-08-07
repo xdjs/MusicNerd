@@ -40,7 +40,6 @@ struct ListeningView: View {
                             .multilineTextAlignment(.center)
                         
                         // Debug info display
-                        #if DEBUG
                         if showDebugInfo {
                             Text("Sample Duration: \(AppSettings.formatDuration(sampleDuration))")
                                 .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
@@ -50,7 +49,6 @@ struct ListeningView: View {
                                 .cornerRadius(CGFloat.BorderRadius.xs)
                                 .accessibilityIdentifier("debug-sample-duration")
                         }
-                        #endif
                     }
                     .padding(.top, CGFloat.MusicNerd.xl)
                     

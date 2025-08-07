@@ -222,8 +222,7 @@ struct SettingsView: View {
                         .musicNerdStyle(.titleSmall(color: Color.MusicNerd.textSecondary))
                 }
                 
-                // Debug Section (only in debug builds)
-                #if DEBUG
+                // Debug Section
                 Section {
                     HStack {
                         Image(systemName: "info.circle")
@@ -298,7 +297,6 @@ struct SettingsView: View {
                     Text("Debug")
                         .musicNerdStyle(.titleSmall(color: Color.MusicNerd.textSecondary))
                 }
-                #endif
             }
             .listStyle(InsetGroupedListStyle())
             .background(Color.MusicNerd.background)
