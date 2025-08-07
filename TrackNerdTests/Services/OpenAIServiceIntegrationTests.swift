@@ -86,7 +86,7 @@ class MockMusicNerdService: MusicNerdServiceProtocol {
     func searchArtist(name: String) async -> Result<MusicNerdArtist> {
         if name == "Test Artist" {
             let artist = MusicNerdArtist(
-                id: "1",
+                artistId: "1",
                 name: "Test Artist",
                 spotify: nil,
                 instagram: nil,

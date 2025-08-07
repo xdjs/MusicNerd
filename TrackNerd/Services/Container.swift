@@ -81,24 +81,74 @@ class OpenAIService: OpenAIServiceProtocol {
         
         switch searchResult {
         case .success(let musicNerdArtist):
-            logWithTimestamp("Found MusicNerd artist: '\(musicNerdArtist.name)' (ID: \(musicNerdArtist.id))")
+            guard let artistId = musicNerdArtist.artistId else {
+                logWithTimestamp("Found artist '\(musicNerdArtist.name)' but no valid ID")
+                return .failure(.musicNerdError(.artistNotFound))
+            }
+            
+            logWithTimestamp("Found MusicNerd artist: '\(musicNerdArtist.name)' (ID: \(artistId))")
             
             // Step 2: Get enrichment data concurrently
-            async let bioResult = musicNerdService.getArtistBio(artistId: musicNerdArtist.id)
-            async let funFactResult = musicNerdService.getFunFact(artistId: musicNerdArtist.id, type: .surprise)
+            async let bioResult = musicNerdService.getArtistBio(artistId: artistId)
+            async let loreFunFactResult = musicNerdService.getFunFact(artistId: artistId, type: .lore)
+            async let btsFunFactResult = musicNerdService.getFunFact(artistId: artistId, type: .bts)
+            async let activityFunFactResult = musicNerdService.getFunFact(artistId: artistId, type: .activity)
+            async let surpriseFunFactResult = musicNerdService.getFunFact(artistId: artistId, type: .surprise)
             
-            // Wait for both requests to complete
+            // Wait for all requests to complete
             let bio = await bioResult
-            let funFact = await funFactResult
+            let loreFunFact = await loreFunFactResult
+            let btsFunFact = await btsFunFactResult
+            let activityFunFact = await activityFunFactResult
+            let surpriseFunFact = await surpriseFunFactResult
             
             // Step 3: Build enrichment data from results
             let artistBio = try? bio.get()
-            let songFunFact = try? funFact.get()
+            let legacySongFunFact = try? surpriseFunFact.get() // Keep first surprise fun fact for legacy compatibility
+            
+            // Build categorized fun facts dictionary
+            var categorizedFunFacts: [String: String] = [:]
+            
+            // Add debug logging for each fun fact type
+            if let lore = try? loreFunFact.get() { 
+                categorizedFunFacts["lore"] = lore
+                logWithTimestamp("✓ Lore fact retrieved: \(lore.prefix(50))...")
+            } else {
+                logWithTimestamp("✗ Lore fact failed or empty")
+            }
+            
+            if let bts = try? btsFunFact.get() { 
+                categorizedFunFacts["bts"] = bts
+                logWithTimestamp("✓ BTS fact retrieved: \(bts.prefix(50))...")
+            } else {
+                logWithTimestamp("✗ BTS fact failed or empty")
+            }
+            
+            if let activity = try? activityFunFact.get() { 
+                categorizedFunFacts["activity"] = activity
+                logWithTimestamp("✓ Activity fact retrieved: \(activity.prefix(50))...")
+            } else {
+                logWithTimestamp("✗ Activity fact failed or empty")
+            }
+            
+            if let surprise = try? surpriseFunFact.get() { 
+                categorizedFunFacts["surprise"] = surprise
+                logWithTimestamp("✓ Surprise fact retrieved: \(surprise.prefix(50))...")
+            } else {
+                logWithTimestamp("✗ Surprise fact failed or empty")
+            }
+            
+            // If no fun facts were retrieved, add a generic fallback
+            if categorizedFunFacts.isEmpty && artistBio != nil {
+                logWithTimestamp("Adding fallback fun fact since no API facts available")
+                categorizedFunFacts["surprise"] = "This track was recognized using advanced audio fingerprinting technology that can identify songs from just a few seconds of audio!"
+            }
             
             let enrichmentData = EnrichmentData(
                 artistBio: artistBio,
                 songTrivia: nil,
-                funFact: songFunFact,
+                funFact: legacySongFunFact,
+                funFacts: categorizedFunFacts,
                 relatedArtists: [],
                 relatedSongs: [],
                 genres: [],
@@ -106,7 +156,7 @@ class OpenAIService: OpenAIServiceProtocol {
                 albumName: match.album
             )
             
-            logWithTimestamp("Enrichment completed - Bio: \(artistBio != nil ? "✓" : "✗"), Fun Fact: \(songFunFact != nil ? "✓" : "✗")")
+            logWithTimestamp("Enrichment completed - Bio: \(artistBio != nil ? "✓" : "✗"), Fun Facts: \(categorizedFunFacts.count) types (\(categorizedFunFacts.keys.sorted().joined(separator: ", ")))")
             return .success(enrichmentData)
             
         case .failure(let error):
@@ -117,6 +167,7 @@ class OpenAIService: OpenAIServiceProtocol {
                 artistBio: nil,
                 songTrivia: nil,
                 funFact: nil,
+                funFacts: [:],
                 relatedArtists: [],
                 relatedSongs: [],
                 genres: [],

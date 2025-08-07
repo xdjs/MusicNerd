@@ -16,6 +16,8 @@ struct SettingsView: View {
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
     @State private var useProductionServer: Bool = AppSettings.shared.useProductionServer
+    @State private var showingCacheExpirationPicker = false
+    @State private var cacheExpirationHours: Double = AppSettings.shared.cacheExpirationHours
     
     private let settings = AppSettings.shared
     
@@ -96,6 +98,47 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("Recognition")
+                        .musicNerdStyle(.titleSmall(color: Color.MusicNerd.textSecondary))
+                }
+                
+                // Cache Settings Section
+                Section {
+                    HStack {
+                        Image(systemName: "timer")
+                            .foregroundColor(Color.MusicNerd.primary)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Cache Duration")
+                                .musicNerdStyle(.bodyLarge())
+                            Text("How long to store artist info locally")
+                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        }
+                        
+                        Spacer()
+                        
+                        Button(AppSettings.formatCacheExpiration(cacheExpirationHours)) {
+                            showingCacheExpirationPicker = true
+                        }
+                        .foregroundColor(Color.MusicNerd.primary)
+                        .accessibilityIdentifier("cache-expiration-button")
+                    }
+                    
+                    HStack {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
+                            .frame(width: 24)
+                        
+                        Text("Clear Cache")
+                            .musicNerdStyle(.bodyLarge())
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        EnrichmentCache.shared.clearAll()
+                    }
+                    .accessibilityIdentifier("clear-cache-button")
+                } header: {
+                    Text("Performance")
                         .musicNerdStyle(.titleSmall(color: Color.MusicNerd.textSecondary))
                 }
                 
@@ -269,6 +312,7 @@ struct SettingsView: View {
                         sampleDuration = AppSettings.shared.sampleDuration
                         showDebugInfo = AppSettings.shared.showDebugInfo
                         useProductionServer = AppSettings.shared.useProductionServer
+                        cacheExpirationHours = AppSettings.shared.cacheExpirationHours
                     }
                     .accessibilityIdentifier("reset-settings-button")
                 } header: {
@@ -288,6 +332,16 @@ struct SettingsView: View {
                         settings.sampleDuration = duration
                         sampleDuration = duration
                         showingSampleDurationPicker = false
+                    }
+                )
+            }
+            .sheet(isPresented: $showingCacheExpirationPicker) {
+                CacheExpirationPickerView(
+                    selectedHours: cacheExpirationHours,
+                    onSelection: { hours in
+                        settings.cacheExpirationHours = hours
+                        cacheExpirationHours = hours
+                        showingCacheExpirationPicker = false
                     }
                 )
             }

@@ -22,7 +22,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_BasicProperties() {
         let artist = MusicNerdArtist(
-            id: "1",
+            artistId: "1",
             name: "Test Artist",
             spotify: "test-spotify-id",
             instagram: "test-instagram",
@@ -44,7 +44,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_HasDataWithBio() {
         let artist = MusicNerdArtist(
-            id: "1",
+            artistId: "1",
             name: "Test Artist",
             spotify: nil,
             instagram: nil,
@@ -63,7 +63,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_HasDataWithSocialMedia() {
         let artist = MusicNerdArtist(
-            id: "1",
+            artistId: "1",
             name: "Test Artist",
             spotify: "spotify-id",
             instagram: nil,
@@ -82,7 +82,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_NoDataWhenEmpty() {
         let artist = MusicNerdArtist(
-            id: "1",
+            artistId: "1",
             name: "Test Artist",
             spotify: nil,
             instagram: nil,
@@ -101,7 +101,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testMusicNerdArtist_Codable() throws {
         let originalArtist = MusicNerdArtist(
-            id: "123",
+            artistId: "123",
             name: "Codable Test",
             spotify: "spotify123",
             instagram: "insta123",
@@ -131,7 +131,7 @@ final class MusicNerdModelsTests: XCTestCase {
     
     func testSearchArtistsResponse_Codable() throws {
         let artist = MusicNerdArtist(
-            id: "1",
+            artistId: "1",
             name: "Test Artist",
             spotify: nil,
             instagram: nil,
@@ -175,7 +175,7 @@ final class MusicNerdModelsTests: XCTestCase {
     // MARK: - FunFactsResponse Tests
     
     func testFunFactsResponse_Codable() throws {
-        let response = FunFactsResponse(funFact: "Interesting fact!", artist: nil)
+        let response = FunFactsResponse(funFact: "Interesting fact!", text: nil, artist: nil)
         
         let encoder = JSONEncoder()
         let data = try encoder.encode(response)

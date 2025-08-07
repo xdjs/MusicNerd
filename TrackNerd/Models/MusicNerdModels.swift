@@ -11,7 +11,7 @@ struct SearchArtistsResponse: Codable {
 }
 
 struct MusicNerdArtist: Codable, Identifiable {
-    let id: String
+    let artistId: String?
     let name: String
     let spotify: String?
     let instagram: String?
@@ -25,6 +25,17 @@ struct MusicNerdArtist: Codable, Identifiable {
     let tiktok: String?
     let bandcamp: String?
     let website: String?
+    
+    // Computed property to satisfy Identifiable protocol
+    var id: String {
+        return artistId ?? UUID().uuidString
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case artistId = "id"
+        case name, spotify, instagram, x, youtube, soundcloud, bio
+        case youtubechannel, tiktok, bandcamp, website
+    }
 }
 
 // MARK: - Artist Bio Response
@@ -38,7 +49,12 @@ struct ArtistBioResponse: Codable {
 
 struct FunFactsResponse: Codable {
     let funFact: String?
+    let text: String? // API returns "text" field
     let artist: MusicNerdArtist?
+    
+    private enum CodingKeys: String, CodingKey {
+        case funFact, text, artist
+    }
 }
 
 // MARK: - API Error Response
