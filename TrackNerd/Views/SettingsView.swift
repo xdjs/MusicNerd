@@ -28,26 +28,27 @@ struct SettingsView: View {
                 Section {
                     HStack {
                         Image(systemName: "bell")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Notifications")
-                            .musicNerdStyle(.bodyLarge())
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                         
                         Spacer()
                         
                         Toggle("", isOn: $notificationsEnabled)
+                            .disabled(true)
                             .accessibilityIdentifier("notifications-toggle")
                     }
                     
                     HStack {
                         Image(systemName: "sparkles")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Auto Enrichment")
-                                .musicNerdStyle(.bodyLarge())
+                                .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                             Text("Automatically get insights for recognized songs")
                                 .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
                         }
@@ -55,17 +56,18 @@ struct SettingsView: View {
                         Spacer()
                         
                         Toggle("", isOn: $autoEnrichment)
+                            .disabled(true)
                             .accessibilityIdentifier("auto-enrichment-toggle")
                     }
                     
                     HStack {
                         Image(systemName: "music.note")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Save to Apple Music")
-                                .musicNerdStyle(.bodyLarge())
+                                .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                             Text("Add recognized songs to your Apple Music library")
                                 .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
                         }
@@ -73,6 +75,7 @@ struct SettingsView: View {
                         Spacer()
                         
                         Toggle("", isOn: $saveToAppleMusic)
+                            .disabled(true)
                             .accessibilityIdentifier("apple-music-toggle")
                     }
                     
@@ -146,29 +149,21 @@ struct SettingsView: View {
                 Section {
                     HStack {
                         Image(systemName: "trash")
-                            .foregroundColor(.red)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Clear History")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // TODO: Implement clear history
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("clear-history-button")
                     
                     HStack {
                         Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Export Data")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // TODO: Implement export data
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("export-data-button")
                 } header: {
@@ -195,43 +190,31 @@ struct SettingsView: View {
                     
                     HStack {
                         Image(systemName: "heart")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Rate TrackNerd")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // TODO: Open App Store rating
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("rate-app-button")
                     
                     HStack {
                         Image(systemName: "envelope")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Contact Support")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // TODO: Open support email
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("contact-support-button")
                     
                     HStack {
                         Image(systemName: "doc.text")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Privacy Policy")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // TODO: Open privacy policy
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("privacy-policy-button")
                 } header: {
@@ -286,15 +269,11 @@ struct SettingsView: View {
                     
                     HStack {
                         Image(systemName: "eye")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Show Onboarding")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        hasSeenOnboarding = false
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("show-onboarding-button")
                     
