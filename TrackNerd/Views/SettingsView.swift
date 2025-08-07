@@ -43,12 +43,12 @@ struct SettingsView: View {
                     
                     HStack {
                         Image(systemName: "sparkles")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Auto Enrichment")
-                                .musicNerdStyle(.bodyLarge())
+                                .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                             Text("Automatically get insights for recognized songs")
                                 .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
                         }
@@ -56,6 +56,7 @@ struct SettingsView: View {
                         Spacer()
                         
                         Toggle("", isOn: $autoEnrichment)
+                            .disabled(true)
                             .accessibilityIdentifier("auto-enrichment-toggle")
                     }
                     
