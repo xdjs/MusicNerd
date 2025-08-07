@@ -49,7 +49,12 @@ struct ArtistBioResponse: Codable {
 
 struct FunFactsResponse: Codable {
     let funFact: String?
+    let text: String? // API returns "text" field
     let artist: MusicNerdArtist?
+    
+    private enum CodingKeys: String, CodingKey {
+        case funFact, text, artist
+    }
 }
 
 // MARK: - API Error Response

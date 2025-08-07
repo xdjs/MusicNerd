@@ -97,7 +97,11 @@ struct MatchDetailView: View {
                 )
             }
             
-            if let funFact = enrichmentData.funFact, !funFact.isEmpty {
+            // Display categorized fun facts
+            if !enrichmentData.funFacts.isEmpty {
+                funFactSections(enrichmentData.funFacts)
+            } else if let funFact = enrichmentData.funFact, !funFact.isEmpty {
+                // Fallback for legacy single fun fact
                 EnrichmentSectionView(
                     title: "Music Nerd Insight",
                     content: funFact,
@@ -172,11 +176,37 @@ struct MatchDetailView: View {
         .cornerRadius(CGFloat.BorderRadius.md)
     }
     
+    private func funFactSections(_ funFacts: [String: String]) -> some View {
+        let funFactConfig: [(type: String, title: String, icon: String)] = [
+            ("lore", "Artist Lore", "book.closed"),
+            ("bts", "Behind the Scenes", "eye"),
+            ("activity", "Artist Activity", "music.note.list"),
+            ("surprise", "Surprise Fact", "sparkles")
+        ]
+        
+        return LazyVStack(spacing: CGFloat.MusicNerd.lg) {
+            ForEach(funFactConfig, id: \.type) { config in
+                if let fact = funFacts[config.type], !fact.isEmpty {
+                    EnrichmentSectionView(
+                        title: config.title,
+                        content: fact,
+                        icon: config.icon
+                    )
+                }
+            }
+        }
+    }
+    
     private var shareText: String {
         var text = "🎵 I just discovered: \(match.title) by \(match.artist)"
         
         if let enrichmentData = match.enrichmentData {
-            if let funFact = enrichmentData.funFact {
+            // Try to get the best fun fact for sharing
+            if let surpriseFact = enrichmentData.surpriseFact {
+                text += "\n\n🤓 Surprise Fact: \(surpriseFact)"
+            } else if let loreFact = enrichmentData.loreFact {
+                text += "\n\n📚 Artist Lore: \(loreFact)"
+            } else if let funFact = enrichmentData.funFact {
                 text += "\n\n🤓 Music Nerd Insight: \(funFact)"
             }
         }
@@ -208,7 +238,7 @@ struct EnrichmentSectionView: View {
                     
                     Spacer()
                     
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: "chevron.down")
                         .foregroundColor(Color.MusicNerd.textSecondary)
                         .font(.caption)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
@@ -220,14 +250,13 @@ struct EnrichmentSectionView: View {
                 Text(content)
                     .musicNerdStyle(.bodyMedium())
                     .fixedSize(horizontal: false, vertical: true)
-                    .transition(.opacity.combined(with: .slide))
+                    .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(CGFloat.MusicNerd.md)
         .background(Color.MusicNerd.cardBackground)
         .cornerRadius(CGFloat.BorderRadius.md)
-        .animation(.easeInOut(duration: 0.3), value: isExpanded)
     }
 }
 
@@ -252,6 +281,12 @@ struct ShareSheet: UIViewControllerRepresentable {
                 artistBio: "Queen are a British rock band formed in London in 1970. Their classic line-up was Freddie Mercury (lead vocals, piano), Brian May (guitar, vocals), Roger Taylor (drums, vocals) and John Deacon (bass).",
                 songTrivia: "This epic 6-minute operatic rock masterpiece was written entirely by Freddie Mercury and is considered one of the greatest songs of all time.",
                 funFact: "The song's famous operatic section includes the made-up words 'Bismillah' (which actually means 'in the name of God' in Arabic) and references to Scaramouche, a stock character from Italian opera.",
+                funFacts: [
+                    "lore": "Freddie Mercury wrote this song on piano, despite being primarily a vocalist. He had no formal musical training but composed one of rock's most complex arrangements entirely by ear.",
+                    "bts": "The song was recorded using innovative 24-track technology and required over 180 vocal overdubs. The famous operatic section took three weeks to record.",
+                    "activity": "Queen performed this song live only a handful of times due to its complexity. The Live Aid performance famously skipped the operatic section.",
+                    "surprise": "The title 'Bohemian Rhapsody' was chosen because Freddie loved the word 'rhapsody' and thought 'bohemian' perfectly described the band's artistic freedom."
+                ],
                 genres: ["Rock", "Progressive Rock", "Opera Rock"],
                 releaseYear: 1975,
                 albumName: "A Night at the Opera"

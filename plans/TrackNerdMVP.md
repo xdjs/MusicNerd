@@ -156,15 +156,17 @@ Build an iOS app under the Music Nerd brand that:
   - [x] MusicNerdService API integration (search, bio, fun facts)
   - [x] Automatic background enrichment after recognition
   - [x] Loading states during enrichment
-- [ ] **Content Display**:
+- [x] **Content Display**:
   - [x] Create match detail view to display enriched content
   - [x] Display artist bio in readable format
-  - [ ] Display fun facts with proper categorization (lore, bts, activity, surprise)
+  - [x] Display fun facts with proper categorization (lore, bts, activity, surprise)
   - [x] Add navigation from SongMatchCard to detail view
   - [x] Format and style enriched content with Music Nerd branding
+  - [x] Fix fun facts parsing (API returns "text" field, not "funFact")
 - [x] **Enhanced UI Features**:
   - [x] Expandable content sections in detail view
   - [x] Share enriched content functionality
+  - [x] Fix animation conflicts in expandable chevrons
 - [ ] **Smart Features**:
   - [ ] Fallback content for API failures
   - [ ] Content caching for offline viewing

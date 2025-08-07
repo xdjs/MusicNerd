@@ -102,4 +102,77 @@ final class EnrichmentDataTests: XCTestCase {
         
         XCTAssertLessThan(timeDifference, 1.0)
     }
+    
+    // MARK: - Fun Facts Tests
+    
+    func testFunFactsCategorization() {
+        let funFacts = [
+            "lore": "Artist lore fact",
+            "bts": "Behind the scenes fact", 
+            "activity": "Activity fact",
+            "surprise": "Surprise fact"
+        ]
+        
+        let enrichment = EnrichmentData(funFacts: funFacts)
+        
+        XCTAssertEqual(enrichment.loreFact, "Artist lore fact")
+        XCTAssertEqual(enrichment.btsFact, "Behind the scenes fact")
+        XCTAssertEqual(enrichment.activityFact, "Activity fact")
+        XCTAssertEqual(enrichment.surpriseFact, "Surprise fact")
+    }
+    
+    func testHasAnyFunFacts() {
+        let enrichmentWithLegacy = EnrichmentData(funFact: "Legacy fact")
+        XCTAssertTrue(enrichmentWithLegacy.hasAnyFunFacts)
+        
+        let enrichmentWithCategorized = EnrichmentData(funFacts: ["lore": "Test fact"])
+        XCTAssertTrue(enrichmentWithCategorized.hasAnyFunFacts)
+        
+        let enrichmentEmpty = EnrichmentData()
+        XCTAssertFalse(enrichmentEmpty.hasAnyFunFacts)
+    }
+    
+    func testAvailableFunFactTypes() {
+        let funFacts = [
+            "surprise": "Surprise fact",
+            "lore": "Lore fact",
+            "bts": "BTS fact"
+        ]
+        
+        let enrichment = EnrichmentData(funFacts: funFacts)
+        let types = enrichment.availableFunFactTypes
+        
+        XCTAssertEqual(types.count, 3)
+        XCTAssertTrue(types.contains("lore"))
+        XCTAssertTrue(types.contains("bts"))
+        XCTAssertTrue(types.contains("surprise"))
+        // Should be sorted
+        XCTAssertEqual(types, ["bts", "lore", "surprise"])
+    }
+    
+    func testFunFactForType() {
+        let funFacts = ["lore": "Test lore fact", "activity": "Test activity fact"]
+        let enrichment = EnrichmentData(funFacts: funFacts)
+        
+        XCTAssertEqual(enrichment.funFact(for: "lore"), "Test lore fact")
+        XCTAssertEqual(enrichment.funFact(for: "activity"), "Test activity fact")
+        XCTAssertNil(enrichment.funFact(for: "bts"))
+        XCTAssertNil(enrichment.funFact(for: "surprise"))
+    }
+    
+    func testHasSongInfoWithFunFacts() {
+        let enrichmentWithFunFacts = EnrichmentData(funFacts: ["lore": "Test fact"])
+        XCTAssertTrue(enrichmentWithFunFacts.hasSongInfo)
+        
+        let enrichmentWithBoth = EnrichmentData(funFact: "Legacy", funFacts: ["lore": "New"])
+        XCTAssertTrue(enrichmentWithBoth.hasSongInfo)
+    }
+    
+    func testIsEmptyWithFunFacts() {
+        let enrichmentWithFunFacts = EnrichmentData(funFacts: ["lore": "Test fact"])
+        XCTAssertFalse(enrichmentWithFunFacts.isEmpty)
+        
+        let enrichmentEmpty = EnrichmentData(funFacts: [:])
+        XCTAssertTrue(enrichmentEmpty.isEmpty)
+    }
 }

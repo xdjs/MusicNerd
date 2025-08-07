@@ -216,7 +216,10 @@ class MusicNerdService: MusicNerdServiceProtocol {
             if httpResponse.statusCode == 200 {
                 let funFactsResponse = try decoder.decode(FunFactsResponse.self, from: data)
                 
-                if let funFact = funFactsResponse.funFact, !funFact.isEmpty {
+                // Check both funFact and text fields (API returns "text")
+                let funFactText = funFactsResponse.funFact ?? funFactsResponse.text
+                
+                if let funFact = funFactText, !funFact.isEmpty {
                     logWithTimestamp("Retrieved \(type.rawValue) fun fact (\(funFact.count) characters)")
                     return .success(funFact)
                 } else {
