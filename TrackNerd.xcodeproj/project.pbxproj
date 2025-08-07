@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F8DCC3B2E4557830047D90F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 2F8DCC3A2E4557830047D90F /* README.md */; };
 		2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 2FA74ED82E41884700575EFD /* CLAUDE.md */; };
 		2FF7CDAA2E42BB89005AA02A /* Unit Tests Only.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2F8DCC3A2E4557830047D90F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		2FA74DF72E41832E00575EFD /* TrackNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E042E41833000575EFD /* TrackNerdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,6 +98,7 @@
 		2FA74DEE2E41832E00575EFD = {
 			isa = PBXGroup;
 			children = (
+				2F8DCC3A2E4557830047D90F /* README.md */,
 				2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */,
 				2FA74ED82E41884700575EFD /* CLAUDE.md */,
 				2FA74E962E4184F600575EFD /* plans */,
@@ -245,6 +248,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2FF7CDAA2E42BB89005AA02A /* Unit Tests Only.xctestplan in Resources */,
+				2F8DCC3B2E4557830047D90F /* README.md in Resources */,
 				2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
