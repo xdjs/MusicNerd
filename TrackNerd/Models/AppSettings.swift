@@ -11,6 +11,7 @@ class AppSettings {
         static let sampleDuration = "sample_duration"
         static let showDebugInfo = "show_debug_info"
         static let useProductionServer = "use_production_server"
+        static let cacheExpirationHours = "cache_expiration_hours"
     }
     
     // MARK: - Sample Duration Setting
@@ -50,6 +51,21 @@ class AppSettings {
         return useProductionServer ? AppConfiguration.API.productionBaseURL : AppConfiguration.API.developmentBaseURL
     }
     
+    // MARK: - Cache Settings
+    var cacheExpirationHours: Double {
+        get {
+            let saved = userDefaults.double(forKey: Keys.cacheExpirationHours)
+            return saved > 0 ? saved : 24.0 // Default to 24 hours
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.cacheExpirationHours)
+        }
+    }
+    
+    var cacheExpirationInterval: TimeInterval {
+        return cacheExpirationHours * 60 * 60 // Convert hours to seconds
+    }
+    
     private init() {}
     
     // MARK: - Debug Methods
@@ -58,6 +74,7 @@ class AppSettings {
         userDefaults.removeObject(forKey: Keys.sampleDuration)
         userDefaults.removeObject(forKey: Keys.showDebugInfo)
         userDefaults.removeObject(forKey: Keys.useProductionServer)
+        userDefaults.removeObject(forKey: Keys.cacheExpirationHours)
     }
 }
 
@@ -68,5 +85,20 @@ extension AppSettings {
     static func formatDuration(_ duration: TimeInterval) -> String {
         let seconds = Int(duration)
         return "\(seconds) second\(seconds == 1 ? "" : "s")"
+    }
+}
+
+// MARK: - Cache Expiration Options
+extension AppSettings {
+    static let cacheExpirationOptions: [Double] = [1, 6, 12, 24, 48, 168] // 1h, 6h, 12h, 24h, 48h, 1 week
+    
+    static func formatCacheExpiration(_ hours: Double) -> String {
+        if hours < 24 {
+            let h = Int(hours)
+            return "\(h) hour\(h == 1 ? "" : "s")"
+        } else {
+            let days = Int(hours / 24)
+            return "\(days) day\(days == 1 ? "" : "s")"
+        }
     }
 }

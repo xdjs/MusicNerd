@@ -175,7 +175,7 @@ final class MusicNerdModelsTests: XCTestCase {
     // MARK: - FunFactsResponse Tests
     
     func testFunFactsResponse_Codable() throws {
-        let response = FunFactsResponse(funFact: "Interesting fact!", artist: nil)
+        let response = FunFactsResponse(funFact: "Interesting fact!", text: nil, artist: nil)
         
         let encoder = JSONEncoder()
         let data = try encoder.encode(response)

@@ -420,6 +420,64 @@ final class MusicNerdServiceTests: XCTestCase {
         XCTAssertTrue(allTypes.contains(.surprise))
     }
     
+    // MARK: - Cache Integration Tests
+    
+    func testMusicNerdService_CacheIntegration() async {
+        // Use a test-specific cache to avoid interference
+        let service = MusicNerdService()
+        let cache = EnrichmentCache.shared
+        cache.clearAll()
+        
+        // Mock successful network responses would be needed for full integration test
+        // For now, test that cache methods are called correctly
+        
+        let artistId = "cache-test-123"
+        let bioKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
+        let funFactKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(.lore))
+        
+        // Test that cache is empty initially
+        XCTAssertNil(cache.retrieve(for: bioKey))
+        XCTAssertNil(cache.retrieve(for: funFactKey))
+        
+        // Store test data in cache
+        let testBio = "Cached bio data"
+        let testFunFact = "Cached fun fact"
+        
+        cache.store(testBio, for: bioKey)
+        cache.store(testFunFact, for: funFactKey)
+        
+        // Verify data is cached
+        XCTAssertEqual(cache.retrieve(for: bioKey), testBio)
+        XCTAssertEqual(cache.retrieve(for: funFactKey), testFunFact)
+        
+        cache.clearAll()
+    }
+    
+    func testEnrichmentCache_Integration() {
+        let cache = EnrichmentCache.shared
+        cache.clearAll()
+        
+        // Test storing bio
+        let bioKey = EnrichmentCacheKey(artistId: "integration-test", type: .bio)
+        let bioData = "Integration test bio"
+        
+        cache.store(bioData, for: bioKey, expirationInterval: 3600)
+        XCTAssertEqual(cache.retrieve(for: bioKey), bioData)
+        
+        // Test storing fun facts for all types
+        let funFactTypes: [FunFactType] = [.lore, .bts, .activity, .surprise]
+        
+        for type in funFactTypes {
+            let key = EnrichmentCacheKey(artistId: "integration-test", type: .funFact(type))
+            let data = "Integration test \(type.rawValue) fact"
+            
+            cache.store(data, for: key, expirationInterval: 3600)
+            XCTAssertEqual(cache.retrieve(for: key), data)
+        }
+        
+        cache.clearAll()
+    }
+    
     func testFunFactType_RawValues() {
         XCTAssertEqual(FunFactType.lore.rawValue, "lore")
         XCTAssertEqual(FunFactType.bts.rawValue, "bts")

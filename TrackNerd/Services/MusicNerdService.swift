@@ -17,6 +17,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
     
     private let session: URLSession
     private let decoder: JSONDecoder
+    private let cache: EnrichmentCache
     
     init() {
         let config = URLSessionConfiguration.default
@@ -24,6 +25,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
         config.timeoutIntervalForResource = AppConfiguration.API.timeoutInterval
         self.session = URLSession(configuration: config)
         self.decoder = JSONDecoder()
+        self.cache = EnrichmentCache.shared
     }
     
     // MARK: - Search Artist
@@ -114,6 +116,12 @@ class MusicNerdService: MusicNerdServiceProtocol {
             return .failure(.musicNerdError(.artistNotFound))
         }
         
+        // Check cache first
+        let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
+        if let cachedBio = cache.retrieve(for: cacheKey) {
+            return .success(cachedBio)
+        }
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.artistBioEndpoint)/\(artistId)"
         
@@ -149,6 +157,11 @@ class MusicNerdService: MusicNerdServiceProtocol {
                 
                 if let bio = bioResponse.bio, !bio.isEmpty {
                     logWithTimestamp("Retrieved bio (\(bio.count) characters)")
+                    
+                    // Store in cache with user-configured expiration
+                    let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
+                    cache.store(bio, for: cacheKey, expirationInterval: AppSettings.shared.cacheExpirationInterval)
+                    
                     return .success(bio)
                 } else {
                     logWithTimestamp("No bio available for artist ID: \(artistId)")
@@ -180,6 +193,12 @@ class MusicNerdService: MusicNerdServiceProtocol {
         guard !artistId.isEmpty else {
             logWithTimestamp("Invalid artistId: empty string")
             return .failure(.musicNerdError(.artistNotFound))
+        }
+        
+        // Check cache first
+        let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
+        if let cachedFunFact = cache.retrieve(for: cacheKey) {
+            return .success(cachedFunFact)
         }
         
         let baseURL = AppConfiguration.API.baseURL
@@ -221,6 +240,11 @@ class MusicNerdService: MusicNerdServiceProtocol {
                 
                 if let funFact = funFactText, !funFact.isEmpty {
                     logWithTimestamp("Retrieved \(type.rawValue) fun fact (\(funFact.count) characters)")
+                    
+                    // Store in cache with user-configured expiration
+                    let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
+                    cache.store(funFact, for: cacheKey, expirationInterval: AppSettings.shared.cacheExpirationInterval)
+                    
                     return .success(funFact)
                 } else {
                     logWithTimestamp("No \(type.rawValue) fun fact available for artist ID: \(artistId)")
