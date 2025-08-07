@@ -17,6 +17,7 @@ struct ListeningView: View {
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var isEnriching: Bool = false
+    @State private var showingMatchDetail: Bool = false
     
     private let services = DefaultServiceContainer.shared
     private let settings = AppSettings.shared
@@ -95,7 +96,7 @@ struct ListeningView: View {
                                     .foregroundColor(Color.MusicNerd.primary)
                                 
                                 SongMatchCard(match: match) {
-                                    // TODO: Navigate to match detail
+                                    showingMatchDetail = true
                                 }
                                 .accessibilityIdentifier("recognition-result")
                                 
@@ -148,7 +149,7 @@ struct ListeningView: View {
                                 )
                             )
                         ) {
-                            // TODO: Navigate to match detail
+                            showingMatchDetail = true
                         }
                         .accessibilityIdentifier("recent-match-0")
                         
@@ -158,7 +159,7 @@ struct ListeningView: View {
                                 artist: "Eagles"
                             )
                         ) {
-                            // TODO: Navigate to match detail
+                            showingMatchDetail = true
                         }
                         .accessibilityIdentifier("recent-match-1")
                     }
@@ -191,6 +192,11 @@ struct ListeningView: View {
             }
         } message: {
             Text("TrackNerd needs microphone access to identify songs. Please enable it in Settings.")
+        }
+        .sheet(isPresented: $showingMatchDetail) {
+            if let match = lastMatch {
+                MatchDetailView(match: match)
+            }
         }
     }
     
@@ -276,6 +282,9 @@ struct ListeningView: View {
                         case .success(let match):
                             lastMatch = match
                             recognitionState = .success(match)
+                            
+                            // Present the detail view immediately
+                            showingMatchDetail = true
                             
                             // Automatically start enrichment in background
                             Task {

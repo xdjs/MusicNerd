@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HistoryView: View {
     @State private var searchText = ""
+    @State private var showingMatchDetail = false
+    @State private var selectedMatch: SongMatch?
     @State private var sampleMatches: [SongMatch] = [
         SongMatch(
             title: "Bohemian Rhapsody",
@@ -115,7 +117,8 @@ struct HistoryView: View {
                         LazyVStack(spacing: CGFloat.MusicNerd.md) {
                             ForEach(Array(filteredMatches.enumerated()), id: \.element.id) { index, match in
                                 SongMatchCard(match: match) {
-                                    // TODO: Navigate to match detail
+                                    selectedMatch = match
+                                    showingMatchDetail = true
                                 }
                                 .accessibilityIdentifier("history-match-\(index)")
                             }
@@ -135,6 +138,11 @@ struct HistoryView: View {
                     .foregroundColor(Color.MusicNerd.primary)
                     .accessibilityIdentifier("export-button")
                 }
+            }
+        }
+        .sheet(isPresented: $showingMatchDetail) {
+            if let match = selectedMatch {
+                MatchDetailView(match: match)
             }
         }
     }

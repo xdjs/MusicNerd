@@ -11,6 +11,7 @@ extension Color {
         // Background colors
         static let background = Color(hex: "#FFEEF8")        // Light Pink Background
         static let surface = Color.white
+        static let cardBackground = Color.white
         static let overlay = Color.black.opacity(0.6)
         
         // Text colors
