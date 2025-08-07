@@ -151,14 +151,24 @@ Build an iOS app under the Music Nerd brand that:
 ---
 
 ### 🧠 Phase 5: Enrichment & Intelligence
-- [ ] **Content Enhancement**:
-  - [ ] Integrate OpenAI enrichment with recognition flow
-  - [ ] Display enriched content (artist bio, song context, trivia)
-  - [ ] Related songs/artists recommendations
+- [x] **Backend Integration**:
+  - [x] Integrate OpenAI enrichment with recognition flow
+  - [x] MusicNerdService API integration (search, bio, fun facts)
+  - [x] Automatic background enrichment after recognition
+  - [x] Loading states during enrichment
+- [ ] **Content Display**:
+  - [ ] Create match detail view to display enriched content
+  - [ ] Display artist bio in readable format
+  - [ ] Display fun facts with proper categorization (lore, bts, activity, surprise)
+  - [ ] Add navigation from SongMatchCard to detail view
+  - [ ] Format and style enriched content with Music Nerd branding
+- [ ] **Enhanced UI Features**:
+  - [ ] Expandable content sections in detail view
+  - [ ] Share enriched content functionality
 - [ ] **Smart Features**:
-  - [ ] Loading states during enrichment
   - [ ] Fallback content for API failures
   - [ ] Content caching for offline viewing
+  - [ ] Retry mechanism for failed enrichment
 - [ ] **Error Handling**:
   - [ ] No match scenarios
   - [ ] Network failure recovery
