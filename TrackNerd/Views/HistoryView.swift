@@ -11,6 +11,7 @@ struct HistoryView: View {
     @State private var searchText = ""
     @State private var showingMatchDetail = false
     @State private var selectedMatch: SongMatch?
+    // Sample data for UI testing - will be replaced with real persistence in Phase 6
     @State private var sampleMatches: [SongMatch] = [
         SongMatch(
             title: "Bohemian Rhapsody",
@@ -113,14 +114,15 @@ struct HistoryView: View {
                     }
                     .padding(CGFloat.MusicNerd.screenMargin)
                 } else {
-                    // Matches List
+                    // Sample Matches List (will be replaced with real data in Phase 6)
                     ScrollView {
                         LazyVStack(spacing: CGFloat.MusicNerd.md) {
                             ForEach(Array(filteredMatches.enumerated()), id: \.element.id) { index, match in
                                 SongMatchCard(match: match) {
-                                    selectedMatch = match
-                                    showingMatchDetail = true
+                                    // Sample data - no action until Phase 6 persistence
                                 }
+                                .disabled(true)
+                                .opacity(0.6)
                                 .accessibilityIdentifier("history-match-\(index)")
                             }
                         }

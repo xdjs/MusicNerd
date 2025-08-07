@@ -135,11 +135,12 @@ struct ListeningView: View {
                             Button("See All") {
                                 // TODO: Navigate to history
                             }
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .disabled(true)
                             .accessibilityIdentifier("see-all-button")
                         }
                         
-                        // Sample matches (will be replaced with real data)
+                        // Sample matches (will be replaced with real data in Phase 6)
                         SongMatchCard(
                             match: SongMatch(
                                 title: "Bohemian Rhapsody",
@@ -149,8 +150,10 @@ struct ListeningView: View {
                                 )
                             )
                         ) {
-                            showingMatchDetail = true
+                            // Sample data - no action until Phase 6 persistence
                         }
+                        .disabled(true)
+                        .opacity(0.6)
                         .accessibilityIdentifier("recent-match-0")
                         
                         SongMatchCard(
@@ -159,8 +162,10 @@ struct ListeningView: View {
                                 artist: "Eagles"
                             )
                         ) {
-                            showingMatchDetail = true
+                            // Sample data - no action until Phase 6 persistence
                         }
+                        .disabled(true)
+                        .opacity(0.6)
                         .accessibilityIdentifier("recent-match-1")
                     }
                     
