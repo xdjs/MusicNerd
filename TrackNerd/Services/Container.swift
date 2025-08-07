@@ -81,11 +81,16 @@ class OpenAIService: OpenAIServiceProtocol {
         
         switch searchResult {
         case .success(let musicNerdArtist):
-            logWithTimestamp("Found MusicNerd artist: '\(musicNerdArtist.name)' (ID: \(musicNerdArtist.id))")
+            guard let artistId = musicNerdArtist.artistId else {
+                logWithTimestamp("Found artist '\(musicNerdArtist.name)' but no valid ID")
+                return .failure(.musicNerdError(.artistNotFound))
+            }
+            
+            logWithTimestamp("Found MusicNerd artist: '\(musicNerdArtist.name)' (ID: \(artistId))")
             
             // Step 2: Get enrichment data concurrently
-            async let bioResult = musicNerdService.getArtistBio(artistId: musicNerdArtist.id)
-            async let funFactResult = musicNerdService.getFunFact(artistId: musicNerdArtist.id, type: .surprise)
+            async let bioResult = musicNerdService.getArtistBio(artistId: artistId)
+            async let funFactResult = musicNerdService.getFunFact(artistId: artistId, type: .surprise)
             
             // Wait for both requests to complete
             let bio = await bioResult

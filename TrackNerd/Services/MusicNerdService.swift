@@ -69,16 +69,20 @@ class MusicNerdService: MusicNerdServiceProtocol {
             if httpResponse.statusCode == 200 {
                 let searchResponse = try decoder.decode(SearchArtistsResponse.self, from: data)
                 
-                logWithTimestamp("Found \(searchResponse.results.count) artists")
+                logWithTimestamp("Found \(searchResponse.results.count) artists (before filtering)")
                 
-                if searchResponse.results.isEmpty {
-                    logWithTimestamp("No artists found for: '\(name)'")
+                // Filter out artists with null IDs
+                let validArtists = searchResponse.results.filter { $0.artistId != nil }
+                logWithTimestamp("Found \(validArtists.count) valid artists (with non-null IDs)")
+                
+                if validArtists.isEmpty {
+                    logWithTimestamp("No valid artists found for: '\(name)'")
                     return .failure(.musicNerdError(.artistNotFound))
                 }
                 
-                // Simple algorithm: always choose the first result
-                let selectedArtist = searchResponse.results[0]
-                logWithTimestamp("Selected artist: '\(selectedArtist.name)' (ID: \(selectedArtist.id))")
+                // Simple algorithm: always choose the first valid result
+                let selectedArtist = validArtists[0]
+                logWithTimestamp("Selected artist: '\(selectedArtist.name)' (ID: \(selectedArtist.artistId ?? "nil"))")
                 
                 return .success(selectedArtist)
             } else {
@@ -105,6 +109,11 @@ class MusicNerdService: MusicNerdServiceProtocol {
     // MARK: - Get Artist Bio
     
     func getArtistBio(artistId: String) async -> Result<String> {
+        guard !artistId.isEmpty else {
+            logWithTimestamp("Invalid artistId: empty string")
+            return .failure(.musicNerdError(.artistNotFound))
+        }
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.artistBioEndpoint)/\(artistId)"
         
@@ -168,6 +177,11 @@ class MusicNerdService: MusicNerdServiceProtocol {
     // MARK: - Get Fun Fact
     
     func getFunFact(artistId: String, type: FunFactType) async -> Result<String> {
+        guard !artistId.isEmpty else {
+            logWithTimestamp("Invalid artistId: empty string")
+            return .failure(.musicNerdError(.artistNotFound))
+        }
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.funFactsEndpoint)/\(type.rawValue)?id=\(artistId)"
         
