@@ -135,12 +135,12 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Handle cases where artist is not found in MusicNerdNG database  
   - [x] Automatic background enrichment with UI status indicators
   - [x] Fallback gracefully when MusicNerdNG APIs are unavailable
-  - [ ] Cache enrichment data locally to avoid repeated API calls
+  - [x] Cache enrichment data locally to avoid repeated API calls
 - [x] **Unit Testing:**
   - [x] Test artist name search and ID resolution
   - [x] Test bio and fun facts API response parsing
   - [x] Test network error handling and retry logic
-  - [ ] Test caching behavior
+  - [x] Test caching behavior
   - [x] Mock MusicNerdNG API responses for testing
 - [ ] **UI Testing:**
   - [ ] Test network error states in UI
@@ -193,6 +193,7 @@ Build an iOS app under the Music Nerd brand that:
 - [ ] **Storage Implementation**:
   - [ ] SwiftData setup for match history
   - [ ] Local storage for enrichment cache
+  - [ ] Migrate in-memory enrichment cache to persistent storage (Core Data/SwiftData)
   - [ ] User preferences and settings
 - [ ] **History Features**:
   - [ ] Scrollable match history list
