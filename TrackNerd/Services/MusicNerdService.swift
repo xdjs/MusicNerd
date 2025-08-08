@@ -18,19 +18,29 @@ class MusicNerdService: MusicNerdServiceProtocol {
     private let session: URLSession
     private let decoder: JSONDecoder
     private let cache: EnrichmentCache
+    private let reachabilityService: NetworkReachabilityService
     
-    init() {
+    init(reachabilityService: NetworkReachabilityService = NetworkReachabilityService.shared) {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = AppConfiguration.API.timeoutInterval
         config.timeoutIntervalForResource = AppConfiguration.API.timeoutInterval
         self.session = URLSession(configuration: config)
         self.decoder = JSONDecoder()
         self.cache = EnrichmentCache.shared
+        self.reachabilityService = reachabilityService
     }
     
     // MARK: - Search Artist
     
     func searchArtist(name: String) async -> Result<MusicNerdArtist> {
+        // Check network connectivity first
+        await checkNetworkConnectivity()
+        
+        guard reachabilityService.isConnected else {
+            logWithTimestamp("No network connection available for artist search: \(name)")
+            return .failure(.networkError(.noConnection))
+        }
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = AppConfiguration.API.searchArtistsEndpoint
         
@@ -122,6 +132,14 @@ class MusicNerdService: MusicNerdServiceProtocol {
             return .success(cachedBio)
         }
         
+        // Check network connectivity before making API call
+        await checkNetworkConnectivity()
+        
+        guard reachabilityService.isConnected else {
+            logWithTimestamp("No network connection available for artist bio: \(artistId)")
+            return .failure(.networkError(.noConnection))
+        }
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.artistBioEndpoint)/\(artistId)"
         
@@ -201,6 +219,14 @@ class MusicNerdService: MusicNerdServiceProtocol {
             return .success(cachedFunFact)
         }
         
+        // Check network connectivity before making API call
+        await checkNetworkConnectivity()
+        
+        guard reachabilityService.isConnected else {
+            logWithTimestamp("No network connection available for fun fact: \(artistId) (\(type.rawValue))")
+            return .failure(.networkError(.noConnection))
+        }
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.funFactsEndpoint)/\(type.rawValue)?id=\(artistId)"
         
@@ -268,6 +294,15 @@ class MusicNerdService: MusicNerdServiceProtocol {
             logWithTimestamp("Fun facts request failed: \(error)")
             return .failure(.networkError(.timeout))
         }
+    }
+    
+    // MARK: - Network Connectivity Helper
+    
+    private func checkNetworkConnectivity() async {
+        // Ensure network monitoring is started
+        reachabilityService.startMonitoring()
+        // Give a brief moment for initial status update
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
     }
     
     // MARK: - Logging Helper

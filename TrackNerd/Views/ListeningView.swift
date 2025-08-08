@@ -18,6 +18,7 @@ struct ListeningView: View {
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var isEnriching: Bool = false
     @State private var showingMatchDetail: Bool = false
+    @StateObject private var reachabilityService = NetworkReachabilityService.shared
     
     private let services = DefaultServiceContainer.shared
     private let settings = AppSettings.shared
@@ -39,6 +40,13 @@ struct ListeningView: View {
                             .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                             .multilineTextAlignment(.center)
                         
+                        // Network status indicator
+                        HStack {
+                            Spacer()
+                            NetworkStatusIndicator()
+                        }
+                        .padding(.horizontal, CGFloat.MusicNerd.md)
+                        
                         // Debug info display
                         if showDebugInfo {
                             Text("Sample Duration: \(AppSettings.formatDuration(sampleDuration))")
@@ -52,6 +60,9 @@ struct ListeningView: View {
                     }
                     .padding(.top, CGFloat.MusicNerd.xl)
                     
+                    // Network status banner (offline)
+                    NetworkStatusBanner()
+                    
                     // Main Listen Button
                     VStack(spacing: CGFloat.MusicNerd.lg) {
                         MusicNerdButton(
@@ -62,6 +73,8 @@ struct ListeningView: View {
                             isLoading: isListening,
                             icon: isListening ? "waveform" : "mic"
                         )
+                        .disabled(!reachabilityService.isConnected && !isListening)
+                        .opacity((!reachabilityService.isConnected && !isListening) ? 0.6 : 1.0)
                         .accessibilityIdentifier("listen-button")
                         
                         if isListening {
@@ -204,6 +217,11 @@ struct ListeningView: View {
     }
     
     private var buttonTitle: String {
+        // Check network connectivity first
+        if !reachabilityService.isConnected && !isListening {
+            return "No Internet Connection"
+        }
+        
         switch permissionStatus {
         case .notDetermined:
             return "Start Listening"
@@ -250,6 +268,12 @@ struct ListeningView: View {
     }
     
     private func handleListenTap() {
+        // Prevent listening when offline (unless already listening)
+        guard reachabilityService.isConnected || isListening else {
+            errorMessage = "Music recognition requires an internet connection"
+            return
+        }
+        
         Task {
             await requestPermissionAndListen()
         }
