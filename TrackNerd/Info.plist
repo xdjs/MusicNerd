@@ -17,7 +17,5 @@
 			</array>
 		</dict>
 	</array>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>TrackNerd needs microphone access to listen to music and identify songs using Shazam technology.</string>
 </dict>
 </plist>
