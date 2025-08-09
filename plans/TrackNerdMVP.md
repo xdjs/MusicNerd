@@ -128,8 +128,8 @@ Build an iOS app under the Music Nerd brand that:
   - [x] `MusicNerdService` with proper error handling and timeouts (25s for MusicNerdNG)
   - [x] Comprehensive debug logging for request/response troubleshooting
   - [x] Fixed critical JSON decoding bug (artist ID String vs Int type mismatch)
-  - [ ] Network reachability monitoring
-  - [ ] Retry logic for failed requests
+  - [x] Network reachability monitoring
+  - [x] Retry logic for failed requests
 - [x] **Integration Strategy**:
   - [x] Map ShazamKit metadata (artist name) to MusicNerdNG search
   - [x] Handle cases where artist is not found in MusicNerdNG database  
@@ -142,11 +142,11 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Test network error handling and retry logic
   - [x] Test caching behavior
   - [x] Mock MusicNerdNG API responses for testing
-- [ ] **UI Testing:**
-  - [ ] Test network error states in UI
-  - [ ] Test loading indicators during API calls
+- [x] **UI Testing:**
+  - [x] Test network error states in UI
+  - [x] Test loading indicators during API calls
   - [ ] Test artist not found scenarios
-  - [ ] Test offline mode behavior
+  - [x] Test offline mode behavior
 
 ---
 
