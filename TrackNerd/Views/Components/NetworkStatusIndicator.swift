@@ -3,8 +3,16 @@ import SwiftUI
 struct NetworkStatusIndicator: View {
     @StateObject private var reachabilityService = NetworkReachabilityService.shared
     @State private var showDetails = false
+    @AppStorage("show_network_indicator") private var showNetworkIndicator = false
     
     var body: some View {
+        // Only show if debug setting is enabled
+        if showNetworkIndicator {
+            networkIndicatorContent
+        }
+    }
+    
+    private var networkIndicatorContent: some View {
         HStack(spacing: 8) {
             if reachabilityService.isConnected {
                 connectedIndicator

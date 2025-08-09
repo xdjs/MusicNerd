@@ -10,6 +10,7 @@ class AppSettings {
     private enum Keys {
         static let sampleDuration = "sample_duration"
         static let showDebugInfo = "show_debug_info"
+        static let showNetworkIndicator = "show_network_indicator"
         static let useProductionServer = "use_production_server"
         static let cacheExpirationHours = "cache_expiration_hours"
     }
@@ -32,6 +33,16 @@ class AppSettings {
         }
         set {
             userDefaults.set(newValue, forKey: Keys.showDebugInfo)
+        }
+    }
+    
+    var showNetworkIndicator: Bool {
+        get {
+            // Default to off (false)
+            return userDefaults.bool(forKey: Keys.showNetworkIndicator)
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.showNetworkIndicator)
         }
     }
     
@@ -73,6 +84,7 @@ class AppSettings {
     func resetToDefaults() {
         userDefaults.removeObject(forKey: Keys.sampleDuration)
         userDefaults.removeObject(forKey: Keys.showDebugInfo)
+        userDefaults.removeObject(forKey: Keys.showNetworkIndicator)
         userDefaults.removeObject(forKey: Keys.useProductionServer)
         userDefaults.removeObject(forKey: Keys.cacheExpirationHours)
     }
