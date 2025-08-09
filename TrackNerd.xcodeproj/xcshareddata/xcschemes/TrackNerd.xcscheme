@@ -30,8 +30,14 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:Unit Tests Only.xctestplan"
+            reference = "container:plans/tests/DevTestPlan.xctestplan"
             default = "YES">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:plans/tests/UITestPlan.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:plans/tests/UnitTestPlan.xctestplan">
          </TestPlanReference>
       </TestPlans>
       <Testables>
