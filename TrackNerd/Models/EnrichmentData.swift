@@ -12,6 +12,10 @@ struct EnrichmentData: Codable, Hashable {
     let albumName: String?
     let enrichedAt: Date
     
+    // Error tracking for fallback content
+    let bioError: EnrichmentError?
+    let funFactErrors: [String: EnrichmentError] // Errors by fun fact type
+    
     init(
         artistBio: String? = nil,
         songTrivia: String? = nil,
@@ -21,7 +25,9 @@ struct EnrichmentData: Codable, Hashable {
         relatedSongs: [String] = [],
         genres: [String] = [],
         releaseYear: Int? = nil,
-        albumName: String? = nil
+        albumName: String? = nil,
+        bioError: EnrichmentError? = nil,
+        funFactErrors: [String: EnrichmentError] = [:]
     ) {
         self.artistBio = artistBio
         self.songTrivia = songTrivia
@@ -33,6 +39,8 @@ struct EnrichmentData: Codable, Hashable {
         self.releaseYear = releaseYear
         self.albumName = albumName
         self.enrichedAt = Date()
+        self.bioError = bioError
+        self.funFactErrors = funFactErrors
     }
 }
 

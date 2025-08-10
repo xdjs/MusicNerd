@@ -111,6 +111,10 @@ class MusicNerdService: MusicNerdServiceProtocol {
                 logWithTimestamp("Selected artist: '\(selectedArtist.name)' (ID: \(selectedArtist.artistId ?? "nil"))")
                 
                 return .success(selectedArtist)
+            } else if httpResponse.statusCode == 429 {
+                logWithTimestamp("=== RATE LIMIT ERROR ===")
+                logWithTimestamp("HTTP Status: 429 - Too Many Requests")
+                return .failure(.networkError(.rateLimited))
             } else {
                 logWithTimestamp("=== SEARCH ARTIST ERROR ===")
                 logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
@@ -208,6 +212,10 @@ class MusicNerdService: MusicNerdServiceProtocol {
                     logWithTimestamp("No bio available for artist ID: \(artistId)")
                     return .failure(.musicNerdError(.noBioAvailable))
                 }
+            } else if httpResponse.statusCode == 429 {
+                logWithTimestamp("=== BIO RATE LIMIT ERROR ===")
+                logWithTimestamp("HTTP Status: 429 - Too Many Requests")
+                return .failure(.networkError(.rateLimited))
             } else {
                 logWithTimestamp("=== GET ARTIST BIO ERROR ===")
                 logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
@@ -308,6 +316,10 @@ class MusicNerdService: MusicNerdServiceProtocol {
                     logWithTimestamp("No \(type.rawValue) fun fact available for artist ID: \(artistId)")
                     return .failure(.musicNerdError(.noFunFactAvailable))
                 }
+            } else if httpResponse.statusCode == 429 {
+                logWithTimestamp("=== FUN FACT RATE LIMIT ERROR ===")
+                logWithTimestamp("HTTP Status: 429 - Too Many Requests")
+                return .failure(.networkError(.rateLimited))
             } else {
                 logWithTimestamp("=== GET FUN FACT ERROR ===")
                 logWithTimestamp("HTTP Status: \(httpResponse.statusCode)")
@@ -371,7 +383,8 @@ class MusicNerdService: MusicNerdServiceProtocol {
             .networkError(.serverError(500)),
             .networkError(.serverError(502)),
             .networkError(.serverError(503)),
-            .networkError(.serverError(504))
+            .networkError(.serverError(504)),
+            .networkError(.rateLimited)
         ]
         let errorsToRetry = retryableErrors ?? defaultRetryableErrors
         

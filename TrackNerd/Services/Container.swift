@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import Combine
 
 @MainActor
 final class Container: ObservableObject {
@@ -36,7 +37,7 @@ protocol ServiceContainer {
 }
 
 @MainActor
-final class DefaultServiceContainer: ServiceContainer {
+final class DefaultServiceContainer: ServiceContainer, ObservableObject {
     static let shared = DefaultServiceContainer()
     
     lazy var shazamService: ShazamServiceProtocol = ShazamService()
@@ -102,46 +103,64 @@ class OpenAIService: OpenAIServiceProtocol {
             let activityFunFact = await activityFunFactResult
             let surpriseFunFact = await surpriseFunFactResult
             
-            // Step 3: Build enrichment data from results
+            // Step 3: Build enrichment data from results with error tracking
             let artistBio = try? bio.get()
             let legacySongFunFact = try? surpriseFunFact.get() // Keep first surprise fun fact for legacy compatibility
             
-            // Build categorized fun facts dictionary
-            var categorizedFunFacts: [String: String] = [:]
+            // Track bio error
+            let bioError: EnrichmentError? = {
+                if case .failure(let error) = bio {
+                    return EnrichmentError.from(error)
+                }
+                return nil
+            }()
             
-            // Add debug logging for each fun fact type
-            if let lore = try? loreFunFact.get() { 
+            // Build categorized fun facts dictionary and track errors
+            var categorizedFunFacts: [String: String] = [:]
+            var funFactErrors: [String: EnrichmentError] = [:]
+            
+            // Process lore fact
+            if let lore = try? loreFunFact.get() {
                 categorizedFunFacts["lore"] = lore
                 logWithTimestamp("✓ Lore fact retrieved: \(lore.prefix(50))...")
             } else {
+                if case .failure(let error) = loreFunFact {
+                    funFactErrors["lore"] = EnrichmentError.from(error)
+                }
                 logWithTimestamp("✗ Lore fact failed or empty")
             }
             
-            if let bts = try? btsFunFact.get() { 
+            // Process BTS fact
+            if let bts = try? btsFunFact.get() {
                 categorizedFunFacts["bts"] = bts
                 logWithTimestamp("✓ BTS fact retrieved: \(bts.prefix(50))...")
             } else {
+                if case .failure(let error) = btsFunFact {
+                    funFactErrors["bts"] = EnrichmentError.from(error)
+                }
                 logWithTimestamp("✗ BTS fact failed or empty")
             }
             
-            if let activity = try? activityFunFact.get() { 
+            // Process activity fact
+            if let activity = try? activityFunFact.get() {
                 categorizedFunFacts["activity"] = activity
                 logWithTimestamp("✓ Activity fact retrieved: \(activity.prefix(50))...")
             } else {
+                if case .failure(let error) = activityFunFact {
+                    funFactErrors["activity"] = EnrichmentError.from(error)
+                }
                 logWithTimestamp("✗ Activity fact failed or empty")
             }
             
-            if let surprise = try? surpriseFunFact.get() { 
+            // Process surprise fact
+            if let surprise = try? surpriseFunFact.get() {
                 categorizedFunFacts["surprise"] = surprise
                 logWithTimestamp("✓ Surprise fact retrieved: \(surprise.prefix(50))...")
             } else {
+                if case .failure(let error) = surpriseFunFact {
+                    funFactErrors["surprise"] = EnrichmentError.from(error)
+                }
                 logWithTimestamp("✗ Surprise fact failed or empty")
-            }
-            
-            // If no fun facts were retrieved, add a generic fallback
-            if categorizedFunFacts.isEmpty && artistBio != nil {
-                logWithTimestamp("Adding fallback fun fact since no API facts available")
-                categorizedFunFacts["surprise"] = "This track was recognized using advanced audio fingerprinting technology that can identify songs from just a few seconds of audio!"
             }
             
             let enrichmentData = EnrichmentData(
@@ -153,7 +172,9 @@ class OpenAIService: OpenAIServiceProtocol {
                 relatedSongs: [],
                 genres: [],
                 releaseYear: nil,
-                albumName: match.album
+                albumName: match.album,
+                bioError: bioError,
+                funFactErrors: funFactErrors
             )
             
             logWithTimestamp("Enrichment completed - Bio: \(artistBio != nil ? "✓" : "✗"), Fun Facts: \(categorizedFunFacts.count) types (\(categorizedFunFacts.keys.sorted().joined(separator: ", ")))")
@@ -162,7 +183,8 @@ class OpenAIService: OpenAIServiceProtocol {
         case .failure(let error):
             logWithTimestamp("Artist not found in MusicNerd database: \(error.localizedDescription)")
             
-            // Return minimal enrichment data when artist not found
+            // Return enrichment data with error information
+            let enrichmentError = EnrichmentError.from(error)
             let enrichmentData = EnrichmentData(
                 artistBio: nil,
                 songTrivia: nil,
@@ -172,7 +194,14 @@ class OpenAIService: OpenAIServiceProtocol {
                 relatedSongs: [],
                 genres: [],
                 releaseYear: nil,
-                albumName: match.album
+                albumName: match.album,
+                bioError: enrichmentError,
+                funFactErrors: [
+                    "lore": enrichmentError,
+                    "bts": enrichmentError,
+                    "activity": enrichmentError,
+                    "surprise": enrichmentError
+                ]
             )
             
             return .success(enrichmentData)
