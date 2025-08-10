@@ -6,8 +6,8 @@ struct NetworkStatusIndicator: View {
     @AppStorage("show_network_indicator") private var showNetworkIndicator = false
     
     var body: some View {
-        // Only show if debug setting is enabled
-        if showNetworkIndicator {
+        // Show if debug setting is enabled OR if running UI tests
+        if showNetworkIndicator || ProcessInfo.processInfo.arguments.contains("--uitesting") {
             networkIndicatorContent
         }
     }
