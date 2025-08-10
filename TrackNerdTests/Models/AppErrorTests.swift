@@ -49,6 +49,21 @@ final class AppErrorTests: XCTestCase {
         let quotaError = AppError.enrichmentError(.quotaExceeded)
         XCTAssertEqual(quotaError.errorDescription, "Enrichment quota exceeded")
         XCTAssertEqual(quotaError.recoverySuggestion, "Please try again tomorrow or upgrade your plan.")
+        
+        let networkError = AppError.enrichmentError(.networkError)
+        XCTAssertEqual(networkError.errorDescription, "Network error occurred")
+        
+        let timeoutError = AppError.enrichmentError(.timeout)
+        XCTAssertEqual(timeoutError.errorDescription, "Request timed out")
+        
+        let artistNotFoundError = AppError.enrichmentError(.artistNotFound)
+        XCTAssertEqual(artistNotFoundError.errorDescription, "Artist not found in database")
+        
+        let serverError = AppError.enrichmentError(.serverError)
+        XCTAssertEqual(serverError.errorDescription, "Server error occurred")
+        
+        let rateLimitedError = AppError.enrichmentError(.rateLimited)
+        XCTAssertEqual(rateLimitedError.errorDescription, "Rate limit exceeded")
     }
     
     func testPermissionErrorDescriptions() {
@@ -95,5 +110,76 @@ final class AppErrorTests: XCTestCase {
         case .failure(let error):
             XCTAssertTrue(error is AppError)
         }
+    }
+    
+    // MARK: - EnrichmentError Fallback Content Tests
+    
+    func testEnrichmentErrorFallbackMessages() {
+        XCTAssertEqual(EnrichmentError.networkError.fallbackMessage, "Unable to load content - check your internet connection")
+        XCTAssertEqual(EnrichmentError.timeout.fallbackMessage, "Content is taking too long to load - try again later")
+        XCTAssertEqual(EnrichmentError.artistNotFound.fallbackMessage, "This artist isn't available in our music database yet")
+        XCTAssertEqual(EnrichmentError.serverError.fallbackMessage, "Our music service is experiencing issues - content unavailable")
+        XCTAssertEqual(EnrichmentError.rateLimited.fallbackMessage, "Too many requests - content temporarily unavailable")
+        XCTAssertEqual(EnrichmentError.noData.fallbackMessage, "Content is not available for this artist")
+        XCTAssertEqual(EnrichmentError.quotaExceeded.fallbackMessage, "Daily content limit reached - try again tomorrow")
+    }
+    
+    func testEnrichmentErrorRetryability() {
+        // Retryable errors
+        XCTAssertTrue(EnrichmentError.networkError.isRetryable)
+        XCTAssertTrue(EnrichmentError.timeout.isRetryable)
+        XCTAssertTrue(EnrichmentError.serverError.isRetryable)
+        XCTAssertTrue(EnrichmentError.rateLimited.isRetryable)
+        
+        // Non-retryable errors
+        XCTAssertFalse(EnrichmentError.artistNotFound.isRetryable)
+        XCTAssertFalse(EnrichmentError.noData.isRetryable)
+        XCTAssertFalse(EnrichmentError.invalidData.isRetryable)
+        XCTAssertFalse(EnrichmentError.processingFailed.isRetryable)
+        XCTAssertFalse(EnrichmentError.quotaExceeded.isRetryable)
+    }
+    
+    func testAppErrorToEnrichmentErrorConversion() {
+        // Network errors
+        XCTAssertEqual(EnrichmentError.from(.networkError(.noConnection)), .networkError)
+        XCTAssertEqual(EnrichmentError.from(.networkError(.invalidResponse)), .networkError)
+        XCTAssertEqual(EnrichmentError.from(.networkError(.timeout)), .timeout)
+        XCTAssertEqual(EnrichmentError.from(.networkError(.serverError(500))), .serverError)
+        XCTAssertEqual(EnrichmentError.from(.networkError(.rateLimited)), .rateLimited)
+        
+        // MusicNerd errors
+        XCTAssertEqual(EnrichmentError.from(.musicNerdError(.artistNotFound)), .artistNotFound)
+        XCTAssertEqual(EnrichmentError.from(.musicNerdError(.noBioAvailable)), .noData)
+        XCTAssertEqual(EnrichmentError.from(.musicNerdError(.noFunFactAvailable)), .noData)
+        XCTAssertEqual(EnrichmentError.from(.musicNerdError(.apiError("test"))), .serverError)
+        
+        // Other errors
+        XCTAssertEqual(EnrichmentError.from(.storageError(.saveFailed)), .processingFailed)
+        XCTAssertEqual(EnrichmentError.from(.unknown("test")), .processingFailed)
+    }
+    
+    func testEnrichmentErrorCodableConformance() throws {
+        let originalErrors: [EnrichmentError] = [
+            .networkError,
+            .timeout,
+            .artistNotFound,
+            .serverError,
+            .rateLimited,
+            .noData,
+            .quotaExceeded
+        ]
+        
+        for originalError in originalErrors {
+            let encoded = try JSONEncoder().encode(originalError)
+            let decoded = try JSONDecoder().decode(EnrichmentError.self, from: encoded)
+            XCTAssertEqual(decoded, originalError, "Failed to encode/decode \(originalError)")
+        }
+    }
+    
+    func testEnrichmentErrorEquality() {
+        XCTAssertEqual(EnrichmentError.networkError, EnrichmentError.networkError)
+        XCTAssertEqual(EnrichmentError.artistNotFound, EnrichmentError.artistNotFound)
+        XCTAssertNotEqual(EnrichmentError.networkError, EnrichmentError.timeout)
+        XCTAssertNotEqual(EnrichmentError.rateLimited, EnrichmentError.artistNotFound)
     }
 }

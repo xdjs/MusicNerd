@@ -163,11 +163,16 @@ enum StorageError: LocalizedError, Equatable {
     }
 }
 
-enum EnrichmentError: LocalizedError, Equatable {
+enum EnrichmentError: LocalizedError, Equatable, Codable {
     case noData
     case invalidData
     case processingFailed
     case quotaExceeded
+    case networkError
+    case timeout
+    case artistNotFound
+    case serverError
+    case rateLimited
     
     var errorDescription: String? {
         switch self {
@@ -179,6 +184,16 @@ enum EnrichmentError: LocalizedError, Equatable {
             return "Failed to process enrichment"
         case .quotaExceeded:
             return "Enrichment quota exceeded"
+        case .networkError:
+            return "Network error occurred"
+        case .timeout:
+            return "Request timed out"
+        case .artistNotFound:
+            return "Artist not found in database"
+        case .serverError:
+            return "Server error occurred"
+        case .rateLimited:
+            return "Rate limit exceeded"
         }
     }
     
@@ -192,6 +207,68 @@ enum EnrichmentError: LocalizedError, Equatable {
             return "Please try again later."
         case .quotaExceeded:
             return "Please try again tomorrow or upgrade your plan."
+        case .networkError:
+            return "Check your internet connection and try again."
+        case .timeout:
+            return "Taking too long to load - try again later."
+        case .artistNotFound:
+            return "This artist isn't available in our music database yet."
+        case .serverError:
+            return "Our music service is experiencing issues - try again later."
+        case .rateLimited:
+            return "Too many requests - try again in a moment."
+        }
+    }
+    
+    // User-friendly messages for fallback content
+    var fallbackMessage: String {
+        switch self {
+        case .networkError:
+            return "Unable to load content - check your internet connection"
+        case .timeout:
+            return "Content is taking too long to load - try again later"
+        case .artistNotFound:
+            return "This artist isn't available in our music database yet"
+        case .serverError:
+            return "Our music service is experiencing issues - content unavailable"
+        case .rateLimited:
+            return "Too many requests - content temporarily unavailable"
+        case .noData, .invalidData, .processingFailed:
+            return "Content is not available for this artist"
+        case .quotaExceeded:
+            return "Daily content limit reached - try again tomorrow"
+        }
+    }
+    
+    // Indicates if this error is retryable
+    var isRetryable: Bool {
+        switch self {
+        case .networkError, .timeout, .serverError, .rateLimited:
+            return true
+        case .artistNotFound, .noData, .invalidData, .processingFailed, .quotaExceeded:
+            return false
+        }
+    }
+    
+    // Convert AppError to EnrichmentError
+    static func from(_ appError: AppError) -> EnrichmentError {
+        switch appError {
+        case .networkError(.noConnection), .networkError(.invalidResponse):
+            return .networkError
+        case .networkError(.timeout):
+            return .timeout
+        case .networkError(.serverError), .networkError(.invalidURL):
+            return .serverError
+        case .networkError(.rateLimited):
+            return .rateLimited
+        case .musicNerdError(.artistNotFound):
+            return .artistNotFound
+        case .musicNerdError(.noBioAvailable), .musicNerdError(.noFunFactAvailable):
+            return .noData
+        case .musicNerdError(.apiError):
+            return .serverError
+        default:
+            return .processingFailed
         }
     }
 }

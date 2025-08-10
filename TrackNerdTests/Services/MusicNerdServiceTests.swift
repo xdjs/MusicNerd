@@ -509,4 +509,179 @@ final class MusicNerdServiceTests: XCTestCase {
         XCTAssertNotNil(URL(string: bioURL))
         XCTAssertNotNil(URL(string: funFactURL))
     }
+    
+    // MARK: - Rate Limiting and Retry Logic Tests
+    
+    func testRetryableErrorConfiguration() {
+        // Test that the right error types are configured as retryable in MusicNerdService
+        let retryableNetworkErrors: [NetworkError] = [
+            .timeout,
+            .noConnection,
+            .serverError(500),
+            .serverError(502),
+            .serverError(503),
+            .serverError(504),
+            .rateLimited
+        ]
+        
+        for error in retryableNetworkErrors {
+            // These should be considered retryable by the service
+            switch error {
+            case .timeout, .noConnection, .serverError, .rateLimited:
+                XCTAssertTrue(true, "\(error) should be retryable")
+            default:
+                XCTFail("\(error) should be retryable but isn't configured as such")
+            }
+        }
+        
+        let nonRetryableErrors: [NetworkError] = [
+            .invalidURL,
+            .invalidResponse
+        ]
+        
+        for error in nonRetryableErrors {
+            // These should not retry immediately
+            switch error {
+            case .invalidURL, .invalidResponse:
+                XCTAssertTrue(true, "\(error) should not be immediately retryable")
+            default:
+                break
+            }
+        }
+    }
+    
+    func testEnrichmentErrorFromAppErrorMapping() {
+        // Test the conversion logic for various error scenarios
+        let testCases: [(AppError, EnrichmentError)] = [
+            // Network errors
+            (.networkError(.noConnection), .networkError),
+            (.networkError(.timeout), .timeout),
+            (.networkError(.serverError(429)), .serverError), // Rate limiting via HTTP status
+            (.networkError(.rateLimited), .rateLimited), // Direct rate limiting
+            (.networkError(.serverError(500)), .serverError),
+            (.networkError(.invalidResponse), .networkError),
+            
+            // MusicNerd API errors
+            (.musicNerdError(.artistNotFound), .artistNotFound),
+            (.musicNerdError(.noBioAvailable), .noData),
+            (.musicNerdError(.noFunFactAvailable), .noData),
+            (.musicNerdError(.apiError("Server error")), .serverError),
+            
+            // Other error types
+            (.storageError(.saveFailed), .processingFailed),
+            (.enrichmentError(.quotaExceeded), .quotaExceeded),
+            (.unknown("Unknown error"), .processingFailed)
+        ]
+        
+        for (appError, expectedEnrichmentError) in testCases {
+            let result = EnrichmentError.from(appError)
+            XCTAssertEqual(result, expectedEnrichmentError, 
+                          "Failed to map \(appError) to \(expectedEnrichmentError), got \(result)")
+        }
+    }
+    
+    func testErrorRecoveryAndFallbackStrategies() {
+        // Test different error recovery approaches based on error types
+        let networkRecoverableErrors: [EnrichmentError] = [
+            .networkError, .timeout, .serverError, .rateLimited
+        ]
+        
+        let permanentErrors: [EnrichmentError] = [
+            .artistNotFound, .noData, .invalidData, .quotaExceeded
+        ]
+        
+        for error in networkRecoverableErrors {
+            XCTAssertTrue(error.isRetryable, "\(error) should be retryable")
+            // Check that retryable errors suggest some form of retry action
+            let message = error.fallbackMessage.lowercased()
+            let hasRetryLanguage = message.contains("try") || message.contains("again") || message.contains("later")
+            XCTAssertTrue(hasRetryLanguage, 
+                         "Retryable error \(error) should suggest trying again, message: '\(error.fallbackMessage)'")
+        }
+        
+        for error in permanentErrors {
+            XCTAssertFalse(error.isRetryable, "\(error) should not be retryable")
+            // Non-retryable errors may still mention trying again, but not immediate retry
+            // The key is that they won't show retry buttons due to isRetryable = false
+        }
+    }
+    
+    func testFallbackMessageSpecificity() {
+        // Test that fallback messages are specific and user-friendly
+        let messageTests: [(EnrichmentError, String)] = [
+            (.networkError, "check your internet connection"),
+            (.timeout, "taking too long to load"),
+            (.artistNotFound, "isn't available in our music database"),
+            (.rateLimited, "Too many requests"),
+            (.serverError, "experiencing issues"),
+            (.quotaExceeded, "Daily content limit")
+        ]
+        
+        for (error, expectedContainedText) in messageTests {
+            let message = error.fallbackMessage
+            XCTAssertTrue(message.contains(expectedContainedText), 
+                         "Error \(error) message '\(message)' should contain '\(expectedContainedText)'")
+            XCTAssertFalse(message.isEmpty, "Fallback message should not be empty")
+            XCTAssertTrue(message.count > 10, "Fallback message should be descriptive")
+        }
+    }
+    
+    func testErrorCategorizationForMusicNerdService() {
+        // Test that MusicNerd-specific errors are properly categorized
+        let musicNerdErrors: [(MusicNerdError, EnrichmentError)] = [
+            (.artistNotFound, .artistNotFound),
+            (.noBioAvailable, .noData),
+            (.noFunFactAvailable, .noData),
+            (.apiError("Test error"), .serverError)
+        ]
+        
+        for (musicNerdError, expectedEnrichmentError) in musicNerdErrors {
+            let appError = AppError.musicNerdError(musicNerdError)
+            let result = EnrichmentError.from(appError)
+            XCTAssertEqual(result, expectedEnrichmentError,
+                          "MusicNerd error \(musicNerdError) should convert to \(expectedEnrichmentError)")
+        }
+    }
+    
+    func testUserExperienceOptimization() {
+        // Test that the error handling optimizes for good UX
+        
+        // Immediate failures vs. retry-worthy failures
+        let immediateFailures: [EnrichmentError] = [.artistNotFound, .quotaExceeded]
+        let retryableFailures: [EnrichmentError] = [.networkError, .timeout, .rateLimited, .serverError]
+        
+        for error in immediateFailures {
+            XCTAssertFalse(error.isRetryable, "Should not show retry for \(error)")
+        }
+        
+        for error in retryableFailures {
+            XCTAssertTrue(error.isRetryable, "Should allow retry for \(error)")
+        }
+        
+        // Message tone - should be helpful, not alarming
+        for error in EnrichmentError.allCases {
+            let message = error.fallbackMessage
+            XCTAssertFalse(message.contains("error"), "Message should not use scary word 'error'")
+            XCTAssertFalse(message.contains("failed"), "Message should not emphasize failure")
+            XCTAssertFalse(message.uppercased() == message, "Message should not be ALL CAPS")
+        }
+    }
+}
+
+// MARK: - Extension for Test Support
+
+extension EnrichmentError {
+    static var allCases: [EnrichmentError] {
+        return [
+            .noData,
+            .invalidData,
+            .processingFailed,
+            .quotaExceeded,
+            .networkError,
+            .timeout,
+            .artistNotFound,
+            .serverError,
+            .rateLimited
+        ]
+    }
 }

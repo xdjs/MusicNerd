@@ -11,6 +11,9 @@ struct MatchDetailView: View {
     let match: SongMatch
     @Environment(\.dismiss) private var dismiss
     @State private var showShareSheet = false
+    @State private var isRetrying = false
+    @State private var retryCount = 0
+    @EnvironmentObject private var services: DefaultServiceContainer
     
     var body: some View {
         NavigationView {
@@ -89,17 +92,27 @@ struct MatchDetailView: View {
     
     private func enrichmentSections(_ enrichmentData: EnrichmentData) -> some View {
         LazyVStack(spacing: CGFloat.MusicNerd.lg) {
+            // Artist Bio Section (with fallback)
             if let bio = enrichmentData.artistBio, !bio.isEmpty {
                 EnrichmentSectionView(
                     title: "About \(match.artist)",
                     content: bio,
                     icon: "person.circle"
                 )
+            } else if let bioError = enrichmentData.bioError {
+                FallbackSectionView(
+                    title: "About \(match.artist)",
+                    errorMessage: bioError.fallbackMessage,
+                    icon: "person.circle",
+                    isRetryable: bioError.isRetryable,
+                    isRetrying: isRetrying,
+                    onRetry: { retryEnrichment() }
+                )
             }
             
-            // Display categorized fun facts
-            if !enrichmentData.funFacts.isEmpty {
-                funFactSections(enrichmentData.funFacts)
+            // Display categorized fun facts (with fallbacks)
+            if !enrichmentData.funFacts.isEmpty || !enrichmentData.funFactErrors.isEmpty {
+                funFactSectionsWithFallbacks(enrichmentData.funFacts, errors: enrichmentData.funFactErrors)
             } else if let funFact = enrichmentData.funFact, !funFact.isEmpty {
                 // Fallback for legacy single fun fact
                 EnrichmentSectionView(
@@ -197,6 +210,71 @@ struct MatchDetailView: View {
         }
     }
     
+    private func funFactSectionsWithFallbacks(_ funFacts: [String: String], errors: [String: EnrichmentError]) -> some View {
+        let funFactConfig: [(type: String, title: String, icon: String)] = [
+            ("lore", "Artist Lore", "book.closed"),
+            ("bts", "Behind the Scenes", "eye"),
+            ("activity", "Artist Activity", "music.note.list"),
+            ("surprise", "Surprise Fact", "sparkles")
+        ]
+        
+        return LazyVStack(spacing: CGFloat.MusicNerd.lg) {
+            ForEach(funFactConfig, id: \.type) { config in
+                if let fact = funFacts[config.type], !fact.isEmpty {
+                    EnrichmentSectionView(
+                        title: config.title,
+                        content: fact,
+                        icon: config.icon
+                    )
+                } else if let error = errors[config.type] {
+                    FallbackSectionView(
+                        title: config.title,
+                        errorMessage: error.fallbackMessage,
+                        icon: config.icon,
+                        isRetryable: error.isRetryable,
+                        isRetrying: isRetrying,
+                        onRetry: { retryEnrichment() }
+                    )
+                }
+            }
+        }
+    }
+    
+    private func retryEnrichment() {
+        guard !isRetrying else { return }
+        
+        Task { @MainActor in
+            isRetrying = true
+            retryCount += 1
+            
+            print("Retry enrichment requested for: '\(match.title)' (attempt #\(retryCount))")
+            
+            let enrichmentResult = await services.openAIService.enrichSong(match)
+            
+            switch enrichmentResult {
+            case .success(let enrichmentData):
+                print("Retry enrichment successful - updating song match")
+                
+                // Update the match with new enrichment data
+                match.enrichmentData = enrichmentData
+                
+                // Save the updated match
+                let saveResult = await services.storageService.save(match)
+                switch saveResult {
+                case .success:
+                    print("Re-enriched song match saved successfully")
+                case .failure(let error):
+                    print("Failed to save re-enriched song match: \(error.localizedDescription)")
+                }
+                
+            case .failure(let error):
+                print("Retry enrichment failed: \(error.localizedDescription)")
+            }
+            
+            isRetrying = false
+        }
+    }
+    
     private var shareText: String {
         var text = "🎵 I just discovered: \(match.title) by \(match.artist)"
         
@@ -257,6 +335,83 @@ struct EnrichmentSectionView: View {
         .padding(CGFloat.MusicNerd.md)
         .background(Color.MusicNerd.cardBackground)
         .cornerRadius(CGFloat.BorderRadius.md)
+    }
+}
+
+struct FallbackSectionView: View {
+    let title: String
+    let errorMessage: String
+    let icon: String
+    let isRetryable: Bool
+    let isRetrying: Bool
+    let onRetry: () -> Void
+    @State private var isExpanded: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: CGFloat.MusicNerd.sm) {
+            Button(action: { 
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isExpanded.toggle()
+                }
+            }) {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundColor(Color.MusicNerd.textSecondary)
+                    
+                    Text(title)
+                        .musicNerdStyle(.headlineSmall(color: Color.MusicNerd.textSecondary))
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(Color.MusicNerd.textSecondary)
+                        .font(.caption)
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            if isExpanded {
+                VStack(alignment: .leading, spacing: CGFloat.MusicNerd.sm) {
+                    Text(errorMessage)
+                        .musicNerdStyle(.bodyMedium(color: Color.MusicNerd.textSecondary))
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    if isRetryable {
+                        Button(action: onRetry) {
+                            HStack(spacing: CGFloat.MusicNerd.xs) {
+                                if isRetrying {
+                                    ProgressView()
+                                        .scaleEffect(0.7)
+                                        .progressViewStyle(CircularProgressViewStyle(tint: Color.MusicNerd.primary))
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.caption)
+                                }
+                                Text(isRetrying ? "Retrying..." : "Retry")
+                                    .musicNerdStyle(.caption())
+                            }
+                            .padding(.horizontal, CGFloat.MusicNerd.sm)
+                            .padding(.vertical, CGFloat.MusicNerd.xs)
+                            .background(Color.MusicNerd.primary.opacity(isRetrying ? 0.05 : 0.1))
+                            .foregroundColor(isRetrying ? Color.MusicNerd.textSecondary : Color.MusicNerd.primary)
+                            .cornerRadius(CGFloat.BorderRadius.sm)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .disabled(isRetrying)
+                    }
+                }
+                .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(CGFloat.MusicNerd.md)
+        .background(Color.MusicNerd.cardBackground.opacity(0.5))
+        .cornerRadius(CGFloat.BorderRadius.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: CGFloat.BorderRadius.md)
+                .stroke(Color.MusicNerd.textSecondary.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
