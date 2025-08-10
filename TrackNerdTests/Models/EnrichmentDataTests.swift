@@ -175,4 +175,65 @@ final class EnrichmentDataTests: XCTestCase {
         let enrichmentEmpty = EnrichmentData(funFacts: [:])
         XCTAssertTrue(enrichmentEmpty.isEmpty)
     }
+    
+    // MARK: - Error Tracking Tests
+    
+    func testErrorTrackingInitialization() {
+        let bioError = EnrichmentError.networkError
+        let funFactErrors = [
+            "lore": EnrichmentError.artistNotFound,
+            "bts": EnrichmentError.rateLimited
+        ]
+        
+        let enrichment = EnrichmentData(
+            artistBio: nil,
+            bioError: bioError,
+            funFactErrors: funFactErrors
+        )
+        
+        XCTAssertEqual(enrichment.bioError, .networkError)
+        XCTAssertEqual(enrichment.funFactErrors["lore"], .artistNotFound)
+        XCTAssertEqual(enrichment.funFactErrors["bts"], .rateLimited)
+        XCTAssertEqual(enrichment.funFactErrors.count, 2)
+    }
+    
+    func testErrorTrackingWithContent() {
+        let enrichment = EnrichmentData(
+            artistBio: "Test bio",
+            funFacts: ["lore": "Test lore"],
+            bioError: nil,
+            funFactErrors: ["bts": .timeout, "activity": .serverError]
+        )
+        
+        // Content should be present
+        XCTAssertEqual(enrichment.artistBio, "Test bio")
+        XCTAssertEqual(enrichment.loreFact, "Test lore")
+        
+        // Errors should track failed content types
+        XCTAssertNil(enrichment.bioError)
+        XCTAssertEqual(enrichment.funFactErrors["bts"], .timeout)
+        XCTAssertEqual(enrichment.funFactErrors["activity"], .serverError)
+        XCTAssertNil(enrichment.funFactErrors["lore"]) // No error for successful lore
+    }
+    
+    func testCodableConformanceWithErrors() throws {
+        let original = EnrichmentData(
+            artistBio: nil,
+            funFacts: ["lore": "Test lore"],
+            bioError: .artistNotFound,
+            funFactErrors: [
+                "bts": .rateLimited,
+                "activity": .networkError
+            ]
+        )
+        
+        let encoded = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(EnrichmentData.self, from: encoded)
+        
+        XCTAssertEqual(decoded.bioError, original.bioError)
+        XCTAssertEqual(decoded.funFactErrors.count, original.funFactErrors.count)
+        XCTAssertEqual(decoded.funFactErrors["bts"], .rateLimited)
+        XCTAssertEqual(decoded.funFactErrors["activity"], .networkError)
+        XCTAssertEqual(decoded.funFacts["lore"], "Test lore")
+    }
 }
