@@ -21,7 +21,7 @@ platform :ios do
       project: "TrackNerd.xcodeproj",
       scheme: "TrackNerd",
       destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
-      only_testing: ["TrackNerdTests"],
+      testplan: "UnitTestPlan",
       output_style: "raw",
       result_bundle: true,
       result_bundle_path: "testResults/#{Time.now.strftime('%Y%m%d_%H%M%S')}/UnitTests.xcresult"
@@ -38,7 +38,24 @@ platform :ios do
       project: "TrackNerd.xcodeproj",
       scheme: "TrackNerd",
       destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
-      only_testing: ["TrackNerdUITests"],
+      testplan: "UITestPlan",
+      output_style: "raw",
+      result_bundle: true,
+      result_bundle_path: "testResults/#{Time.now.strftime('%Y%m%d_%H%M%S')}/UITests.xcresult"
+    )
+  end
+
+  desc "Run dev tests"
+  lane :dev_test do
+    # Ensure simulator is booted (ignore if already booted)
+    sh("xcrun simctl boot 'iPhone SE (3rd generation)' || true")
+    sh("xcrun simctl spawn booted launchctl setenv SIMULATOR_SLOW_MOTION_TIMEOUT 0")
+    
+    run_tests(
+      project: "TrackNerd.xcodeproj",
+      scheme: "TrackNerd",
+      destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
+      testplan: "DevTestPlan",
       output_style: "raw",
       result_bundle: true,
       result_bundle_path: "testResults/#{Time.now.strftime('%Y%m%d_%H%M%S')}/UITests.xcresult"
