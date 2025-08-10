@@ -1,0 +1,50 @@
+{
+  "configurations" : [
+    {
+      "id" : "5F69CA7B-444E-465E-BB1E-4190D8A735D6",
+      "name" : "Configuration 1",
+      "options" : {
+        "commandLineArgumentEntries" : [
+          {
+            "argument" : "UIViewAnimationDuration=0"
+          },
+          {
+            "argument" : "UIPopoverControllerBlocksInteractionUntilDismissed=0"
+          },
+          {
+            "argument" : "UITests_DisableAnimations=1"
+          },
+          {
+            "argument" : "USE_MOCK_NETWORK=1"
+          },
+          {
+            "argument" : "SKIP_ONBOARDING=1"
+          }
+        ],
+        "environmentVariableEntries" : [
+          {
+            "key" : "OPENAI_PROXY_BASE_URL",
+            "value" : "http:\/\/localhost:3000\/mock"
+          },
+          {
+            "key" : "SHOULD_RANDOM_FAIL",
+            "value" : "0"
+          }
+        ]
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:TrackNerd.xcodeproj",
+        "identifier" : "2FA74E0D2E41833000575EFD",
+        "name" : "TrackNerdUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

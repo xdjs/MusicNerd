@@ -18,19 +18,43 @@ class MusicNerdService: MusicNerdServiceProtocol {
     private let session: URLSession
     private let decoder: JSONDecoder
     private let cache: EnrichmentCache
+    private let reachabilityService: NetworkReachabilityService
     
-    init() {
+    // Retry configuration
+    private let maxRetryAttempts: Int = 3
+    private let baseRetryDelay: TimeInterval = 1.0 // seconds
+    private let maxRetryDelay: TimeInterval = 10.0 // seconds
+    
+    init(reachabilityService: NetworkReachabilityService = NetworkReachabilityService.shared) {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = AppConfiguration.API.timeoutInterval
         config.timeoutIntervalForResource = AppConfiguration.API.timeoutInterval
         self.session = URLSession(configuration: config)
         self.decoder = JSONDecoder()
         self.cache = EnrichmentCache.shared
+        self.reachabilityService = reachabilityService
     }
     
     // MARK: - Search Artist
     
     func searchArtist(name: String) async -> Result<MusicNerdArtist> {
+        // Check network connectivity first
+        await checkNetworkConnectivity()
+        
+        guard reachabilityService.isConnected else {
+            logWithTimestamp("No network connection available for artist search: \(name)")
+            return .failure(.networkError(.noConnection))
+        }
+        
+        // Execute search with retry logic
+        return await withRetry(operation: "Artist search for '\(name)'") {
+            try await performArtistSearch(name: name)
+        }
+    }
+    
+    /// Performs the actual artist search API call
+    private func performArtistSearch(name: String) async throws -> Result<MusicNerdArtist> {
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = AppConfiguration.API.searchArtistsEndpoint
         
@@ -122,6 +146,23 @@ class MusicNerdService: MusicNerdServiceProtocol {
             return .success(cachedBio)
         }
         
+        // Check network connectivity before making API call
+        await checkNetworkConnectivity()
+        
+        guard reachabilityService.isConnected else {
+            logWithTimestamp("No network connection available for artist bio: \(artistId)")
+            return .failure(.networkError(.noConnection))
+        }
+        
+        // Execute bio request with retry logic
+        return await withRetry(operation: "Artist bio for ID '\(artistId)'") {
+            try await performArtistBioRequest(artistId: artistId)
+        }
+    }
+    
+    /// Performs the actual artist bio API call
+    private func performArtistBioRequest(artistId: String) async throws -> Result<String> {
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.artistBioEndpoint)/\(artistId)"
         
@@ -201,6 +242,23 @@ class MusicNerdService: MusicNerdServiceProtocol {
             return .success(cachedFunFact)
         }
         
+        // Check network connectivity before making API call
+        await checkNetworkConnectivity()
+        
+        guard reachabilityService.isConnected else {
+            logWithTimestamp("No network connection available for fun fact: \(artistId) (\(type.rawValue))")
+            return .failure(.networkError(.noConnection))
+        }
+        
+        // Execute fun fact request with retry logic
+        return await withRetry(operation: "Fun fact (\(type.rawValue)) for ID '\(artistId)'") {
+            try await performFunFactRequest(artistId: artistId, type: type)
+        }
+    }
+    
+    /// Performs the actual fun fact API call
+    private func performFunFactRequest(artistId: String, type: FunFactType) async throws -> Result<String> {
+        
         let baseURL = AppConfiguration.API.baseURL
         let endpoint = "\(AppConfiguration.API.funFactsEndpoint)/\(type.rawValue)?id=\(artistId)"
         
@@ -268,6 +326,128 @@ class MusicNerdService: MusicNerdServiceProtocol {
             logWithTimestamp("Fun facts request failed: \(error)")
             return .failure(.networkError(.timeout))
         }
+    }
+    
+    // MARK: - Network Connectivity Helper
+    
+    private func checkNetworkConnectivity() async {
+        // Ensure network monitoring is started
+        reachabilityService.startMonitoring()
+        // Give a brief moment for initial status update
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+    }
+    
+    /// Waits for network connectivity to be restored with timeout
+    private func waitForNetworkRecovery(timeout: TimeInterval = 5.0) async -> Bool {
+        let startTime = Date()
+        
+        while Date().timeIntervalSince(startTime) < timeout {
+            if reachabilityService.isConnected {
+                logWithTimestamp("Network connectivity restored")
+                return true
+            }
+            
+            // Wait 0.5 seconds before checking again
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
+        
+        logWithTimestamp("Network recovery timeout after \(timeout)s")
+        return false
+    }
+    
+    // MARK: - Retry Logic
+    
+    /// Executes an async operation with exponential backoff retry logic
+    private func withRetry<T>(
+        operation: String,
+        maxAttempts: Int? = nil,
+        retryableErrors: [AppError]? = nil,
+        execute: () async throws -> Result<T>
+    ) async -> Result<T> {
+        let attempts = maxAttempts ?? maxRetryAttempts
+        let defaultRetryableErrors: [AppError] = [
+            .networkError(.timeout),
+            .networkError(.noConnection),
+            .networkError(.serverError(500)),
+            .networkError(.serverError(502)),
+            .networkError(.serverError(503)),
+            .networkError(.serverError(504))
+        ]
+        let errorsToRetry = retryableErrors ?? defaultRetryableErrors
+        
+        for attempt in 1...attempts {
+            do {
+                let result = try await execute()
+                
+                switch result {
+                case .success:
+                    if attempt > 1 {
+                        logWithTimestamp("\(operation) succeeded on attempt \(attempt)")
+                    }
+                    return result
+                case .failure(let error):
+                    // Check if error is retryable
+                    let shouldRetry = errorsToRetry.contains { retryableError in
+                        switch (error, retryableError) {
+                        case (.networkError(let networkError1), .networkError(let networkError2)):
+                            return networkError1 == networkError2
+                        default:
+                            return false
+                        }
+                    }
+                    
+                    if shouldRetry && attempt < attempts {
+                        let delay = calculateRetryDelay(attempt: attempt)
+                        logWithTimestamp("\(operation) failed on attempt \(attempt), retrying in \(String(format: "%.1f", delay))s: \(error)")
+                        
+                        // For network connection errors, wait for network recovery
+                        if case .networkError(.noConnection) = error {
+                            logWithTimestamp("Waiting for network recovery before retry...")
+                            let networkRecovered = await waitForNetworkRecovery(timeout: delay)
+                            if !networkRecovered {
+                                logWithTimestamp("Network not recovered, proceeding with normal retry delay")
+                                try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                            }
+                        } else {
+                            // Wait before retrying for other errors
+                            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                        }
+                        continue
+                    } else {
+                        if attempt > 1 {
+                            logWithTimestamp("\(operation) failed after \(attempt) attempts: \(error)")
+                        }
+                        return result
+                    }
+                }
+            } catch {
+                if attempt < attempts {
+                    let delay = calculateRetryDelay(attempt: attempt)
+                    logWithTimestamp("\(operation) threw error on attempt \(attempt), retrying in \(String(format: "%.1f", delay))s: \(error)")
+                    
+                    // Wait before retrying
+                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    continue
+                } else {
+                    logWithTimestamp("\(operation) threw error after \(attempt) attempts: \(error)")
+                    return .failure(.networkError(.timeout))
+                }
+            }
+        }
+        
+        return .failure(.networkError(.timeout))
+    }
+    
+    /// Calculates exponential backoff delay with jitter
+    private func calculateRetryDelay(attempt: Int) -> TimeInterval {
+        let exponentialDelay = baseRetryDelay * pow(2.0, Double(attempt - 1))
+        let cappedDelay = min(exponentialDelay, maxRetryDelay)
+        
+        // Add jitter to prevent thundering herd (±25% randomization)
+        let jitter = cappedDelay * 0.25 * (Double.random(in: 0...1) * 2 - 1)
+        let finalDelay = max(0.1, cappedDelay + jitter)
+        
+        return finalDelay
     }
     
     // MARK: - Logging Helper

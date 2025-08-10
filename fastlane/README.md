@@ -39,6 +39,14 @@ Run unit tests
 
 Run UI tests
 
+### ios dev_test
+
+```sh
+[bundle exec] fastlane ios dev_test
+```
+
+Run dev tests
+
 ### ios test_all
 
 ```sh

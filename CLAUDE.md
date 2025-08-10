@@ -52,6 +52,9 @@ fastlane ios ui_test
 # Run all tests (unit and UI)
 fastlane ios test_all
 
+# Run dev test plan
+faastlane ios dev_test
+
 # Build and run unit tests (CI pipeline)
 fastlane ios ci
 ```

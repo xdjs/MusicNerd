@@ -15,6 +15,7 @@ struct SettingsView: View {
     @State private var showingSampleDurationPicker = false
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
+    @State private var showNetworkIndicator: Bool = AppSettings.shared.showNetworkIndicator
     @State private var useProductionServer: Bool = AppSettings.shared.useProductionServer
     @State private var showingCacheExpirationPicker = false
     @State private var cacheExpirationHours: Double = AppSettings.shared.cacheExpirationHours
@@ -246,6 +247,27 @@ struct SettingsView: View {
                     }
                     
                     HStack {
+                        Image(systemName: "network")
+                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .frame(width: 24)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Show Network Indicator")
+                                .musicNerdStyle(.bodyLarge())
+                            Text("Display network status indicator in main UI")
+                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        }
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: $showNetworkIndicator)
+                            .accessibilityIdentifier("network-indicator-toggle")
+                            .onChange(of: showNetworkIndicator) { _, newValue in
+                                settings.showNetworkIndicator = newValue
+                            }
+                    }
+                    
+                    HStack {
                         Image(systemName: "server.rack")
                             .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
@@ -289,6 +311,7 @@ struct SettingsView: View {
                         settings.resetToDefaults()
                         sampleDuration = AppSettings.shared.sampleDuration
                         showDebugInfo = AppSettings.shared.showDebugInfo
+                        showNetworkIndicator = AppSettings.shared.showNetworkIndicator
                         useProductionServer = AppSettings.shared.useProductionServer
                         cacheExpirationHours = AppSettings.shared.cacheExpirationHours
                     }

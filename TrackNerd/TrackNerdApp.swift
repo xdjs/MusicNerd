@@ -15,6 +15,9 @@ struct TrackNerdApp: App {
         if ProcessInfo.processInfo.arguments.contains("--uitesting") {
             UIView.setAnimationsEnabled(false)
         }
+        
+        // Start network reachability monitoring
+        NetworkReachabilityService.shared.startMonitoring()
     }
     
     var body: some Scene {

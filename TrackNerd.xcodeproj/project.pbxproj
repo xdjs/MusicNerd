@@ -9,7 +9,8 @@
 /* Begin PBXBuildFile section */
 		2F8DCC3B2E4557830047D90F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 2F8DCC3A2E4557830047D90F /* README.md */; };
 		2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 2FA74ED82E41884700575EFD /* CLAUDE.md */; };
-		2FF7CDAA2E42BB89005AA02A /* Unit Tests Only.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */; };
+		2FDA9C612E47CB7F002BB007 /* UITestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2FDA9C602E47CB7F002BB007 /* UITestPlan.xctestplan */; };
+		2FDA9C632E47CD27002BB007 /* UnitTestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 2FDA9C622E47CD27002BB007 /* UnitTestPlan.xctestplan */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,13 +31,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2F08D5892E47C9DF00740CD6 /* DevTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DevTestPlan.xctestplan; sourceTree = "<group>"; };
 		2F8DCC3A2E4557830047D90F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		2FA74DF72E41832E00575EFD /* TrackNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E042E41833000575EFD /* TrackNerdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E972E41850100575EFD /* TrackNerdMVP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TrackNerdMVP.md; sourceTree = "<group>"; };
 		2FA74ED82E41884700575EFD /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
-		2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Unit Tests Only.xctestplan"; sourceTree = "<group>"; };
+		2FDA9C602E47CB7F002BB007 /* UITestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UITestPlan.xctestplan; sourceTree = "<group>"; };
+		2FDA9C622E47CD27002BB007 /* UnitTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTestPlan.xctestplan; sourceTree = "<group>"; };
+		2FDA9C642E47CF11002BB007 /* Appfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Appfile; sourceTree = "<group>"; };
+		2FDA9C652E47CF11002BB007 /* Fastfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fastfile; sourceTree = "<group>"; };
+		2FDA9C662E47CF11002BB007 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		2FDA9C672E47CF11002BB007 /* report.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = report.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -95,17 +102,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2F08D58A2E47C9DF00740CD6 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				2FDA9C622E47CD27002BB007 /* UnitTestPlan.xctestplan */,
+				2FDA9C602E47CB7F002BB007 /* UITestPlan.xctestplan */,
+				2F08D5892E47C9DF00740CD6 /* DevTestPlan.xctestplan */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
 		2FA74DEE2E41832E00575EFD = {
 			isa = PBXGroup;
 			children = (
 				2F8DCC3A2E4557830047D90F /* README.md */,
-				2FF7CDA92E42BB89005AA02A /* Unit Tests Only.xctestplan */,
 				2FA74ED82E41884700575EFD /* CLAUDE.md */,
 				2FA74E962E4184F600575EFD /* plans */,
 				2FA74DF92E41832E00575EFD /* TrackNerd */,
 				2FA74E072E41833000575EFD /* TrackNerdTests */,
 				2FA74E112E41833000575EFD /* TrackNerdUITests */,
 				2FA74DF82E41832E00575EFD /* Products */,
+				2FDA9C682E47CF11002BB007 /* fastlane */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,9 +139,21 @@
 		2FA74E962E4184F600575EFD /* plans */ = {
 			isa = PBXGroup;
 			children = (
+				2F08D58A2E47C9DF00740CD6 /* tests */,
 				2FA74E972E41850100575EFD /* TrackNerdMVP.md */,
 			);
 			path = plans;
+			sourceTree = "<group>";
+		};
+		2FDA9C682E47CF11002BB007 /* fastlane */ = {
+			isa = PBXGroup;
+			children = (
+				2FDA9C642E47CF11002BB007 /* Appfile */,
+				2FDA9C652E47CF11002BB007 /* Fastfile */,
+				2FDA9C662E47CF11002BB007 /* README.md */,
+				2FDA9C672E47CF11002BB007 /* report.xml */,
+			);
+			path = fastlane;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -247,9 +276,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2FF7CDAA2E42BB89005AA02A /* Unit Tests Only.xctestplan in Resources */,
 				2F8DCC3B2E4557830047D90F /* README.md in Resources */,
+				2FDA9C632E47CD27002BB007 /* UnitTestPlan.xctestplan in Resources */,
 				2FA74ED92E41884700575EFD /* CLAUDE.md in Resources */,
+				2FDA9C612E47CB7F002BB007 /* UITestPlan.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
