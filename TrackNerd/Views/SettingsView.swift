@@ -22,7 +22,7 @@ struct SettingsView: View {
     @State private var showingClearHistoryAlert = false
     
     private let settings = AppSettings.shared
-    @EnvironmentObject private var services: DefaultServiceContainer
+    private let services = DefaultServiceContainer.shared
     
     var body: some View {
         NavigationView {
@@ -383,6 +383,7 @@ struct SettingsView: View {
     
     // MARK: - Helper Methods
     
+    @MainActor
     private func clearAllHistory() async {
         let result = await services.storageService.loadMatches()
         switch result {
@@ -393,14 +394,10 @@ struct SettingsView: View {
             }
             
             // Clear cache as well
-            await MainActor.run {
-                EnrichmentCache.shared.clearAll()
-            }
+            EnrichmentCache.shared.clearAll()
         case .failure:
             // Even if loading fails, try to clear cache
-            await MainActor.run {
-                EnrichmentCache.shared.clearAll()
-            }
+            EnrichmentCache.shared.clearAll()
         }
     }
     
