@@ -310,6 +310,11 @@ struct ListeningView: View {
                             lastMatch = match
                             recognitionState = .success(match)
                             
+                            // Save the match immediately (before enrichment)
+                            Task {
+                                await saveMatchToHistory(match)
+                            }
+                            
                             // Present the detail view immediately
                             showingMatchDetail = true
                             
@@ -333,6 +338,17 @@ struct ListeningView: View {
     }
     
     @MainActor
+    private func saveMatchToHistory(_ match: SongMatch) async {
+        let saveResult = await services.storageService.save(match)
+        switch saveResult {
+        case .success:
+            print("Song match saved to history: '\(match.title)' by '\(match.artist)'")
+        case .failure(let error):
+            print("Failed to save song match to history: \(error.localizedDescription)")
+        }
+    }
+    
+    @MainActor
     private func enrichSongMatch(_ match: SongMatch) async {
         // Only enrich if not already enriched
         guard match.enrichmentData == nil else {
@@ -352,11 +368,11 @@ struct ListeningView: View {
             // Update the match with enrichment data
             match.enrichmentData = enrichmentData
             
-            // Save the enriched match
+            // Save the updated enriched match
             let saveResult = await services.storageService.save(match)
             switch saveResult {
             case .success:
-                print("Enriched song match saved successfully")
+                print("Enriched song match updated successfully")
                 
                 // Update UI to reflect enrichment
                 if lastMatch?.id == match.id {
@@ -364,7 +380,7 @@ struct ListeningView: View {
                 }
                 
             case .failure(let error):
-                print("Failed to save enriched song match: \(error.localizedDescription)")
+                print("Failed to update enriched song match: \(error.localizedDescription)")
             }
             
         case .failure(let error):
