@@ -236,7 +236,68 @@ Build an iOS app under the Music Nerd brand that:
 
 ---
 
-### 🚀 Phase 7: Polish & App Store Preparation
+### 🎵 Phase 7: Apple Music Integration
+- [ ] **MusicKit Framework Setup**:
+  - [ ] Add MusicKit framework to project capabilities
+  - [ ] Configure Apple Developer Program MusicKit entitlements
+  - [ ] Add "Privacy — Media Library Usage Description" to Info.plist
+  - [ ] Set up MusicKit authorization flow
+- [ ] **Apple Music Service Layer**:
+  - [ ] Create `AppleMusicService` with MusicKit integration
+  - [ ] Implement subscription status checking
+  - [ ] Add Apple Music authentication flow
+  - [ ] Handle authorization states (denied, authorized, restricted)
+- [ ] **Playback Implementation**:
+  - [ ] **Preview Playback** (Non-subscribers):
+    - [ ] Fetch preview assets using `Song.previewAssets`
+    - [ ] Implement 30-second preview playback with AVPlayer
+    - [ ] Handle DRM-free preview audio streams
+    - [ ] Add preview playback controls (play/pause/seek)
+  - [ ] **Full Playback** (Subscribers):
+    - [ ] Use `ApplicationMusicPlayer` for full track playback
+    - [ ] Convert ShazamKit `appleMusicID` to MusicKit song objects
+    - [ ] Implement queue management for continuous playback
+    - [ ] Handle playback states and progress tracking
+- [ ] **UI Integration**:
+  - [ ] Add playback controls to `SongMatchCard` components
+  - [ ] Create playback UI with play/pause buttons and progress indicators
+  - [ ] Design subscription upgrade prompts for non-subscribers
+  - [ ] Add "Listen on Apple Music" action buttons
+  - [ ] Implement now playing mini-player for active playback
+- [ ] **Subscription Management**:
+  - [ ] Implement subscription trial offers within the app
+  - [ ] Handle subscription status changes
+  - [ ] Display appropriate playback options based on subscription status
+  - [ ] Add subscription management in Settings
+- [ ] **Playback Features**:
+  - [ ] Lock screen playback controls integration
+  - [ ] Background playback support
+  - [ ] Audio session management for proper audio mixing
+  - [ ] Handle interruptions (calls, other apps)
+- [ ] **Error Handling & Edge Cases**:
+  - [ ] Handle songs not available on Apple Music
+  - [ ] Manage regional content restrictions
+  - [ ] Fallback when `appleMusicID` is unavailable
+  - [ ] Network connectivity issues during playback
+- [ ] **Unit Testing:**
+  - [ ] Test AppleMusicService subscription checking
+  - [ ] Test preview asset fetching and playback logic
+  - [ ] Test full track playback for subscribers
+  - [ ] Test authorization flow handling
+  - [ ] Test playback state management
+  - [ ] Test error scenarios (unavailable tracks, network issues)
+- [ ] **UI Testing:**
+  - [ ] Test Apple Music authorization flow
+  - [ ] Test preview playback controls and feedback
+  - [ ] Test subscriber playback experience
+  - [ ] Test subscription upgrade prompts
+  - [ ] Test playback controls in match cards and detail views
+  - [ ] Test background playback behavior
+  - [ ] Test lock screen controls integration
+
+---
+
+### 🚀 Phase 8: Polish & App Store Preparation
 - [ ] **Data Export/Import Features**:
   - [ ] Implement user data export functionality (JSON format)
   - [ ] Add export options (email, save to files, share)
@@ -311,7 +372,13 @@ Build an iOS app under the Music Nerd brand that:
 - ✅ Advanced filtering system with enrichment status and date range filtering
 - ⏳ Remaining: UI testing suite, export functionality
 
-**Next:** Complete Phase 6 UI testing and export features, then move to Phase 7
+**Next:** Complete Phase 6, then Phase 7 (Apple Music Integration) for playback features
+
+**New Phase:** Phase 7 (Apple Music Integration) - 0% complete
+- 🎵 **Core Value**: Transform TrackNerd from recognition-only to full playback experience
+- 🔑 **Key Features**: Preview playback (non-subscribers), full playback (subscribers)
+- 📱 **Foundation Ready**: ShazamKit already captures `appleMusicID` for seamless integration
+- 🎯 **User Flow**: Recognize → Enrich → Play (preview or full based on subscription)
 
 **Previous Phase:**
 - ✅ Phase 5 (Enrichment & Intelligence) - 100% COMPLETE!
