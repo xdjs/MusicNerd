@@ -40,6 +40,26 @@ struct HistoryView: View {
                 .padding(CGFloat.MusicNerd.screenMargin)
                 .background(Color.MusicNerd.background)
                 
+                // Filter Bar (if filters are active)
+                if viewModel.hasActiveFilters {
+                    HStack {
+                        Text("\(viewModel.activeFilterCount) filter\(viewModel.activeFilterCount == 1 ? "" : "s") applied")
+                            .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        
+                        Spacer()
+                        
+                        Button("Clear") {
+                            viewModel.clearFilters()
+                        }
+                        .foregroundColor(Color.MusicNerd.primary)
+                        .font(.system(size: 14, weight: .medium))
+                        .accessibilityIdentifier("clear-filters-button")
+                    }
+                    .padding(.horizontal, CGFloat.MusicNerd.screenMargin)
+                    .padding(.vertical, CGFloat.MusicNerd.xs)
+                    .background(Color.MusicNerd.surface)
+                }
+                
                 // Content
                 if viewModel.isLoading {
                     // Loading State
@@ -155,6 +175,28 @@ struct HistoryView: View {
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        viewModel.toggleFilter()
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .foregroundColor(viewModel.hasActiveFilters ? Color.MusicNerd.primary : Color.MusicNerd.textSecondary)
+                            
+                            if viewModel.hasActiveFilters {
+                                Text("\(viewModel.activeFilterCount)")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.MusicNerd.primary)
+                                    .clipShape(Circle())
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("filter-button")
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Export") {
                         // TODO: Implement export functionality
@@ -172,6 +214,12 @@ struct HistoryView: View {
             if let match = selectedMatch {
                 MatchDetailView(match: match)
             }
+        }
+        .sheet(isPresented: $viewModel.showingFilter) {
+            HistoryFilterView(
+                filterCriteria: $viewModel.filterCriteria,
+                isPresented: $viewModel.showingFilter
+            )
         }
     }
 }

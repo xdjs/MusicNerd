@@ -15,6 +15,8 @@ class HistoryViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var filterCriteria: FilterCriteria = FilterCriteria()
+    @Published var showingFilter: Bool = false
     
     private let storageService: StorageServiceProtocol
     
@@ -25,15 +27,21 @@ class HistoryViewModel: ObservableObject {
     // MARK: - Computed Properties
     
     var filteredMatches: [SongMatch] {
-        if searchText.isEmpty {
-            return matches
-        } else {
-            return matches.filter { match in
+        var filtered = matches
+        
+        // Apply search filter first
+        if !searchText.isEmpty {
+            filtered = filtered.filter { match in
                 match.title.localizedCaseInsensitiveContains(searchText) ||
                 match.artist.localizedCaseInsensitiveContains(searchText) ||
                 (match.album?.localizedCaseInsensitiveContains(searchText) == true)
             }
         }
+        
+        // Apply filter criteria
+        filtered = applyFilterCriteria(to: filtered)
+        
+        return filtered
     }
     
     var isEmpty: Bool {
@@ -42,6 +50,17 @@ class HistoryViewModel: ObservableObject {
     
     var hasSearchResults: Bool {
         return !filteredMatches.isEmpty
+    }
+    
+    var hasActiveFilters: Bool {
+        return filterCriteria.isActive
+    }
+    
+    var activeFilterCount: Int {
+        var count = 0
+        if filterCriteria.enrichmentStatus != .all { count += 1 }
+        if filterCriteria.startDate != nil || filterCriteria.endDate != nil { count += 1 }
+        return count
     }
     
     // MARK: - Public Methods
@@ -95,11 +114,11 @@ class HistoryViewModel: ObservableObject {
         logWithTimestamp("Searching matches with query: '\(query)'")
     }
     
-    func filterMatches(by criteria: FilterCriteria) -> [SongMatch] {
-        var filtered = filteredMatches
+    func applyFilterCriteria(to matches: [SongMatch]) -> [SongMatch] {
+        var filtered = matches
         
         // Filter by enrichment status
-        switch criteria.enrichmentStatus {
+        switch filterCriteria.enrichmentStatus {
         case .all:
             break
         case .enriched:
@@ -109,16 +128,28 @@ class HistoryViewModel: ObservableObject {
         }
         
         // Filter by date range
-        if let startDate = criteria.startDate {
+        if let startDate = filterCriteria.startDate {
             filtered = filtered.filter { $0.matchedAt >= startDate }
         }
         
-        if let endDate = criteria.endDate {
+        if let endDate = filterCriteria.endDate {
             filtered = filtered.filter { $0.matchedAt <= endDate }
         }
         
-        logWithTimestamp("Applied filters - \(filtered.count) matches remain")
+        if hasActiveFilters {
+            logWithTimestamp("Applied filters - \(filtered.count) matches remain from \(matches.count) total")
+        }
+        
         return filtered
+    }
+    
+    func clearFilters() {
+        filterCriteria = FilterCriteria()
+        logWithTimestamp("Cleared all filters")
+    }
+    
+    func toggleFilter() {
+        showingFilter = true
     }
     
     // MARK: - Private Helpers
