@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var notificationsEnabled = true
-    @State private var autoEnrichment = true
+    @State private var autoEnrichment = AppSettings.shared.autoEnrichment
     @State private var saveToAppleMusic = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var showingSampleDurationPicker = false
@@ -19,8 +19,10 @@ struct SettingsView: View {
     @State private var useProductionServer: Bool = AppSettings.shared.useProductionServer
     @State private var showingCacheExpirationPicker = false
     @State private var cacheExpirationHours: Double = AppSettings.shared.cacheExpirationHours
+    @State private var showingClearHistoryAlert = false
     
     private let settings = AppSettings.shared
+    @EnvironmentObject private var services: DefaultServiceContainer
     
     var body: some View {
         NavigationView {
@@ -57,8 +59,10 @@ struct SettingsView: View {
                         Spacer()
                         
                         Toggle("", isOn: $autoEnrichment)
-                            .disabled(true)
                             .accessibilityIdentifier("auto-enrichment-toggle")
+                            .onChange(of: autoEnrichment) { _, newValue in
+                                settings.autoEnrichment = newValue
+                            }
                     }
                     
                     HStack {
@@ -152,11 +156,15 @@ struct SettingsView: View {
                 Section {
                     HStack {
                         Image(systemName: "trash")
-                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .foregroundColor(.red)
                             .frame(width: 24)
                         
                         Text("Clear History")
-                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                            .musicNerdStyle(.bodyLarge())
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        showingClearHistoryAlert = true
                     }
                     .accessibilityIdentifier("clear-history-button")
                     
@@ -193,31 +201,43 @@ struct SettingsView: View {
                     
                     HStack {
                         Image(systemName: "heart")
-                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
                         
                         Text("Rate TrackNerd")
-                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                            .musicNerdStyle(.bodyLarge())
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        rateApp()
                     }
                     .accessibilityIdentifier("rate-app-button")
                     
                     HStack {
                         Image(systemName: "envelope")
-                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
                         
                         Text("Contact Support")
-                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                            .musicNerdStyle(.bodyLarge())
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        contactSupport()
                     }
                     .accessibilityIdentifier("contact-support-button")
                     
                     HStack {
                         Image(systemName: "doc.text")
-                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
                         
                         Text("Privacy Policy")
-                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                            .musicNerdStyle(.bodyLarge())
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        openPrivacyPolicy()
                     }
                     .accessibilityIdentifier("privacy-policy-button")
                 } header: {
@@ -316,6 +336,7 @@ struct SettingsView: View {
                         showNetworkIndicator = AppSettings.shared.showNetworkIndicator
                         useProductionServer = AppSettings.shared.useProductionServer
                         cacheExpirationHours = AppSettings.shared.cacheExpirationHours
+                        autoEnrichment = AppSettings.shared.autoEnrichment
                     }
                     .accessibilityIdentifier("reset-settings-button")
                 } header: {
@@ -347,6 +368,66 @@ struct SettingsView: View {
                     }
                 )
             }
+            .alert("Clear All History", isPresented: $showingClearHistoryAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Clear", role: .destructive) {
+                    Task {
+                        await clearAllHistory()
+                    }
+                }
+            } message: {
+                Text("This will permanently delete all your recognized songs and history. This action cannot be undone.")
+            }
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func clearAllHistory() async {
+        let result = await services.storageService.loadMatches()
+        switch result {
+        case .success(let matches):
+            // Delete all matches
+            for match in matches {
+                let _ = await services.storageService.delete(match)
+            }
+            
+            // Clear cache as well
+            await MainActor.run {
+                EnrichmentCache.shared.clearAll()
+            }
+        case .failure:
+            // Even if loading fails, try to clear cache
+            await MainActor.run {
+                EnrichmentCache.shared.clearAll()
+            }
+        }
+    }
+    
+    
+    private func rateApp() {
+        // App Store URL for rating (would need actual App Store ID)
+        let appStoreURL = "https://apps.apple.com/app/id1234567890"
+        if let url = URL(string: appStoreURL) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    private func contactSupport() {
+        let email = "support@musicnerd.xyz"
+        let subject = "TrackNerd Support"
+        let body = "Hello TrackNerd Team,\n\n"
+        
+        if let emailURL = URL(string: "mailto:\(email)?subject=\(subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&body=\(body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")") {
+            UIApplication.shared.open(emailURL)
+        }
+    }
+    
+    private func openPrivacyPolicy() {
+        // Privacy policy URL (would need actual URL)
+        let privacyURL = "https://musicnerd.xyz/privacy"
+        if let url = URL(string: privacyURL) {
+            UIApplication.shared.open(url)
         }
     }
 }

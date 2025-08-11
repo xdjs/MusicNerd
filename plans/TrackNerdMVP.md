@@ -199,14 +199,14 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Comprehensive CRUD operations with StorageService
   - [x] Migrate in-memory enrichment cache to persistent storage (EnrichmentCacheEntry SwiftData model)
   - [x] Persistent enrichment cache with expiration and cleanup
-  - [ ] User preferences and settings
+  - [x] User preferences and settings (auto-enrichment toggle, clear history, export data)
 - [x] **History Features**:
   - [x] Scrollable match history list with SongMatchCard components
   - [x] Search and filter capabilities (by title, artist, album, enrichment status, date ranges)
   - [x] Advanced filtering with HistoryFilterView (enrichment status, date presets, custom ranges)
   - [x] Match detail view with full enrichment (existing MatchDetailView integration)
   - [x] Real-time search and filtering with HistoryViewModel
-  - [ ] Export/share functionality
+  - [ ] Export/share functionality (deferred - placeholder in Settings UI)
 - [x] **Unit Testing:**
   - [x] Test SwiftData persistence and retrieval (SwiftDataPersistenceTests with 10 comprehensive tests)
   - [x] Test CRUD operations, error data persistence, performance with 100 records
@@ -214,7 +214,7 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Test search and filtering logic (HistoryViewModelTests with 18 comprehensive test methods)
   - [x] Test enrichment cache persistence and expiration (EnrichmentCacheTests)
   - [ ] Test data migration between app versions
-  - [ ] Test export data formatting
+  - [ ] Test export data formatting (deferred)
 - [ ] **UI Testing:**
   - [ ] Test history list scrolling and performance
   - [ ] Test search functionality with various queries
@@ -223,11 +223,15 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Test empty state when no history exists
   - [ ] Test loading states and error handling
   - [ ] Test combined search and filtering workflows
-  - [ ] Test export/share workflows
+  - [ ] Test export/share workflows (deferred)
 
 ---
 
 ### 🚀 Phase 7: Polish & App Store Preparation
+- [ ] **Data Export/Import Features**:
+  - [ ] Implement user data export functionality (JSON format)
+  - [ ] Add export options (email, save to files, share)
+  - [ ] Consider data import capabilities for backup restoration
 - [ ] **UI Polish**:
   - [ ] Responsive design for all device sizes
   - [ ] Dark mode support
