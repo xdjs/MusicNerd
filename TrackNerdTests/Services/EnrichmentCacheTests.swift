@@ -1,19 +1,22 @@
 import XCTest
+import SwiftData
 @testable import TrackNerd
 
+@MainActor
 final class EnrichmentCacheTests: XCTestCase {
     
     var cache: EnrichmentCache!
     
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         cache = EnrichmentCache.shared
-        cache.clearAll()
+        cache.clearAll() // Start with clean cache for each test
     }
     
-    override func tearDown() {
-        cache.clearAll()
-        super.tearDown()
+    override func tearDown() async throws {
+        cache.clearAll() // Clean up after each test
+        cache = nil
+        try await super.tearDown()
     }
     
     // MARK: - Cache Key Tests
@@ -28,15 +31,15 @@ final class EnrichmentCacheTests: XCTestCase {
         XCTAssertNotEqual(loreKey, btsKey)
         
         // Keys should be equal for same data
-        let bioKey2 = EnrichmentCacheKey(artistId: "123", type: .bio)
-        XCTAssertEqual(bioKey, bioKey2)
+        let sameBioKey = EnrichmentCacheKey(artistId: "123", type: .bio)
+        XCTAssertEqual(bioKey, sameBioKey)
     }
     
-    // MARK: - Basic Cache Operations
+    // MARK: - Basic Operations
     
-    func testStoreAndRetrieve() {
-        let key = EnrichmentCacheKey(artistId: "test123", type: .bio)
-        let testData = "This is a test bio for the artist."
+    func testBasicStoreAndRetrieve() {
+        let key = EnrichmentCacheKey(artistId: "artist123", type: .bio)
+        let testData = "Test artist biography"
         
         // Store data
         cache.store(testData, for: key)
@@ -53,13 +56,14 @@ final class EnrichmentCacheTests: XCTestCase {
         XCTAssertNil(result)
     }
     
-    func testStoreMultipleItems() {
-        let bioKey = EnrichmentCacheKey(artistId: "artist1", type: .bio)
-        let loreKey = EnrichmentCacheKey(artistId: "artist1", type: .funFact(.lore))
-        let btsKey = EnrichmentCacheKey(artistId: "artist2", type: .funFact(.bts))
+    func testMultipleDataTypes() {
+        let artistId = "multitest123"
+        let bioKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
+        let loreKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(.lore))
+        let btsKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(.bts))
         
         let bioData = "Artist biography"
-        let loreData = "Artist lore fact"
+        let loreData = "Lore fun fact"
         let btsData = "Behind the scenes fact"
         
         cache.store(bioData, for: bioKey)
@@ -73,9 +77,9 @@ final class EnrichmentCacheTests: XCTestCase {
     
     // MARK: - Expiration Tests
     
-    func testCacheExpiration() {
-        let key = EnrichmentCacheKey(artistId: "test123", type: .bio)
-        let testData = "This is a test bio."
+    func testExpiration() async {
+        let key = EnrichmentCacheKey(artistId: "expire123", type: .bio)
+        let testData = "Data that will expire"
         
         // Store with very short expiration (0.1 seconds)
         cache.store(testData, for: key, expirationInterval: 0.1)
@@ -84,19 +88,15 @@ final class EnrichmentCacheTests: XCTestCase {
         XCTAssertEqual(cache.retrieve(for: key), testData)
         
         // Wait for expiration
-        let expectation = XCTestExpectation(description: "Wait for cache expiration")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1.0)
+        try? await Task.sleep(nanoseconds: 150_000_000) // 0.15 seconds
         
-        // Should be expired now
+        // Should be expired and return nil
         XCTAssertNil(cache.retrieve(for: key))
     }
     
     func testCustomExpirationInterval() {
-        let key = EnrichmentCacheKey(artistId: "test123", type: .bio)
-        let testData = "This is a test bio."
+        let key = EnrichmentCacheKey(artistId: "custom123", type: .funFact(.activity))
+        let testData = "Custom expiration data"
         let customExpiration: TimeInterval = 3600 // 1 hour
         
         cache.store(testData, for: key, expirationInterval: customExpiration)
@@ -105,9 +105,9 @@ final class EnrichmentCacheTests: XCTestCase {
         XCTAssertEqual(cache.retrieve(for: key), testData)
     }
     
-    // MARK: - Cache Management Tests
+    // MARK: - Cache Management
     
-    func testRemoveSpecificKey() {
+    func testRemoveSpecificEntry() {
         let key1 = EnrichmentCacheKey(artistId: "artist1", type: .bio)
         let key2 = EnrichmentCacheKey(artistId: "artist2", type: .bio)
         
@@ -148,53 +148,40 @@ final class EnrichmentCacheTests: XCTestCase {
         XCTAssertNil(cache.retrieve(for: key2))
     }
     
-    // MARK: - Fun Fact Type Tests
+    // MARK: - Performance Tests
     
-    func testAllFunFactTypes() {
-        let artistId = "testArtist"
-        let allTypes: [FunFactType] = [.lore, .bts, .activity, .surprise]
+    func testMultipleEntriesPerformance() {
+        let artistTypes: [FunFactType] = [.lore, .bts, .activity, .surprise]
         
-        // Store different fun facts
-        for (index, type) in allTypes.enumerated() {
-            let key = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
-            let data = "Fun fact \(index) for \(type.rawValue)"
-            cache.store(data, for: key)
-        }
-        
-        // Retrieve all fun facts
-        for (index, type) in allTypes.enumerated() {
-            let key = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
-            let expectedData = "Fun fact \(index) for \(type.rawValue)"
-            XCTAssertEqual(cache.retrieve(for: key), expectedData)
-        }
-    }
-    
-    // MARK: - Thread Safety Tests
-    
-    func testConcurrentAccess() {
-        let key = EnrichmentCacheKey(artistId: "concurrent", type: .bio)
-        let testData = "Concurrent test data"
-        
-        let expectation = XCTestExpectation(description: "Concurrent operations")
-        expectation.expectedFulfillmentCount = 10
-        
-        // Perform concurrent store/retrieve operations
-        for i in 0..<10 {
-            DispatchQueue.global(qos: .userInteractive).async {
-                if i % 2 == 0 {
-                    self.cache.store("\(testData) \(i)", for: key)
-                } else {
-                    _ = self.cache.retrieve(for: key)
-                }
-                expectation.fulfill()
+        // Store multiple entries for different artists and types
+        for i in 1...20 {
+            let artistId = "artist\(i)"
+            
+            // Store bio
+            let bioKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
+            cache.store("Bio for artist \(i)", for: bioKey)
+            
+            // Store fun facts
+            for type in artistTypes {
+                let key = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
+                let data = "Fun fact \(i) for \(type.rawValue)"
+                cache.store(data, for: key)
             }
         }
         
-        wait(for: [expectation], timeout: 5.0)
-        
-        // Should not crash and should have some data
-        let finalData = cache.retrieve(for: key)
-        XCTAssertNotNil(finalData)
+        // Verify all data can be retrieved
+        for i in 1...20 {
+            let artistId = "artist\(i)"
+            let bioKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
+            let expectedBioData = "Bio for artist \(i)"
+            XCTAssertEqual(cache.retrieve(for: bioKey), expectedBioData)
+            
+            for type in artistTypes {
+                let key = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
+                let expectedData = "Fun fact \(i) for \(type.rawValue)"
+                XCTAssertEqual(cache.retrieve(for: key), expectedData)
+            }
+        }
     }
     
     // MARK: - Edge Cases
@@ -207,16 +194,16 @@ final class EnrichmentCacheTests: XCTestCase {
         XCTAssertEqual(cache.retrieve(for: key), testData)
     }
     
-    func testLargeData() {
-        let key = EnrichmentCacheKey(artistId: "largeData", type: .bio)
+    func testLargeDataStorage() {
+        let key = EnrichmentCacheKey(artistId: "large123", type: .bio)
         let largeData = String(repeating: "A", count: 10000) // 10KB string
         
         cache.store(largeData, for: key)
         XCTAssertEqual(cache.retrieve(for: key), largeData)
     }
     
-    func testOverwriteExistingKey() {
-        let key = EnrichmentCacheKey(artistId: "overwrite", type: .bio)
+    func testDataOverwrite() {
+        let key = EnrichmentCacheKey(artistId: "overwrite123", type: .bio)
         let originalData = "Original data"
         let newData = "New data"
         

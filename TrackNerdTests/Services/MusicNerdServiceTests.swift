@@ -425,8 +425,8 @@ final class MusicNerdServiceTests: XCTestCase {
     func testMusicNerdService_CacheIntegration() async {
         // Use a test-specific cache to avoid interference
         let service = MusicNerdService()
-        let cache = EnrichmentCache.shared
-        cache.clearAll()
+        let cache = await EnrichmentCache.shared
+        await MainActor.run { cache.clearAll() }
         
         // Mock successful network responses would be needed for full integration test
         // For now, test that cache methods are called correctly
@@ -436,33 +436,42 @@ final class MusicNerdServiceTests: XCTestCase {
         let funFactKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(.lore))
         
         // Test that cache is empty initially
-        XCTAssertNil(cache.retrieve(for: bioKey))
-        XCTAssertNil(cache.retrieve(for: funFactKey))
+        let initialBioData = await MainActor.run { cache.retrieve(for: bioKey) }
+        let initialFunFactData = await MainActor.run { cache.retrieve(for: funFactKey) }
+        XCTAssertNil(initialBioData)
+        XCTAssertNil(initialFunFactData)
         
         // Store test data in cache
         let testBio = "Cached bio data"
         let testFunFact = "Cached fun fact"
         
-        cache.store(testBio, for: bioKey)
-        cache.store(testFunFact, for: funFactKey)
+        await MainActor.run {
+            cache.store(testBio, for: bioKey)
+            cache.store(testFunFact, for: funFactKey)
+        }
         
         // Verify data is cached
-        XCTAssertEqual(cache.retrieve(for: bioKey), testBio)
-        XCTAssertEqual(cache.retrieve(for: funFactKey), testFunFact)
+        let cachedBioData = await MainActor.run { cache.retrieve(for: bioKey) }
+        let cachedFunFactData = await MainActor.run { cache.retrieve(for: funFactKey) }
+        XCTAssertEqual(cachedBioData, testBio)
+        XCTAssertEqual(cachedFunFactData, testFunFact)
         
-        cache.clearAll()
+        await MainActor.run { cache.clearAll() }
     }
     
-    func testEnrichmentCache_Integration() {
-        let cache = EnrichmentCache.shared
-        cache.clearAll()
+    func testEnrichmentCache_Integration() async {
+        let cache = await EnrichmentCache.shared
+        await MainActor.run { cache.clearAll() }
         
         // Test storing bio
         let bioKey = EnrichmentCacheKey(artistId: "integration-test", type: .bio)
         let bioData = "Integration test bio"
         
-        cache.store(bioData, for: bioKey, expirationInterval: 3600)
-        XCTAssertEqual(cache.retrieve(for: bioKey), bioData)
+        await MainActor.run {
+            cache.store(bioData, for: bioKey, expirationInterval: 3600)
+        }
+        let retrievedData = await MainActor.run { cache.retrieve(for: bioKey) }
+        XCTAssertEqual(retrievedData, bioData)
         
         // Test storing fun facts for all types
         let funFactTypes: [FunFactType] = [.lore, .bts, .activity, .surprise]
@@ -471,11 +480,14 @@ final class MusicNerdServiceTests: XCTestCase {
             let key = EnrichmentCacheKey(artistId: "integration-test", type: .funFact(type))
             let data = "Integration test \(type.rawValue) fact"
             
-            cache.store(data, for: key, expirationInterval: 3600)
-            XCTAssertEqual(cache.retrieve(for: key), data)
+            await MainActor.run {
+                cache.store(data, for: key, expirationInterval: 3600)
+            }
+            let retrievedTypeData = await MainActor.run { cache.retrieve(for: key) }
+            XCTAssertEqual(retrievedTypeData, data)
         }
         
-        cache.clearAll()
+        await MainActor.run { cache.clearAll() }
     }
     
     func testFunFactType_RawValues() {

@@ -115,11 +115,11 @@ final class AppErrorTests: XCTestCase {
     // MARK: - EnrichmentError Fallback Content Tests
     
     func testEnrichmentErrorFallbackMessages() {
-        XCTAssertEqual(EnrichmentError.networkError.fallbackMessage, "Unable to load content - check your internet connection")
+        XCTAssertEqual(EnrichmentError.networkError.fallbackMessage, "Unable to load content - check your internet connection and try again")
         XCTAssertEqual(EnrichmentError.timeout.fallbackMessage, "Content is taking too long to load - try again later")
         XCTAssertEqual(EnrichmentError.artistNotFound.fallbackMessage, "This artist isn't available in our music database yet")
-        XCTAssertEqual(EnrichmentError.serverError.fallbackMessage, "Our music service is experiencing issues - content unavailable")
-        XCTAssertEqual(EnrichmentError.rateLimited.fallbackMessage, "Too many requests - content temporarily unavailable")
+        XCTAssertEqual(EnrichmentError.serverError.fallbackMessage, "Our music service is experiencing issues - try again later")
+        XCTAssertEqual(EnrichmentError.rateLimited.fallbackMessage, "Too many requests - try again in a moment")
         XCTAssertEqual(EnrichmentError.noData.fallbackMessage, "Content is not available for this artist")
         XCTAssertEqual(EnrichmentError.quotaExceeded.fallbackMessage, "Daily content limit reached - try again tomorrow")
     }

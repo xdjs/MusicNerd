@@ -8,46 +8,9 @@
 import SwiftUI
 
 struct HistoryView: View {
-    @State private var searchText = ""
-    @State private var showingMatchDetail = false
+    @StateObject private var viewModel = HistoryViewModel()
     @State private var selectedMatch: SongMatch?
-    // Sample data for UI testing - will be replaced with real persistence in Phase 6
-    @State private var sampleMatches: [SongMatch] = [
-        SongMatch(
-            title: "Bohemian Rhapsody",
-            artist: "Queen",
-            enrichmentData: EnrichmentData(
-                artistBio: "British rock band formed in London in 1970",
-                songTrivia: "Took 3 weeks to record, considered one of the greatest songs of all time"
-            )
-        ),
-        SongMatch(
-            title: "Hotel California",
-            artist: "Eagles",
-            enrichmentData: EnrichmentData(
-                artistBio: "American rock band formed in Los Angeles in 1971"
-            )
-        ),
-        SongMatch(
-            title: "Stairway to Heaven",
-            artist: "Led Zeppelin"
-        ),
-        SongMatch(
-            title: "Sweet Child O' Mine",
-            artist: "Guns N' Roses"
-        )
-    ]
-    
-    var filteredMatches: [SongMatch] {
-        if searchText.isEmpty {
-            return sampleMatches
-        } else {
-            return sampleMatches.filter { match in
-                match.title.localizedCaseInsensitiveContains(searchText) ||
-                match.artist.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
+    @FocusState private var isSearchFocused: Bool
     
     var body: some View {
         NavigationView {
@@ -58,17 +21,19 @@ struct HistoryView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(Color.MusicNerd.textSecondary)
                         
-                        TextField("Search your matches...", text: $searchText)
+                        TextField("Search your matches...", text: $viewModel.searchText)
                             .textFieldStyle(PlainTextFieldStyle())
+                            .focused($isSearchFocused)
                             .accessibilityIdentifier("search-field")
                     }
                     .padding(CGFloat.MusicNerd.md)
                     .background(Color.MusicNerd.surface)
                     .cornerRadius(12)
                     
-                    if !searchText.isEmpty {
+                    if !viewModel.searchText.isEmpty {
                         Button("Cancel") {
-                            searchText = ""
+                            viewModel.clearSearch()
+                            isSearchFocused = false
                         }
                         .foregroundColor(Color.MusicNerd.primary)
                         .accessibilityIdentifier("search-cancel-button")
@@ -77,26 +42,93 @@ struct HistoryView: View {
                 .padding(CGFloat.MusicNerd.screenMargin)
                 .background(Color.MusicNerd.background)
                 
+                // Filter Bar (if filters are active)
+                if viewModel.hasActiveFilters {
+                    HStack {
+                        Text("\(viewModel.activeFilterCount) filter\(viewModel.activeFilterCount == 1 ? "" : "s") applied")
+                            .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        
+                        Spacer()
+                        
+                        Button("Clear") {
+                            viewModel.clearFilters()
+                        }
+                        .foregroundColor(Color.MusicNerd.primary)
+                        .font(.system(size: 14, weight: .medium))
+                        .accessibilityIdentifier("clear-filters-button")
+                    }
+                    .padding(.horizontal, CGFloat.MusicNerd.screenMargin)
+                    .padding(.vertical, CGFloat.MusicNerd.xs)
+                    .background(Color.MusicNerd.surface)
+                }
+                
                 // Content
-                if filteredMatches.isEmpty {
+                if viewModel.isLoading {
+                    // Loading State
+                    VStack(spacing: CGFloat.MusicNerd.lg) {
+                        Spacer()
+                        
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(Color.MusicNerd.primary)
+                        
+                        Text("Loading your matches...")
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                        
+                        Spacer()
+                    }
+                    .padding(CGFloat.MusicNerd.screenMargin)
+                } else if let errorMessage = viewModel.errorMessage {
+                    // Error State
+                    VStack(spacing: CGFloat.MusicNerd.lg) {
+                        Spacer()
+                        
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 60))
+                            .foregroundColor(Color.MusicNerd.textSecondary)
+                        
+                        Text("Something Went Wrong")
+                            .musicNerdStyle(.headlineLarge())
+                        
+                        Text(errorMessage)
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
+                            .multilineTextAlignment(.center)
+                        
+                        MusicNerdButton(
+                            title: "Try Again",
+                            action: {
+                                Task {
+                                    await viewModel.refreshMatches()
+                                }
+                            },
+                            style: .secondary,
+                            size: .medium,
+                            icon: "arrow.clockwise"
+                        )
+                        .accessibilityIdentifier("retry-button")
+                        
+                        Spacer()
+                    }
+                    .padding(CGFloat.MusicNerd.screenMargin)
+                } else if !viewModel.hasSearchResults {
                     // Empty State
                     VStack(spacing: CGFloat.MusicNerd.lg) {
                         Spacer()
                         
-                        Image(systemName: searchText.isEmpty ? "music.note.list" : "magnifyingglass")
+                        Image(systemName: viewModel.searchText.isEmpty ? "music.note.list" : "magnifyingglass")
                             .font(.system(size: 60))
                             .foregroundColor(Color.MusicNerd.textSecondary)
                         
-                        Text(searchText.isEmpty ? "No Matches Yet" : "No Results")
+                        Text(viewModel.searchText.isEmpty ? "No Matches Yet" : "No Results")
                             .musicNerdStyle(.headlineLarge())
                         
-                        Text(searchText.isEmpty 
+                        Text(viewModel.searchText.isEmpty 
                              ? "Start listening to music to build your collection"
                              : "Try searching for a different song or artist")
                             .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                             .multilineTextAlignment(.center)
                         
-                        if searchText.isEmpty {
+                        if viewModel.searchText.isEmpty {
                             MusicNerdButton(
                                 title: "Start Listening",
                                 action: {
@@ -114,40 +146,86 @@ struct HistoryView: View {
                     }
                     .padding(CGFloat.MusicNerd.screenMargin)
                 } else {
-                    // Sample Matches List (will be replaced with real data in Phase 6)
+                    // Match History List
                     ScrollView {
                         LazyVStack(spacing: CGFloat.MusicNerd.md) {
-                            ForEach(Array(filteredMatches.enumerated()), id: \.element.id) { index, match in
+                            ForEach(Array(viewModel.filteredMatches.enumerated()), id: \.element.id) { index, match in
                                 SongMatchCard(match: match) {
-                                    // Sample data - no action until Phase 6 persistence
+                                    // Dismiss keyboard first, then show match detail
+                                    isSearchFocused = false
+                                    selectedMatch = match
                                 }
-                                .disabled(true)
-                                .opacity(0.6)
                                 .accessibilityIdentifier("history-match-\(index)")
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        Task {
+                                            await viewModel.deleteMatch(match)
+                                        }
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                             }
                         }
                         .padding(CGFloat.MusicNerd.screenMargin)
                     }
+                    .refreshable {
+                        await viewModel.refreshMatches()
+                    }
                 }
             }
             .background(Color.MusicNerd.background)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                // Dismiss keyboard and remove focus when tapping anywhere in the view
+                isSearchFocused = false
+            }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        viewModel.toggleFilter()
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .foregroundColor(viewModel.hasActiveFilters ? Color.MusicNerd.primary : Color.MusicNerd.textSecondary)
+                            
+                            if viewModel.hasActiveFilters {
+                                Text("\(viewModel.activeFilterCount)")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.MusicNerd.primary)
+                                    .clipShape(Circle())
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("filter-button")
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Export") {
                         // TODO: Implement export functionality
                     }
                     .foregroundColor(Color.MusicNerd.textSecondary)
-                    .disabled(true)
+                    .disabled(viewModel.isEmpty)
                     .accessibilityIdentifier("export-button")
                 }
             }
-        }
-        .sheet(isPresented: $showingMatchDetail) {
-            if let match = selectedMatch {
-                MatchDetailView(match: match)
+            .task {
+                await viewModel.loadMatches()
             }
+        }
+        .sheet(item: $selectedMatch) { match in
+            MatchDetailView(match: match)
+        }
+        .sheet(isPresented: $viewModel.showingFilter) {
+            HistoryFilterView(
+                filterCriteria: $viewModel.filterCriteria,
+                isPresented: $viewModel.showingFilter
+            )
         }
     }
 }

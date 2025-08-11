@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ListeningView: View {
+    @Binding var selectedTab: ContentView.Tab
     @State private var isListening = false
     @State private var permissionStatus: PermissionStatus = .notDetermined
     @State private var showingPermissionAlert = false
@@ -18,6 +19,7 @@ struct ListeningView: View {
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var isEnriching: Bool = false
     @State private var showingMatchDetail: Bool = false
+    @State private var recentMatches: [SongMatch] = []
     @StateObject private var reachabilityService = NetworkReachabilityService.shared
     
     private let services = DefaultServiceContainer.shared
@@ -102,10 +104,6 @@ struct ListeningView: View {
                         // Recognition Result
                         if let match = lastMatch {
                             VStack(spacing: CGFloat.MusicNerd.md) {
-                                Text("Found It!")
-                                    .musicNerdStyle(.headlineLarge())
-                                    .foregroundColor(Color.MusicNerd.primary)
-                                
                                 SongMatchCard(match: match) {
                                     showingMatchDetail = true
                                 }
@@ -136,48 +134,30 @@ struct ListeningView: View {
                     }
                     
                     // Recent Matches Section
-                    VStack(spacing: CGFloat.MusicNerd.md) {
-                        HStack {
-                            Text("Recent Matches")
-                                .musicNerdStyle(.headlineLarge())
-                            
-                            Spacer()
-                            
-                            Button("See All") {
-                                // TODO: Navigate to history
+                    if !recentMatches.isEmpty {
+                        VStack(spacing: CGFloat.MusicNerd.md) {
+                            HStack {
+                                Text("Recent Matches")
+                                    .musicNerdStyle(.headlineLarge())
+                                
+                                Spacer()
+                                
+                                Button("See All") {
+                                    selectedTab = .history
+                                }
+                                .foregroundColor(Color.MusicNerd.primary)
+                                .accessibilityIdentifier("see-all-button")
                             }
-                            .foregroundColor(Color.MusicNerd.textSecondary)
-                            .disabled(true)
-                            .accessibilityIdentifier("see-all-button")
+                            
+                            ForEach(recentMatches.prefix(5)) { match in
+                                SongMatchCard(match: match) {
+                                    // Navigate to match detail
+                                    lastMatch = match
+                                    showingMatchDetail = true
+                                }
+                                .accessibilityIdentifier("recent-match-\(match.id)")
+                            }
                         }
-                        
-                        // Sample matches (will be replaced with real data in Phase 6)
-                        SongMatchCard(
-                            match: SongMatch(
-                                title: "Bohemian Rhapsody",
-                                artist: "Queen",
-                                enrichmentData: EnrichmentData(
-                                    artistBio: "British rock band formed in London in 1970"
-                                )
-                            )
-                        ) {
-                            // Sample data - no action until Phase 6 persistence
-                        }
-                        .disabled(true)
-                        .opacity(0.6)
-                        .accessibilityIdentifier("recent-match-0")
-                        
-                        SongMatchCard(
-                            match: SongMatch(
-                                title: "Hotel California",
-                                artist: "Eagles"
-                            )
-                        ) {
-                            // Sample data - no action until Phase 6 persistence
-                        }
-                        .disabled(true)
-                        .opacity(0.6)
-                        .accessibilityIdentifier("recent-match-1")
                     }
                     
                     Spacer(minLength: CGFloat.MusicNerd.xl)
@@ -194,6 +174,9 @@ struct ListeningView: View {
         .onAppear {
             checkPermissionStatus()
             updateDebugSettings()
+            Task {
+                await loadRecentMatches()
+            }
         }
         .onChange(of: settings.showDebugInfo) { _, newValue in
             showDebugInfo = newValue
@@ -267,6 +250,20 @@ struct ListeningView: View {
         sampleDuration = settings.sampleDuration
     }
     
+    @MainActor
+    private func loadRecentMatches() async {
+        let result = await services.storageService.loadMatches()
+        switch result {
+        case .success(let matches):
+            // Take only the first 5 matches (already sorted by matchedAt desc in StorageService)
+            recentMatches = Array(matches.prefix(5))
+            print("Loaded \(recentMatches.count) recent matches for ListeningView")
+        case .failure(let error):
+            print("Failed to load recent matches: \(error.localizedDescription)")
+            recentMatches = []
+        }
+    }
+    
     private func handleListenTap() {
         // Prevent listening when offline (unless already listening)
         guard reachabilityService.isConnected || isListening else {
@@ -310,6 +307,13 @@ struct ListeningView: View {
                             lastMatch = match
                             recognitionState = .success(match)
                             
+                            // Save the match immediately (before enrichment)
+                            Task {
+                                await saveMatchToHistory(match)
+                                // Refresh recent matches to include the new match
+                                await loadRecentMatches()
+                            }
+                            
                             // Present the detail view immediately
                             showingMatchDetail = true
                             
@@ -333,6 +337,17 @@ struct ListeningView: View {
     }
     
     @MainActor
+    private func saveMatchToHistory(_ match: SongMatch) async {
+        let saveResult = await services.storageService.save(match)
+        switch saveResult {
+        case .success:
+            print("Song match saved to history: '\(match.title)' by '\(match.artist)'")
+        case .failure(let error):
+            print("Failed to save song match to history: \(error.localizedDescription)")
+        }
+    }
+    
+    @MainActor
     private func enrichSongMatch(_ match: SongMatch) async {
         // Only enrich if not already enriched
         guard match.enrichmentData == nil else {
@@ -352,11 +367,11 @@ struct ListeningView: View {
             // Update the match with enrichment data
             match.enrichmentData = enrichmentData
             
-            // Save the enriched match
+            // Save the updated enriched match
             let saveResult = await services.storageService.save(match)
             switch saveResult {
             case .success:
-                print("Enriched song match saved successfully")
+                print("Enriched song match updated successfully")
                 
                 // Update UI to reflect enrichment
                 if lastMatch?.id == match.id {
@@ -364,7 +379,7 @@ struct ListeningView: View {
                 }
                 
             case .failure(let error):
-                print("Failed to save enriched song match: \(error.localizedDescription)")
+                print("Failed to update enriched song match: \(error.localizedDescription)")
             }
             
         case .failure(let error):
@@ -383,5 +398,5 @@ struct ListeningView: View {
 }
 
 #Preview {
-    ListeningView()
+    ListeningView(selectedTab: .constant(.listen))
 }

@@ -77,6 +77,7 @@ class AppSettings {
         return cacheExpirationHours * 60 * 60 // Convert hours to seconds
     }
     
+    
     private init() {}
     
     // MARK: - Debug Methods

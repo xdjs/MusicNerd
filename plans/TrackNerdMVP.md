@@ -87,6 +87,9 @@ Build an iOS app under the Music Nerd brand that:
   - [x] UserDefaults-based settings persistence
   - [x] User-friendly duration descriptions and recommendations
   - [x] Debug toggle to display sample duration in main UI
+  - [x] Remove auto enrichment setting (unused functionality)
+  - [x] Disable About section options (Rate App, Contact Support, Privacy Policy)
+  - [x] Remove notifications setting toggle
 - [x] **Production Readiness**:
   - [x] Professional debug logging with timestamps
   - [x] Comprehensive error handling and user-friendly messages
@@ -150,7 +153,7 @@ Build an iOS app under the Music Nerd brand that:
 
 ---
 
-### 🧠 Phase 5: Enrichment & Intelligence
+### 🧠 Phase 5: Enrichment & Intelligence ✅
 - [x] **Backend Integration**:
   - [x] Integrate OpenAI enrichment with recognition flow
   - [x] MusicNerdService API integration (search, bio, fun facts)
@@ -168,53 +171,76 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Share enriched content functionality
   - [x] Fix animation conflicts in expandable chevrons
 - [x] **Smart Features**:
-  - [ ] Fallback content for API failures
+  - [x] Fallback content for API failures (FallbackSectionView with user-friendly error messages)
   - [x] Content caching for offline viewing
-  - [ ] Retry mechanism for failed enrichment
+  - [x] Retry mechanism for failed enrichment (retryEnrichment() with exponential backoff)
 - [x] **Error Handling**:
   - [x] No match scenarios
   - [x] Network failure recovery (null ID handling, API error parsing)
-  - [ ] API rate limit handling
+  - [x] API rate limit handling (comprehensive retry logic with timeouts)
+  - [x] Individual content error tracking (bioError, funFactErrors by type)
+  - [x] User-friendly error messages and graceful degradation
 - [x] **Unit Testing:**
-  - [ ] Test enrichment data processing and formatting
+  - [x] Test enrichment data processing and formatting (EnrichmentErrorHandlingTests)
   - [x] Test caching logic for enrichment content
-  - [ ] Test fallback content selection
-  - [ ] Test error recovery mechanisms
-- [ ] **UI Testing:**
-  - [ ] Test enrichment loading states
-  - [ ] Test enriched content display formatting
-  - [ ] Test fallback content when enrichment fails
-  - [ ] Test "no match" user experience
-  - [ ] Test rate limit handling in UI
+  - [x] Test fallback content selection and error tracking
+  - [x] Test error recovery mechanisms (rate limiting, network errors, individual content failures)
+  - [x] Test retry scenarios with different error types
+- [x] **UI Testing:**
+  - [x] Test enrichment loading states (EnrichmentUITests comprehensive suite)
+  - [x] Test enriched content display formatting (expandable sections, content display)
+  - [x] Test fallback content when enrichment fails (error messages, retry buttons)
+  - [x] Test "no match" user experience (empty states, navigation maintenance)
+  - [x] Test rate limit handling in UI (user-friendly messaging, retry behavior)
 
 ---
 
-### 💾 Phase 6: Data Persistence & History
-- [ ] **Storage Implementation**:
-  - [ ] SwiftData setup for match history
-  - [ ] Local storage for enrichment cache
-  - [ ] Migrate in-memory enrichment cache to persistent storage (Core Data/SwiftData)
-  - [ ] User preferences and settings
-- [ ] **History Features**:
-  - [ ] Scrollable match history list
-  - [ ] Search and filter capabilities
-  - [ ] Match detail view with full enrichment
-  - [ ] Export/share functionality
-- [ ] **Unit Testing:**
-  - [ ] Test SwiftData persistence and retrieval
-  - [ ] Test search and filtering logic
+### 💾 Phase 6: Data Persistence & History ✅
+- [x] **Storage Implementation**:
+  - [x] SwiftData setup for match history (SongMatch and EnrichmentData @Model classes)
+  - [x] SwiftData model container configuration in app and services
+  - [x] Comprehensive CRUD operations with StorageService
+  - [x] Migrate in-memory enrichment cache to persistent storage (EnrichmentCacheEntry SwiftData model)
+  - [x] Persistent enrichment cache with expiration and cleanup
+  - [x] User preferences and settings (auto-enrichment toggle, clear history, export data)
+- [x] **History Features**:
+  - [x] Scrollable match history list with SongMatchCard components
+  - [x] Search and filter capabilities (by title, artist, album, enrichment status, date ranges)
+  - [x] Advanced filtering with HistoryFilterView (enrichment status, date presets, custom ranges)
+  - [x] Match detail view with full enrichment (existing MatchDetailView integration)
+  - [x] Real-time search and filtering with HistoryViewModel
+  - [x] Implement recent matches display in ListeningView (show last 3-5 matches)
+  - [x] Remove sample data from recent matches section in ListeningView
+  - [x] Implement "See All" navigation from recent matches to History tab
+  - [x] Remove "Found it!" message after successful match recognition
+  - [x] Keyboard dismissal when tapping outside search field in HistoryView
+  - [x] Keyboard dismissal when tapping on history matches before showing detail
+  - [ ] Export/share functionality (deferred - placeholder in Settings UI)
+- [x] **Unit Testing:**
+  - [x] Test SwiftData persistence and retrieval (SwiftDataPersistenceTests with 10 comprehensive tests)
+  - [x] Test CRUD operations, error data persistence, performance with 100 records
+  - [x] Test data integrity across app restarts and edge cases
+  - [x] Test search and filtering logic (HistoryViewModelTests with 18 comprehensive test methods)
+  - [x] Test enrichment cache persistence and expiration (EnrichmentCacheTests)
   - [ ] Test data migration between app versions
-  - [ ] Test export data formatting
+  - [ ] Test export data formatting (deferred)
 - [ ] **UI Testing:**
   - [ ] Test history list scrolling and performance
   - [ ] Test search functionality with various queries
-  - [ ] Test match detail view navigation
-  - [ ] Test export/share workflows
+  - [x] Test match detail view navigation (fixed sheet presentation race condition)
+  - [ ] Test filter functionality (filter sheet, enrichment status, date ranges, reset/clear)
   - [ ] Test empty state when no history exists
+  - [ ] Test loading states and error handling
+  - [ ] Test combined search and filtering workflows
+  - [ ] Test export/share workflows (deferred)
 
 ---
 
 ### 🚀 Phase 7: Polish & App Store Preparation
+- [ ] **Data Export/Import Features**:
+  - [ ] Implement user data export functionality (JSON format)
+  - [ ] Add export options (email, save to files, share)
+  - [ ] Consider data import capabilities for backup restoration
 - [ ] **UI Polish**:
   - [ ] Responsive design for all device sizes
   - [ ] Dark mode support
@@ -276,11 +302,19 @@ Build an iOS app under the Music Nerd brand that:
   - ✅ NetworkStatusUITests: 100% pass rate (17/17 tests)
   - ✅ RecognitionFlowUITests: 100% pass rate after timing fixes
 
-**Currently:** Phase 5 content caching complete! Comprehensive in-memory caching system implemented with user-configurable expiration and settings UI.
+**Currently:** Phase 6 (Data Persistence & History) - 75% complete
+- ✅ Complete SwiftData setup with SongMatch and EnrichmentData persistence
+- ✅ Enrichment cache migration to persistent SwiftData storage with expiration
+- ✅ Full history UI implementation with search, filtering, and real-time updates
+- ✅ Unit testing: 18 tests for history logic, enrichment cache persistence
+- ✅ MVVM architecture with HistoryViewModel for proper data management
+- ✅ Advanced filtering system with enrichment status and date range filtering
+- ⏳ Remaining: UI testing suite, export functionality
 
-**Next Phase:**
-- Complete remaining Phase 5 tasks: Smart features (fallback content, retry mechanism) and API rate limiting
-- Begin Phase 6: Data Persistence & History
+**Next:** Complete Phase 6 UI testing and export features, then move to Phase 7
+
+**Previous Phase:**
+- ✅ Phase 5 (Enrichment & Intelligence) - 100% COMPLETE!
 
 **Development Philosophy:**
 - Build solid architectural foundation before adding features

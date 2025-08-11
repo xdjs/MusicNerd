@@ -224,15 +224,15 @@ enum EnrichmentError: LocalizedError, Equatable, Codable {
     var fallbackMessage: String {
         switch self {
         case .networkError:
-            return "Unable to load content - check your internet connection"
+            return "Unable to load content - check your internet connection and try again"
         case .timeout:
             return "Content is taking too long to load - try again later"
         case .artistNotFound:
             return "This artist isn't available in our music database yet"
         case .serverError:
-            return "Our music service is experiencing issues - content unavailable"
+            return "Our music service is experiencing issues - try again later"
         case .rateLimited:
-            return "Too many requests - content temporarily unavailable"
+            return "Too many requests - try again in a moment"
         case .noData, .invalidData, .processingFailed:
             return "Content is not available for this artist"
         case .quotaExceeded:
@@ -267,6 +267,8 @@ enum EnrichmentError: LocalizedError, Equatable, Codable {
             return .noData
         case .musicNerdError(.apiError):
             return .serverError
+        case .enrichmentError(let enrichmentError):
+            return enrichmentError
         default:
             return .processingFailed
         }
