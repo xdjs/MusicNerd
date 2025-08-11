@@ -81,10 +81,6 @@ final class RecognitionFlowUITests: XCTestCase {
         // If a match is found (unlikely in testing environment)
         if recognitionResult.waitForExistence(timeout: 10.0) {
             XCTAssertTrue(recognitionResult.exists)
-            
-            // Check that "Found It!" text appears
-            let foundItText = app.staticTexts["Found It!"]
-            XCTAssertTrue(foundItText.exists)
         }
     }
     

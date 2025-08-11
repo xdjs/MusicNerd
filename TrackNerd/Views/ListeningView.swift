@@ -102,10 +102,6 @@ struct ListeningView: View {
                         // Recognition Result
                         if let match = lastMatch {
                             VStack(spacing: CGFloat.MusicNerd.md) {
-                                Text("Found It!")
-                                    .musicNerdStyle(.headlineLarge())
-                                    .foregroundColor(Color.MusicNerd.primary)
-                                
                                 SongMatchCard(match: match) {
                                     showingMatchDetail = true
                                 }
