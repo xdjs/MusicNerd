@@ -146,7 +146,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
         
         // Check cache first
         let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
-        if let cachedBio = cache.retrieve(for: cacheKey) {
+        if let cachedBio = await MainActor.run { cache.retrieve(for: cacheKey) } {
             return .success(cachedBio)
         }
         
@@ -205,7 +205,9 @@ class MusicNerdService: MusicNerdServiceProtocol {
                     
                     // Store in cache with user-configured expiration
                     let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .bio)
-                    cache.store(bio, for: cacheKey, expirationInterval: AppSettings.shared.cacheExpirationInterval)
+                    await MainActor.run {
+                        cache.store(bio, for: cacheKey, expirationInterval: AppSettings.shared.cacheExpirationInterval)
+                    }
                     
                     return .success(bio)
                 } else {
@@ -246,7 +248,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
         
         // Check cache first
         let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
-        if let cachedFunFact = cache.retrieve(for: cacheKey) {
+        if let cachedFunFact = await MainActor.run { cache.retrieve(for: cacheKey) } {
             return .success(cachedFunFact)
         }
         
@@ -309,7 +311,9 @@ class MusicNerdService: MusicNerdServiceProtocol {
                     
                     // Store in cache with user-configured expiration
                     let cacheKey = EnrichmentCacheKey(artistId: artistId, type: .funFact(type))
-                    cache.store(funFact, for: cacheKey, expirationInterval: AppSettings.shared.cacheExpirationInterval)
+                    await MainActor.run {
+                        cache.store(funFact, for: cacheKey, expirationInterval: AppSettings.shared.cacheExpirationInterval)
+                    }
                     
                     return .success(funFact)
                 } else {

@@ -25,6 +25,6 @@ struct TrackNerdApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [SongMatch.self, EnrichmentData.self])
+        .modelContainer(for: [SongMatch.self, EnrichmentData.self, EnrichmentCacheEntry.self])
     }
 }

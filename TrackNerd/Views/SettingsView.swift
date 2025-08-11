@@ -138,7 +138,9 @@ struct SettingsView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        EnrichmentCache.shared.clearAll()
+                        Task { @MainActor in
+                            EnrichmentCache.shared.clearAll()
+                        }
                     }
                     .accessibilityIdentifier("clear-cache-button")
                 } header: {
