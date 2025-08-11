@@ -192,32 +192,38 @@ Build an iOS app under the Music Nerd brand that:
 
 ---
 
-### 💾 Phase 6: Data Persistence & History
+### 💾 Phase 6: Data Persistence & History ✅
 - [x] **Storage Implementation**:
   - [x] SwiftData setup for match history (SongMatch and EnrichmentData @Model classes)
   - [x] SwiftData model container configuration in app and services
   - [x] Comprehensive CRUD operations with StorageService
-  - [ ] Local storage for enrichment cache
-  - [ ] Migrate in-memory enrichment cache to persistent storage (Core Data/SwiftData)
+  - [x] Migrate in-memory enrichment cache to persistent storage (EnrichmentCacheEntry SwiftData model)
+  - [x] Persistent enrichment cache with expiration and cleanup
   - [ ] User preferences and settings
-- [ ] **History Features**:
-  - [ ] Scrollable match history list
-  - [ ] Search and filter capabilities
-  - [ ] Match detail view with full enrichment
+- [x] **History Features**:
+  - [x] Scrollable match history list with SongMatchCard components
+  - [x] Search and filter capabilities (by title, artist, album, enrichment status, date ranges)
+  - [x] Advanced filtering with HistoryFilterView (enrichment status, date presets, custom ranges)
+  - [x] Match detail view with full enrichment (existing MatchDetailView integration)
+  - [x] Real-time search and filtering with HistoryViewModel
   - [ ] Export/share functionality
 - [x] **Unit Testing:**
   - [x] Test SwiftData persistence and retrieval (SwiftDataPersistenceTests with 10 comprehensive tests)
   - [x] Test CRUD operations, error data persistence, performance with 100 records
   - [x] Test data integrity across app restarts and edge cases
-  - [ ] Test search and filtering logic
+  - [x] Test search and filtering logic (HistoryViewModelTests with 18 comprehensive test methods)
+  - [x] Test enrichment cache persistence and expiration (EnrichmentCacheTests)
   - [ ] Test data migration between app versions
   - [ ] Test export data formatting
 - [ ] **UI Testing:**
   - [ ] Test history list scrolling and performance
   - [ ] Test search functionality with various queries
   - [ ] Test match detail view navigation
-  - [ ] Test export/share workflows
+  - [ ] Test filter functionality (filter sheet, enrichment status, date ranges, reset/clear)
   - [ ] Test empty state when no history exists
+  - [ ] Test loading states and error handling
+  - [ ] Test combined search and filtering workflows
+  - [ ] Test export/share workflows
 
 ---
 
@@ -283,11 +289,16 @@ Build an iOS app under the Music Nerd brand that:
   - ✅ NetworkStatusUITests: 100% pass rate (17/17 tests)
   - ✅ RecognitionFlowUITests: 100% pass rate after timing fixes
 
-**Currently:** Phase 6 (Data Persistence & History) - 25% complete
-- ✅ SwiftData setup complete: SongMatch and EnrichmentData @Model classes with full persistence
-- ✅ Comprehensive SwiftData testing: 10 test scenarios covering CRUD, errors, performance, edge cases
-- ✅ All existing functionality maintained with proper error handling and fallback content
-- ⏳ Next: Migrate enrichment cache to persistent storage, implement history UI features
+**Currently:** Phase 6 (Data Persistence & History) - 75% complete
+- ✅ Complete SwiftData setup with SongMatch and EnrichmentData persistence
+- ✅ Enrichment cache migration to persistent SwiftData storage with expiration
+- ✅ Full history UI implementation with search, filtering, and real-time updates
+- ✅ Unit testing: 18 tests for history logic, enrichment cache persistence
+- ✅ MVVM architecture with HistoryViewModel for proper data management
+- ✅ Advanced filtering system with enrichment status and date range filtering
+- ⏳ Remaining: UI testing suite, export functionality
+
+**Next:** Complete Phase 6 UI testing and export features, then move to Phase 7
 
 **Previous Phase:**
 - ✅ Phase 5 (Enrichment & Intelligence) - 100% COMPLETE!
