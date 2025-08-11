@@ -29,7 +29,7 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            ListeningView()
+            ListeningView(selectedTab: $selectedTab)
                 .tabItem {
                     Label(Tab.listen.rawValue, systemImage: Tab.listen.systemImage)
                 }

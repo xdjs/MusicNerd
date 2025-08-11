@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ListeningView: View {
+    @Binding var selectedTab: ContentView.Tab
     @State private var isListening = false
     @State private var permissionStatus: PermissionStatus = .notDetermined
     @State private var showingPermissionAlert = false
@@ -142,10 +143,9 @@ struct ListeningView: View {
                                 Spacer()
                                 
                                 Button("See All") {
-                                    // TODO: Navigate to history tab
+                                    selectedTab = .history
                                 }
-                                .foregroundColor(Color.MusicNerd.textSecondary)
-                                .disabled(true)
+                                .foregroundColor(Color.MusicNerd.primary)
                                 .accessibilityIdentifier("see-all-button")
                             }
                             
@@ -398,5 +398,5 @@ struct ListeningView: View {
 }
 
 #Preview {
-    ListeningView()
+    ListeningView(selectedTab: .constant(.listen))
 }
