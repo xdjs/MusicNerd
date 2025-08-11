@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct TrackNerdApp: App {
@@ -24,5 +25,6 @@ struct TrackNerdApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [SongMatch.self, EnrichmentData.self])
     }
 }

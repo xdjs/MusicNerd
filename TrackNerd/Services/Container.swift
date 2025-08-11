@@ -8,7 +8,8 @@ final class Container: ObservableObject {
     
     lazy var modelContainer: ModelContainer = {
         let schema = Schema([
-            SongMatch.self
+            SongMatch.self,
+            EnrichmentData.self
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,

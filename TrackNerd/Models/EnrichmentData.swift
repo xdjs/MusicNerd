@@ -1,20 +1,22 @@
 import Foundation
+import SwiftData
 
-struct EnrichmentData: Codable, Hashable {
-    let artistBio: String?
-    let songTrivia: String?
-    let funFact: String? // Legacy single fun fact for backward compatibility
-    let funFacts: [String: String] // Categorized fun facts by type
-    let relatedArtists: [String]
-    let relatedSongs: [String]
-    let genres: [String]
-    let releaseYear: Int?
-    let albumName: String?
-    let enrichedAt: Date
+@Model
+final class EnrichmentData {
+    var artistBio: String?
+    var songTrivia: String?
+    var funFact: String? // Legacy single fun fact for backward compatibility
+    var funFacts: [String: String] // Categorized fun facts by type
+    var relatedArtists: [String]
+    var relatedSongs: [String]
+    var genres: [String]
+    var releaseYear: Int?
+    var albumName: String?
+    var enrichedAt: Date
     
-    // Error tracking for fallback content
-    let bioError: EnrichmentError?
-    let funFactErrors: [String: EnrichmentError] // Errors by fun fact type
+    // Error tracking for fallback content (stored as JSON strings for SwiftData compatibility)
+    @Attribute(.externalStorage) var bioErrorData: Data?
+    @Attribute(.externalStorage) var funFactErrorsData: Data?
     
     init(
         artistBio: String? = nil,
@@ -39,12 +41,34 @@ struct EnrichmentData: Codable, Hashable {
         self.releaseYear = releaseYear
         self.albumName = albumName
         self.enrichedAt = Date()
-        self.bioError = bioError
-        self.funFactErrors = funFactErrors
+        
+        // Encode errors as JSON data for SwiftData storage
+        if let bioError = bioError {
+            self.bioErrorData = try? JSONEncoder().encode(bioError)
+        } else {
+            self.bioErrorData = nil
+        }
+        
+        if !funFactErrors.isEmpty {
+            self.funFactErrorsData = try? JSONEncoder().encode(funFactErrors)
+        } else {
+            self.funFactErrorsData = nil
+        }
     }
 }
 
 extension EnrichmentData {
+    // Computed properties for error handling (backward compatibility)
+    var bioError: EnrichmentError? {
+        guard let data = bioErrorData else { return nil }
+        return try? JSONDecoder().decode(EnrichmentError.self, from: data)
+    }
+    
+    var funFactErrors: [String: EnrichmentError] {
+        guard let data = funFactErrorsData else { return [:] }
+        return (try? JSONDecoder().decode([String: EnrichmentError].self, from: data)) ?? [:]
+    }
+    
     var hasArtistInfo: Bool {
         artistBio != nil || !genres.isEmpty || !relatedArtists.isEmpty
     }
