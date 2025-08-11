@@ -218,7 +218,7 @@ Build an iOS app under the Music Nerd brand that:
 - [ ] **UI Testing:**
   - [ ] Test history list scrolling and performance
   - [ ] Test search functionality with various queries
-  - [ ] Test match detail view navigation
+  - [x] Test match detail view navigation (fixed sheet presentation race condition)
   - [ ] Test filter functionality (filter sheet, enrichment status, date ranges, reset/clear)
   - [ ] Test empty state when no history exists
   - [ ] Test loading states and error handling

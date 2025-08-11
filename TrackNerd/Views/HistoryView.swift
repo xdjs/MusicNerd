@@ -9,7 +9,6 @@ import SwiftUI
 
 struct HistoryView: View {
     @StateObject private var viewModel = HistoryViewModel()
-    @State private var showingMatchDetail = false
     @State private var selectedMatch: SongMatch?
     
     var body: some View {
@@ -150,7 +149,6 @@ struct HistoryView: View {
                             ForEach(Array(viewModel.filteredMatches.enumerated()), id: \.element.id) { index, match in
                                 SongMatchCard(match: match) {
                                     selectedMatch = match
-                                    showingMatchDetail = true
                                 }
                                 .accessibilityIdentifier("history-match-\(index)")
                                 .contextMenu {
@@ -210,10 +208,8 @@ struct HistoryView: View {
                 await viewModel.loadMatches()
             }
         }
-        .sheet(isPresented: $showingMatchDetail) {
-            if let match = selectedMatch {
-                MatchDetailView(match: match)
-            }
+        .sheet(item: $selectedMatch) { match in
+            MatchDetailView(match: match)
         }
         .sheet(isPresented: $viewModel.showingFilter) {
             HistoryFilterView(
