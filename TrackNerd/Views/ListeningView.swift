@@ -18,6 +18,7 @@ struct ListeningView: View {
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var isEnriching: Bool = false
     @State private var showingMatchDetail: Bool = false
+    @State private var recentMatches: [SongMatch] = []
     @StateObject private var reachabilityService = NetworkReachabilityService.shared
     
     private let services = DefaultServiceContainer.shared
@@ -131,8 +132,33 @@ struct ListeningView: View {
                         }
                     }
                     
-                    // Recent Matches Section - TODO: Implement in Phase 6
-                    // Will display last 3-5 matches from persistent storage
+                    // Recent Matches Section
+                    if !recentMatches.isEmpty {
+                        VStack(spacing: CGFloat.MusicNerd.md) {
+                            HStack {
+                                Text("Recent Matches")
+                                    .musicNerdStyle(.headlineLarge())
+                                
+                                Spacer()
+                                
+                                Button("See All") {
+                                    // TODO: Navigate to history tab
+                                }
+                                .foregroundColor(Color.MusicNerd.textSecondary)
+                                .disabled(true)
+                                .accessibilityIdentifier("see-all-button")
+                            }
+                            
+                            ForEach(recentMatches.prefix(5)) { match in
+                                SongMatchCard(match: match) {
+                                    // Navigate to match detail
+                                    lastMatch = match
+                                    showingMatchDetail = true
+                                }
+                                .accessibilityIdentifier("recent-match-\(match.id)")
+                            }
+                        }
+                    }
                     
                     Spacer(minLength: CGFloat.MusicNerd.xl)
                 }
@@ -148,6 +174,9 @@ struct ListeningView: View {
         .onAppear {
             checkPermissionStatus()
             updateDebugSettings()
+            Task {
+                await loadRecentMatches()
+            }
         }
         .onChange(of: settings.showDebugInfo) { _, newValue in
             showDebugInfo = newValue
@@ -221,6 +250,20 @@ struct ListeningView: View {
         sampleDuration = settings.sampleDuration
     }
     
+    @MainActor
+    private func loadRecentMatches() async {
+        let result = await services.storageService.loadMatches()
+        switch result {
+        case .success(let matches):
+            // Take only the first 5 matches (already sorted by matchedAt desc in StorageService)
+            recentMatches = Array(matches.prefix(5))
+            print("Loaded \(recentMatches.count) recent matches for ListeningView")
+        case .failure(let error):
+            print("Failed to load recent matches: \(error.localizedDescription)")
+            recentMatches = []
+        }
+    }
+    
     private func handleListenTap() {
         // Prevent listening when offline (unless already listening)
         guard reachabilityService.isConnected || isListening else {
@@ -267,6 +310,8 @@ struct ListeningView: View {
                             // Save the match immediately (before enrichment)
                             Task {
                                 await saveMatchToHistory(match)
+                                // Refresh recent matches to include the new match
+                                await loadRecentMatches()
                             }
                             
                             // Present the detail view immediately
