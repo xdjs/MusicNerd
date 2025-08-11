@@ -13,7 +13,6 @@ class AppSettings {
         static let showNetworkIndicator = "show_network_indicator"
         static let useProductionServer = "use_production_server"
         static let cacheExpirationHours = "cache_expiration_hours"
-        static let autoEnrichment = "auto_enrichment"
     }
     
     // MARK: - Sample Duration Setting
@@ -78,16 +77,6 @@ class AppSettings {
         return cacheExpirationHours * 60 * 60 // Convert hours to seconds
     }
     
-    // MARK: - User Preferences
-    var autoEnrichment: Bool {
-        get {
-            // Default to true (auto-enrichment enabled by default)
-            return userDefaults.object(forKey: Keys.autoEnrichment) as? Bool ?? true
-        }
-        set {
-            userDefaults.set(newValue, forKey: Keys.autoEnrichment)
-        }
-    }
     
     private init() {}
     
@@ -99,7 +88,6 @@ class AppSettings {
         userDefaults.removeObject(forKey: Keys.showNetworkIndicator)
         userDefaults.removeObject(forKey: Keys.useProductionServer)
         userDefaults.removeObject(forKey: Keys.cacheExpirationHours)
-        userDefaults.removeObject(forKey: Keys.autoEnrichment)
     }
 }
 

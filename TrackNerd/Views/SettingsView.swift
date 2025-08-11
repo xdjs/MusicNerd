@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var notificationsEnabled = true
-    @State private var autoEnrichment = AppSettings.shared.autoEnrichment
     @State private var saveToAppleMusic = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var showingSampleDurationPicker = false
@@ -29,42 +27,6 @@ struct SettingsView: View {
             List {
                 // App Settings Section
                 Section {
-                    HStack {
-                        Image(systemName: "bell")
-                            .foregroundColor(Color.MusicNerd.textSecondary)
-                            .frame(width: 24)
-                        
-                        Text("Notifications")
-                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: $notificationsEnabled)
-                            .disabled(true)
-                            .accessibilityIdentifier("notifications-toggle")
-                    }
-                    
-                    HStack {
-                        Image(systemName: "sparkles")
-                            .foregroundColor(Color.MusicNerd.textSecondary)
-                            .frame(width: 24)
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Auto Enrichment")
-                                .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
-                            Text("Automatically get insights for recognized songs")
-                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
-                        }
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: $autoEnrichment)
-                            .accessibilityIdentifier("auto-enrichment-toggle")
-                            .onChange(of: autoEnrichment) { _, newValue in
-                                settings.autoEnrichment = newValue
-                            }
-                    }
-                    
                     HStack {
                         Image(systemName: "music.note")
                             .foregroundColor(Color.MusicNerd.textSecondary)
@@ -201,43 +163,31 @@ struct SettingsView: View {
                     
                     HStack {
                         Image(systemName: "heart")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Rate TrackNerd")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        rateApp()
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("rate-app-button")
                     
                     HStack {
                         Image(systemName: "envelope")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Contact Support")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        contactSupport()
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("contact-support-button")
                     
                     HStack {
                         Image(systemName: "doc.text")
-                            .foregroundColor(Color.MusicNerd.primary)
+                            .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
                         Text("Privacy Policy")
-                            .musicNerdStyle(.bodyLarge())
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        openPrivacyPolicy()
+                            .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("privacy-policy-button")
                 } header: {
@@ -336,7 +286,6 @@ struct SettingsView: View {
                         showNetworkIndicator = AppSettings.shared.showNetworkIndicator
                         useProductionServer = AppSettings.shared.useProductionServer
                         cacheExpirationHours = AppSettings.shared.cacheExpirationHours
-                        autoEnrichment = AppSettings.shared.autoEnrichment
                     }
                     .accessibilityIdentifier("reset-settings-button")
                 } header: {
