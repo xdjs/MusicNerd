@@ -131,50 +131,8 @@ struct ListeningView: View {
                         }
                     }
                     
-                    // Recent Matches Section
-                    VStack(spacing: CGFloat.MusicNerd.md) {
-                        HStack {
-                            Text("Recent Matches")
-                                .musicNerdStyle(.headlineLarge())
-                            
-                            Spacer()
-                            
-                            Button("See All") {
-                                // TODO: Navigate to history
-                            }
-                            .foregroundColor(Color.MusicNerd.textSecondary)
-                            .disabled(true)
-                            .accessibilityIdentifier("see-all-button")
-                        }
-                        
-                        // Sample matches (will be replaced with real data in Phase 6)
-                        SongMatchCard(
-                            match: SongMatch(
-                                title: "Bohemian Rhapsody",
-                                artist: "Queen",
-                                enrichmentData: EnrichmentData(
-                                    artistBio: "British rock band formed in London in 1970"
-                                )
-                            )
-                        ) {
-                            // Sample data - no action until Phase 6 persistence
-                        }
-                        .disabled(true)
-                        .opacity(0.6)
-                        .accessibilityIdentifier("recent-match-0")
-                        
-                        SongMatchCard(
-                            match: SongMatch(
-                                title: "Hotel California",
-                                artist: "Eagles"
-                            )
-                        ) {
-                            // Sample data - no action until Phase 6 persistence
-                        }
-                        .disabled(true)
-                        .opacity(0.6)
-                        .accessibilityIdentifier("recent-match-1")
-                    }
+                    // Recent Matches Section - TODO: Implement in Phase 6
+                    // Will display last 3-5 matches from persistent storage
                     
                     Spacer(minLength: CGFloat.MusicNerd.xl)
                 }
