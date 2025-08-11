@@ -10,6 +10,7 @@ import SwiftUI
 struct HistoryView: View {
     @StateObject private var viewModel = HistoryViewModel()
     @State private var selectedMatch: SongMatch?
+    @FocusState private var isSearchFocused: Bool
     
     var body: some View {
         NavigationView {
@@ -22,6 +23,7 @@ struct HistoryView: View {
                         
                         TextField("Search your matches...", text: $viewModel.searchText)
                             .textFieldStyle(PlainTextFieldStyle())
+                            .focused($isSearchFocused)
                             .accessibilityIdentifier("search-field")
                     }
                     .padding(CGFloat.MusicNerd.md)
@@ -31,6 +33,7 @@ struct HistoryView: View {
                     if !viewModel.searchText.isEmpty {
                         Button("Cancel") {
                             viewModel.clearSearch()
+                            isSearchFocused = false
                         }
                         .foregroundColor(Color.MusicNerd.primary)
                         .accessibilityIdentifier("search-cancel-button")
@@ -148,6 +151,8 @@ struct HistoryView: View {
                         LazyVStack(spacing: CGFloat.MusicNerd.md) {
                             ForEach(Array(viewModel.filteredMatches.enumerated()), id: \.element.id) { index, match in
                                 SongMatchCard(match: match) {
+                                    // Dismiss keyboard first, then show match detail
+                                    isSearchFocused = false
                                     selectedMatch = match
                                 }
                                 .accessibilityIdentifier("history-match-\(index)")
@@ -170,6 +175,11 @@ struct HistoryView: View {
                 }
             }
             .background(Color.MusicNerd.background)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                // Dismiss keyboard and remove focus when tapping anywhere in the view
+                isSearchFocused = false
+            }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

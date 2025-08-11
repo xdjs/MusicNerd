@@ -87,6 +87,9 @@ Build an iOS app under the Music Nerd brand that:
   - [x] UserDefaults-based settings persistence
   - [x] User-friendly duration descriptions and recommendations
   - [x] Debug toggle to display sample duration in main UI
+  - [x] Remove auto enrichment setting (unused functionality)
+  - [x] Disable About section options (Rate App, Contact Support, Privacy Policy)
+  - [x] Remove notifications setting toggle
 - [x] **Production Readiness**:
   - [x] Professional debug logging with timestamps
   - [x] Comprehensive error handling and user-friendly messages
@@ -208,7 +211,10 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Real-time search and filtering with HistoryViewModel
   - [x] Implement recent matches display in ListeningView (show last 3-5 matches)
   - [x] Remove sample data from recent matches section in ListeningView
+  - [x] Implement "See All" navigation from recent matches to History tab
   - [x] Remove "Found it!" message after successful match recognition
+  - [x] Keyboard dismissal when tapping outside search field in HistoryView
+  - [x] Keyboard dismissal when tapping on history matches before showing detail
   - [ ] Export/share functionality (deferred - placeholder in Settings UI)
 - [x] **Unit Testing:**
   - [x] Test SwiftData persistence and retrieval (SwiftDataPersistenceTests with 10 comprehensive tests)
