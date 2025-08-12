@@ -247,11 +247,11 @@ Build an iOS app under the Music Nerd brand that:
   - Skip upsell flows unless Apple requires; skip analytics and localization.
   - Fallback when `appleMusicID` is missing/unavailable: search by title/artist, if still unavailable, notify user clearly.
 
-- [ ] **MusicKit Framework Setup**:
-  - [ ] Add MusicKit capability and entitlements in project settings.
-  - [ ] Add "Privacy — Media Library Usage Description" to Info.plist.
-  - [ ] Enable Background Modes > Audio and AirPlay.
-  - [ ] Implement MusicKit authorization flow using `MusicAuthorization`.
+- [x] **MusicKit Framework Setup**:
+  - [x] Add MusicKit capability and entitlements in project settings.
+  - [x] Add "Privacy — Media Library Usage Description" to Info.plist.
+  - [x] Enable Background Modes > Audio and AirPlay.
+  - [x] Implement MusicKit authorization flow using `MusicAuthorization`.
 
 - [ ] **Apple Music Service Layer**:
   - [ ] Create `AppleMusicService` with MusicKit integration providing:

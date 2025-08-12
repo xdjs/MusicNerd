@@ -36,6 +36,7 @@ protocol ServiceContainer {
     var musicNerdService: MusicNerdServiceProtocol { get }
     var storageService: StorageServiceProtocol { get }
     var permissionService: PermissionServiceProtocol { get }
+    var appleMusicService: AppleMusicServiceProtocol { get }
 }
 
 @MainActor
@@ -49,6 +50,7 @@ final class DefaultServiceContainer: ServiceContainer, ObservableObject {
         modelContext: Container.shared.modelContainer.mainContext
     )
     lazy var permissionService: PermissionServiceProtocol = PermissionService()
+    lazy var appleMusicService: AppleMusicServiceProtocol = AppleMusicService()
     
     private init() {}
 }
