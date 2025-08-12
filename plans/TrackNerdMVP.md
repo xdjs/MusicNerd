@@ -253,8 +253,8 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Enable Background Modes > Audio and AirPlay.
   - [x] Implement MusicKit authorization flow using `MusicAuthorization`.
 
-- [ ] **Apple Music Service Layer**:
-  - [ ] Create `AppleMusicService` with MusicKit integration providing:
+- [x] **Apple Music Service Layer**:
+  - [x] Create `AppleMusicService` with MusicKit integration providing:
     - [x] `requestAuthorization() -> MusicAuthorization.Status`
     - [x] `currentSubscription() -> MusicSubscription?`
     - [x] `song(fromAppleMusicID:) async throws -> Song?`
@@ -263,6 +263,7 @@ Build an iOS app under the Music Nerd brand that:
     - [x] Playback control: `playPreview(url:)`, `pause()`, `resume()`
     - [ ] Playback control: `playFull(song:)`, `seek(to:)`
     - [ ] Observable playback state (isPlaying, position, duration, source: preview/full, current item)
+    - [x] Publish `isPlayingPreview` for preview play/pause UI
   - [ ] Handle authorization states (denied, authorized, restricted) and subscription capability.
 
 - [ ] **Playback Implementation**:
@@ -271,6 +272,7 @@ Build an iOS app under the Music Nerd brand that:
     - [x] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
     - [ ] Handle DRM‑free preview audio streams and errors.
     - [x] Preview controls: play/pause (seek optional - deferred).
+    - [x] SwiftUI binding to live playback state via `@EnvironmentObject` service
   - [ ] **Full Playback** (Subscribers):
     - [ ] Use `ApplicationMusicPlayer` for full track playback.
     - [ ] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.
@@ -402,9 +404,9 @@ Build an iOS app under the Music Nerd brand that:
 - ✅ Advanced filtering system with enrichment status and date range filtering
 - ⏳ Remaining: UI testing suite, export functionality
 
-**Next:** Complete Phase 6, then Phase 7 (Apple Music Integration) for playback features
+**Next:** Complete Phase 6, then continue Phase 7 (Apple Music Integration) focusing on preview UX polish (progress indicator, denied authorization UX) and full playback scaffolding
 
-**New Phase:** Phase 7 (Apple Music Integration) - 0% complete
+**New Phase:** Phase 7 (Apple Music Integration) - 25% complete
 - 🎵 **Core Value**: Transform TrackNerd from recognition-only to full playback experience
 - 🔑 **Key Features**: Preview playback (non-subscribers), full playback (subscribers)
 - 📱 **Foundation Ready**: ShazamKit already captures `appleMusicID` for seamless integration
