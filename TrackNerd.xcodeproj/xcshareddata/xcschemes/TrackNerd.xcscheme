@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2FA74DF62E41832E00575EFD"
-               BuildableName = "TrackNerd.app"
+               BuildableName = "Music Nerd ID.app"
                BlueprintName = "TrackNerd"
                ReferencedContainer = "container:TrackNerd.xcodeproj">
             </BuildableReference>
@@ -90,7 +90,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2FA74DF62E41832E00575EFD"
-            BuildableName = "TrackNerd.app"
+            BuildableName = "Music Nerd ID.app"
             BlueprintName = "TrackNerd"
             ReferencedContainer = "container:TrackNerd.xcodeproj">
          </BuildableReference>
@@ -107,7 +107,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2FA74DF62E41832E00575EFD"
-            BuildableName = "TrackNerd.app"
+            BuildableName = "Music Nerd ID.app"
             BlueprintName = "TrackNerd"
             ReferencedContainer = "container:TrackNerd.xcodeproj">
          </BuildableReference>

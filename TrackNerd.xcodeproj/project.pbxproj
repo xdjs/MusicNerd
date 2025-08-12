@@ -33,7 +33,7 @@
 /* Begin PBXFileReference section */
 		2F08D5892E47C9DF00740CD6 /* DevTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DevTestPlan.xctestplan; sourceTree = "<group>"; };
 		2F8DCC3A2E4557830047D90F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		2FA74DF72E41832E00575EFD /* Music Nerd ID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Music Nerd ID.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2FA74DF72E41832E00575EFD /* TrackNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E042E41833000575EFD /* TrackNerdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E972E41850100575EFD /* TrackNerdMVP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TrackNerdMVP.md; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 		2FA74DF82E41832E00575EFD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2FA74DF72E41832E00575EFD /* Music Nerd ID.app */,
+				2FA74DF72E41832E00575EFD /* TrackNerd.app */,
 				2FA74E042E41833000575EFD /* TrackNerdTests.xctest */,
 				2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */,
 			);
@@ -178,7 +178,7 @@
 			packageProductDependencies = (
 			);
 			productName = TrackNerd;
-			productReference = 2FA74DF72E41832E00575EFD /* Music Nerd ID.app */;
+			productReference = 2FA74DF72E41832E00575EFD /* TrackNerd.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2FA74E032E41833000575EFD /* TrackNerdTests */ = {
@@ -484,7 +484,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xdjs.TrackNerd;
-				PRODUCT_NAME = "Music Nerd ID";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -517,7 +517,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xdjs.TrackNerd;
-				PRODUCT_NAME = "Music Nerd ID";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
