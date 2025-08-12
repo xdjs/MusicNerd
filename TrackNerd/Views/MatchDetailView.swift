@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import MusicKit
 
 struct MatchDetailView: View {
@@ -49,6 +50,16 @@ struct MatchDetailView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(items: [shareText])
+        }
+        .alert("Apple Music Access Needed", isPresented: $showAuthDeniedAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+        } message: {
+            Text("Please allow Apple Music access to play previews.")
         }
     }
     
@@ -106,21 +117,42 @@ struct MatchDetailView: View {
                         }
                     },
                     style: .primary,
-                    size: .medium
+                    size: .medium,
+                    isEnabled: !isResolvingPreview && isPreviewAvailable,
+                    isLoading: isResolvingPreview
                 )
                 
                 // Removed Resume button (not needed)
             }
             .padding(.top, CGFloat.MusicNerd.sm)
+
+            // Progress + status
+            VStack(spacing: CGFloat.MusicNerd.xs) {
+                ProgressView(value: appleMusic.previewProgress)
+                    .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
+                    .opacity(appleMusic.isPlayingPreview || appleMusic.previewProgress > 0 ? 1 : 0)
+                if !isPreviewAvailable {
+                    Text("Preview not available for this track")
+                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                }
+            }
         }
     }
+
+    @State private var isResolvingPreview: Bool = false
+    @State private var isPreviewAvailable: Bool = true
+    @State private var showAuthDeniedAlert: Bool = false
 
     private func playPreview() async {
         // 1) Authorize
         let status = await services.appleMusicService.requestAuthorization()
-        guard status == .authorized else { return }
+        guard status == .authorized else {
+            await MainActor.run { showAuthDeniedAlert = true }
+            return
+        }
         
         // 2) Resolve song via appleMusicID or search
+        await MainActor.run { isResolvingPreview = true }
         var song: Song?
         if let id = match.appleMusicID {
             song = await services.appleMusicService.song(fromAppleMusicID: id)
@@ -128,10 +160,17 @@ struct MatchDetailView: View {
         if song == nil {
             song = await services.appleMusicService.searchSong(title: match.title, artist: match.artist)
         }
-        guard let resolved = song, let url = services.appleMusicService.previewURL(for: resolved) else { return }
+        guard let resolved = song, let url = services.appleMusicService.previewURL(for: resolved) else {
+            await MainActor.run {
+                isResolvingPreview = false
+                isPreviewAvailable = false
+            }
+            return
+        }
         
         // 3) Play preview
         services.appleMusicService.playPreview(url: url)
+        await MainActor.run { isResolvingPreview = false; isPreviewAvailable = true }
     }
     
     private func enrichmentSections(_ enrichmentData: EnrichmentData) -> some View {

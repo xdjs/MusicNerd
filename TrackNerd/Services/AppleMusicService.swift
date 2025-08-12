@@ -17,6 +17,7 @@ protocol AppleMusicServiceProtocol: AnyObject {
     func pause()
     func resume()
     var isPlayingPreview: Bool { get }
+    var previewProgress: Double { get }
 }
 
 @MainActor
@@ -25,7 +26,10 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     private var player: AVPlayer?
     private var boundaryObserver: Any?
+    private var periodicObserver: Any?
+    private var endObserverCancellable: AnyCancellable?
     @Published private(set) var isPlayingPreview: Bool = false
+    @Published private(set) var previewProgress: Double = 0
 
     func requestAuthorization() async -> MusicAuthorization.Status {
         // If already determined, return current status
@@ -83,6 +87,12 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
             player?.removeTimeObserver(boundaryObserver)
             self.boundaryObserver = nil
         }
+        if let periodicObserver {
+            player?.removeTimeObserver(periodicObserver)
+            self.periodicObserver = nil
+        }
+        endObserverCancellable?.cancel()
+        endObserverCancellable = nil
         player?.pause()
         let item = AVPlayerItem(url: url)
         player = AVPlayer(playerItem: item)
@@ -91,6 +101,7 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
         try? AVAudioSession.sharedInstance().setActive(true)
         player?.play()
         isPlayingPreview = true
+        previewProgress = 0
         
         // Auto-stop at 30 seconds (if item is longer)
         let boundaryTime = CMTime(seconds: 30, preferredTimescale: 1)
@@ -98,12 +109,33 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
             guard let self else { return }
             self.player?.pause()
             self.isPlayingPreview = false
+            self.previewProgress = 0
         }
+
+        // Periodic progress updates (normalize to 30s max)
+        let interval = CMTime(seconds: 0.2, preferredTimescale: 10)
+        periodicObserver = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+            guard let self else { return }
+            let currentSeconds = CMTimeGetSeconds(time)
+            let normalized = max(0, min(1, currentSeconds / 30.0))
+            self.previewProgress = normalized
+        }
+
+        // Observe item end (for previews shorter than 30s)
+        endObserverCancellable = NotificationCenter.default
+            .publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.isPlayingPreview = false
+                self.previewProgress = 0
+            }
     }
 
     func pause() {
         player?.pause()
         isPlayingPreview = false
+        // Keep progress but stop advancing
     }
 
     func resume() {

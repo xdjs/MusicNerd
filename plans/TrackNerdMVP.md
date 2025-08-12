@@ -264,6 +264,7 @@ Build an iOS app under the Music Nerd brand that:
     - [ ] Playback control: `playFull(song:)`, `seek(to:)`
     - [ ] Observable playback state (isPlaying, position, duration, source: preview/full, current item)
     - [x] Publish `isPlayingPreview` for preview play/pause UI
+    - [x] Publish `previewProgress` (0–1) for progress UI
   - [ ] Handle authorization states (denied, authorized, restricted) and subscription capability.
 
 - [ ] **Playback Implementation**:
@@ -273,6 +274,9 @@ Build an iOS app under the Music Nerd brand that:
     - [ ] Handle DRM‑free preview audio streams and errors.
     - [x] Preview controls: play/pause (seek optional - deferred).
     - [x] SwiftUI binding to live playback state via `@EnvironmentObject` service
+    - [x] Progress indicator in `MatchDetailView` bound to `previewProgress`
+    - [x] Denied authorization UX with Settings CTA
+    - [x] Unavailable preview messaging and disabled button state while resolving
   - [ ] **Full Playback** (Subscribers):
     - [ ] Use `ApplicationMusicPlayer` for full track playback.
     - [ ] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.
