@@ -255,21 +255,22 @@ Build an iOS app under the Music Nerd brand that:
 
 - [ ] **Apple Music Service Layer**:
   - [ ] Create `AppleMusicService` with MusicKit integration providing:
-    - [ ] `requestAuthorization() -> MusicAuthorization.Status`
-    - [ ] `currentSubscription() -> MusicSubscription?`
-    - [ ] `song(fromAppleMusicID:) async throws -> Song?`
-    - [ ] `searchSong(title:artist:) async throws -> Song?` (fallback)
-    - [ ] `previewURL(for:) async throws -> URL?`
-    - [ ] Playback control: `playPreview(url:)`, `playFull(song:)`, `pause()`, `resume()`, `seek(to:)`
+    - [x] `requestAuthorization() -> MusicAuthorization.Status`
+    - [x] `currentSubscription() -> MusicSubscription?`
+    - [x] `song(fromAppleMusicID:) async throws -> Song?`
+    - [x] `searchSong(title:artist:) async throws -> Song?` (fallback)
+    - [x] `previewURL(for:) async throws -> URL?`
+    - [x] Playback control: `playPreview(url:)`, `pause()`, `resume()`
+    - [ ] Playback control: `playFull(song:)`, `seek(to:)`
     - [ ] Observable playback state (isPlaying, position, duration, source: preview/full, current item)
   - [ ] Handle authorization states (denied, authorized, restricted) and subscription capability.
 
 - [ ] **Playback Implementation**:
   - [ ] **Preview Playback** (Non‑subscribers):
-    - [ ] Fetch preview assets using `Song.previewAssets`.
+    - [x] Fetch preview assets using `Song.previewAssets`.
     - [ ] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
     - [ ] Handle DRM‑free preview audio streams and errors.
-    - [ ] Preview controls: play/pause and seek (optional seek for MVP).
+    - [x] Preview controls: play/pause (seek optional - deferred).
   - [ ] **Full Playback** (Subscribers):
     - [ ] Use `ApplicationMusicPlayer` for full track playback.
     - [ ] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MusicKit
 
 struct MatchDetailView: View {
     let match: SongMatch
@@ -20,6 +21,7 @@ struct MatchDetailView: View {
             ScrollView {
                 VStack(spacing: CGFloat.MusicNerd.lg) {
                     headerSection
+                    playbackControls
                     contentSection
                     Spacer(minLength: CGFloat.MusicNerd.xl)
                 }
@@ -88,6 +90,46 @@ struct MatchDetailView: View {
                 loadingSection
             }
         }
+    }
+
+    private var playbackControls: some View {
+        VStack(spacing: CGFloat.MusicNerd.sm) {
+            HStack(spacing: CGFloat.MusicNerd.sm) {
+                MusicNerdButton(
+                    title: "Play Preview",
+                    action: { Task { await playPreview() } },
+                    style: .primary,
+                    size: .medium
+                )
+                
+                MusicNerdButton(
+                    title: "Pause",
+                    action: { services.appleMusicService.pause() },
+                    style: .outline,
+                    size: .medium
+                )
+            }
+            .padding(.top, CGFloat.MusicNerd.sm)
+        }
+    }
+
+    private func playPreview() async {
+        // 1) Authorize
+        let status = await services.appleMusicService.requestAuthorization()
+        guard status == .authorized else { return }
+        
+        // 2) Resolve song via appleMusicID or search
+        var song: Song?
+        if let id = match.appleMusicID {
+            song = await services.appleMusicService.song(fromAppleMusicID: id)
+        }
+        if song == nil {
+            song = await services.appleMusicService.searchSong(title: match.title, artist: match.artist)
+        }
+        guard let resolved = song, let url = services.appleMusicService.previewURL(for: resolved) else { return }
+        
+        // 3) Play preview
+        services.appleMusicService.playPreview(url: url)
     }
     
     private func enrichmentSections(_ enrichmentData: EnrichmentData) -> some View {
