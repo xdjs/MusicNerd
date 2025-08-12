@@ -237,63 +237,92 @@ Build an iOS app under the Music Nerd brand that:
 ---
 
 ### 🎵 Phase 7: Apple Music Integration
+
+- Scope and constraints for MVP:
+  - Target iOS 18.2+ for MusicKit features.
+  - Include full playback for subscribers and 30s previews for non‑subscribers.
+  - Persistent mini‑player across all tabs (sticky bottom).
+  - Include background playback and lock screen controls.
+  - Audio policy: interrupt other audio (no mixing/ducking).
+  - Skip upsell flows unless Apple requires; skip analytics and localization.
+  - Fallback when `appleMusicID` is missing/unavailable: search by title/artist, if still unavailable, notify user clearly.
+
 - [ ] **MusicKit Framework Setup**:
-  - [ ] Add MusicKit framework to project capabilities
-  - [ ] Configure Apple Developer Program MusicKit entitlements
-  - [ ] Add "Privacy — Media Library Usage Description" to Info.plist
-  - [ ] Set up MusicKit authorization flow
+  - [ ] Add MusicKit capability and entitlements in project settings.
+  - [ ] Add "Privacy — Media Library Usage Description" to Info.plist.
+  - [ ] Enable Background Modes > Audio and AirPlay.
+  - [ ] Implement MusicKit authorization flow using `MusicAuthorization`.
+
 - [ ] **Apple Music Service Layer**:
-  - [ ] Create `AppleMusicService` with MusicKit integration
-  - [ ] Implement subscription status checking
-  - [ ] Add Apple Music authentication flow
-  - [ ] Handle authorization states (denied, authorized, restricted)
+  - [ ] Create `AppleMusicService` with MusicKit integration providing:
+    - [ ] `requestAuthorization() -> MusicAuthorization.Status`
+    - [ ] `currentSubscription() -> MusicSubscription?`
+    - [ ] `song(fromAppleMusicID:) async throws -> Song?`
+    - [ ] `searchSong(title:artist:) async throws -> Song?` (fallback)
+    - [ ] `previewURL(for:) async throws -> URL?`
+    - [ ] Playback control: `playPreview(url:)`, `playFull(song:)`, `pause()`, `resume()`, `seek(to:)`
+    - [ ] Observable playback state (isPlaying, position, duration, source: preview/full, current item)
+  - [ ] Handle authorization states (denied, authorized, restricted) and subscription capability.
+
 - [ ] **Playback Implementation**:
-  - [ ] **Preview Playback** (Non-subscribers):
-    - [ ] Fetch preview assets using `Song.previewAssets`
-    - [ ] Implement 30-second preview playback with AVPlayer
-    - [ ] Handle DRM-free preview audio streams
-    - [ ] Add preview playback controls (play/pause/seek)
+  - [ ] **Preview Playback** (Non‑subscribers):
+    - [ ] Fetch preview assets using `Song.previewAssets`.
+    - [ ] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
+    - [ ] Handle DRM‑free preview audio streams and errors.
+    - [ ] Preview controls: play/pause and seek (optional seek for MVP).
   - [ ] **Full Playback** (Subscribers):
-    - [ ] Use `ApplicationMusicPlayer` for full track playback
-    - [ ] Convert ShazamKit `appleMusicID` to MusicKit song objects
-    - [ ] Implement queue management for continuous playback
-    - [ ] Handle playback states and progress tracking
+    - [ ] Use `ApplicationMusicPlayer` for full track playback.
+    - [ ] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.
+    - [ ] Single‑item queue for MVP; manage playback states and progress.
+    - [ ] Configure `AVAudioSession` for `.playback`; handle route changes and interruptions.
+
 - [ ] **UI Integration**:
-  - [ ] Add playback controls to `SongMatchCard` components
-  - [ ] Create playback UI with play/pause buttons and progress indicators
-  - [ ] Design subscription upgrade prompts for non-subscribers
-  - [ ] Add "Listen on Apple Music" action buttons
-  - [ ] Implement now playing mini-player for active playback
+  - [ ] Add playback controls to `SongMatchCard` components (play/pause, progress, source badge: Preview/Apple Music).
+  - [ ] Implement a persistent mini‑player (sticky across tabs) showing artwork, title/artist, play/pause, progress; optional 15s skip.
+  - [ ] Add "Listen on Apple Music" deep link only if required by Apple.
+
 - [ ] **Subscription Management**:
-  - [ ] Implement subscription trial offers within the app
-  - [ ] Handle subscription status changes
-  - [ ] Display appropriate playback options based on subscription status
-  - [ ] Add subscription management in Settings
+  - [ ] Reflect subscription status and capability in UI.
+  - [ ] Display appropriate playback options based on subscription status (full vs preview).
+  - [ ] Settings surface for managing Apple Music permissions (no upsell in MVP).
+
 - [ ] **Playback Features**:
-  - [ ] Lock screen playback controls integration
-  - [ ] Background playback support
-  - [ ] Audio session management for proper audio mixing
-  - [ ] Handle interruptions (calls, other apps)
+  - [ ] Lock screen playback controls integration (Now Playing info, remote commands).
+  - [ ] Background playback support (continues when app goes to background).
+  - [ ] Audio session management with interruption handling (calls, other apps) and route changes.
+
 - [ ] **Error Handling & Edge Cases**:
-  - [ ] Handle songs not available on Apple Music
-  - [ ] Manage regional content restrictions
-  - [ ] Fallback when `appleMusicID` is unavailable
-  - [ ] Network connectivity issues during playback
+  - [ ] Handle songs not available on Apple Music or region‑restricted.
+  - [ ] Fallback when `appleMusicID` is unavailable -> search by title/artist; if not found, notify user.
+  - [ ] Offline behavior: disable playback controls with clear messaging; auto‑recover when network returns.
+  - [ ] Network connectivity issues during playback with retry guidance.
+
 - [ ] **Unit Testing:**
-  - [ ] Test AppleMusicService subscription checking
-  - [ ] Test preview asset fetching and playback logic
-  - [ ] Test full track playback for subscribers
-  - [ ] Test authorization flow handling
-  - [ ] Test playback state management
-  - [ ] Test error scenarios (unavailable tracks, network issues)
+  - [ ] Test `AppleMusicService` authorization and subscription checks.
+  - [ ] Test song lookup by `appleMusicID` and search fallback.
+  - [ ] Test preview playback logic and 30‑second cutoff.
+  - [ ] Test full track playback for subscribers, state transitions, and interruptions.
+  - [ ] Test error scenarios (unavailable tracks, network issues, region restrictions).
+
 - [ ] **UI Testing:**
-  - [ ] Test Apple Music authorization flow
-  - [ ] Test preview playback controls and feedback
-  - [ ] Test subscriber playback experience
-  - [ ] Test subscription upgrade prompts
-  - [ ] Test playback controls in match cards and detail views
-  - [ ] Test background playback behavior
-  - [ ] Test lock screen controls integration
+  - [ ] Test authorization request UX and denied state with Settings CTA.
+  - [ ] Test preview and full playback controls and feedback in `SongMatchCard` and mini‑player.
+  - [ ] Test persistent mini‑player across tab navigation and app lifecycle.
+  - [ ] Test background playback behavior and lock screen controls.
+
+- [ ] **Sequencing & Acceptance Criteria:**
+  - [ ] 7.1 Capability + Auth + Subscription
+    - AC: Auth prompt appears once; status reflects; denied state includes Settings CTA.
+  - [ ] 7.2 Preview playback
+    - AC: 30s preview plays with play/pause and progress; resilient to network toggles.
+  - [ ] 7.3 Full playback
+    - AC: Subscribers can play a full track via `ApplicationMusicPlayer`; non‑subs fall back to preview with clear notice.
+  - [ ] 7.4 UI integration
+    - AC: Controls on `SongMatchCard`; persistent mini‑player functions across tabs; optional Apple Music link if required.
+  - [ ] 7.5 Background/lock screen
+    - AC: Lock screen shows now playing; remote commands work; playback continues in background.
+  - [ ] 7.6 Tests
+    - AC: Unit + basic UI tests pass; manual device checklist green.
 
 ---
 
