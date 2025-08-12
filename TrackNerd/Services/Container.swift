@@ -50,7 +50,12 @@ final class DefaultServiceContainer: ServiceContainer, ObservableObject {
         modelContext: Container.shared.modelContainer.mainContext
     )
     lazy var permissionService: PermissionServiceProtocol = PermissionService()
-    lazy var appleMusicService: AppleMusicServiceProtocol = AppleMusicService()
+    // Store a concrete instance for SwiftUI environment injection
+    private lazy var _appleMusicServiceObject = AppleMusicService()
+    // Expose protocol-typed service for general use
+    lazy var appleMusicService: AppleMusicServiceProtocol = _appleMusicServiceObject
+    // Expose concrete type for EnvironmentObject injection
+    var appleMusicServiceObject: AppleMusicService { _appleMusicServiceObject }
     
     private init() {}
 }

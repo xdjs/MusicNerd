@@ -15,6 +15,7 @@ struct MatchDetailView: View {
     @State private var isRetrying = false
     @State private var retryCount = 0
     @EnvironmentObject private var services: DefaultServiceContainer
+    @EnvironmentObject private var appleMusic: AppleMusicService
     
     var body: some View {
         NavigationView {
@@ -96,15 +97,21 @@ struct MatchDetailView: View {
         VStack(spacing: CGFloat.MusicNerd.sm) {
             HStack(spacing: CGFloat.MusicNerd.sm) {
                 MusicNerdButton(
-                    title: "Play Preview",
-                    action: { Task { await playPreview() } },
+                    title: appleMusic.isPlayingPreview ? "Pause" : "Play Preview",
+                    action: {
+                        if appleMusic.isPlayingPreview {
+                            services.appleMusicService.pause()
+                        } else {
+                            Task { await playPreview() }
+                        }
+                    },
                     style: .primary,
                     size: .medium
                 )
                 
                 MusicNerdButton(
-                    title: "Pause",
-                    action: { services.appleMusicService.pause() },
+                    title: "Resume",
+                    action: { services.appleMusicService.resume() },
                     style: .outline,
                     size: .medium
                 )

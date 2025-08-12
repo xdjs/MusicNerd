@@ -3,6 +3,7 @@ import MusicKit
 import Combine
 import AVFoundation
 
+@MainActor
 protocol AppleMusicServiceProtocol: AnyObject {
     func requestAuthorization() async -> MusicAuthorization.Status
     var authorizationStatus: MusicAuthorization.Status { get }
@@ -15,8 +16,10 @@ protocol AppleMusicServiceProtocol: AnyObject {
     func playPreview(url: URL)
     func pause()
     func resume()
+    var isPlayingPreview: Bool { get }
 }
 
+@MainActor
 final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     @Published private(set) var authorizationStatus: MusicAuthorization.Status = MusicAuthorization.currentStatus
     private var cancellables: Set<AnyCancellable> = []
