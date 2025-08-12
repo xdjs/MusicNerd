@@ -109,12 +109,7 @@ struct MatchDetailView: View {
                     size: .medium
                 )
                 
-                MusicNerdButton(
-                    title: "Resume",
-                    action: { services.appleMusicService.resume() },
-                    style: .outline,
-                    size: .medium
-                )
+                // Removed Resume button (not needed)
             }
             .padding(.top, CGFloat.MusicNerd.sm)
         }
