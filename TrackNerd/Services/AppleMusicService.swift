@@ -21,6 +21,8 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     @Published private(set) var authorizationStatus: MusicAuthorization.Status = MusicAuthorization.currentStatus
     private var cancellables: Set<AnyCancellable> = []
     private var player: AVPlayer?
+    private var boundaryObserver: Any?
+    @Published private(set) var isPlayingPreview: Bool = false
 
     func requestAuthorization() async -> MusicAuthorization.Status {
         // If already determined, return current status
@@ -73,19 +75,36 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
 
     // MARK: - Preview Playback
     func playPreview(url: URL) {
+        // Clean up previous observer
+        if let boundaryObserver {
+            player?.removeTimeObserver(boundaryObserver)
+            self.boundaryObserver = nil
+        }
         player?.pause()
-        player = AVPlayer(url: url)
+        let item = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: item)
         // Ensure playback category is correct for preview
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
         try? AVAudioSession.sharedInstance().setActive(true)
         player?.play()
+        isPlayingPreview = true
+        
+        // Auto-stop at 30 seconds (if item is longer)
+        let boundaryTime = CMTime(seconds: 30, preferredTimescale: 1)
+        boundaryObserver = player?.addBoundaryTimeObserver(forTimes: [NSValue(time: boundaryTime)], queue: .main) { [weak self] in
+            guard let self else { return }
+            self.player?.pause()
+            self.isPlayingPreview = false
+        }
     }
 
     func pause() {
         player?.pause()
+        isPlayingPreview = false
     }
 
     func resume() {
         player?.play()
+        isPlayingPreview = true
     }
 }

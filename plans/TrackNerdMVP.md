@@ -268,7 +268,7 @@ Build an iOS app under the Music Nerd brand that:
 - [ ] **Playback Implementation**:
   - [ ] **Preview Playback** (Non‑subscribers):
     - [x] Fetch preview assets using `Song.previewAssets`.
-    - [ ] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
+    - [x] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
     - [ ] Handle DRM‑free preview audio streams and errors.
     - [x] Preview controls: play/pause (seek optional - deferred).
   - [ ] **Full Playback** (Subscribers):
