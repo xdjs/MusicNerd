@@ -24,6 +24,8 @@ struct TrackNerdApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(DefaultServiceContainer.shared)
+                .environmentObject(DefaultServiceContainer.shared.appleMusicServiceObject)
         }
         .modelContainer(for: [SongMatch.self, EnrichmentData.self, EnrichmentCacheEntry.self])
     }

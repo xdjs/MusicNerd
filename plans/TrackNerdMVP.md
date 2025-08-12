@@ -247,29 +247,32 @@ Build an iOS app under the Music Nerd brand that:
   - Skip upsell flows unless Apple requires; skip analytics and localization.
   - Fallback when `appleMusicID` is missing/unavailable: search by title/artist, if still unavailable, notify user clearly.
 
-- [ ] **MusicKit Framework Setup**:
-  - [ ] Add MusicKit capability and entitlements in project settings.
-  - [ ] Add "Privacy — Media Library Usage Description" to Info.plist.
-  - [ ] Enable Background Modes > Audio and AirPlay.
-  - [ ] Implement MusicKit authorization flow using `MusicAuthorization`.
+- [x] **MusicKit Framework Setup**:
+  - [x] Add MusicKit capability and entitlements in project settings.
+  - [x] Add "Privacy — Media Library Usage Description" to Info.plist.
+  - [x] Enable Background Modes > Audio and AirPlay.
+  - [x] Implement MusicKit authorization flow using `MusicAuthorization`.
 
-- [ ] **Apple Music Service Layer**:
-  - [ ] Create `AppleMusicService` with MusicKit integration providing:
-    - [ ] `requestAuthorization() -> MusicAuthorization.Status`
-    - [ ] `currentSubscription() -> MusicSubscription?`
-    - [ ] `song(fromAppleMusicID:) async throws -> Song?`
-    - [ ] `searchSong(title:artist:) async throws -> Song?` (fallback)
-    - [ ] `previewURL(for:) async throws -> URL?`
-    - [ ] Playback control: `playPreview(url:)`, `playFull(song:)`, `pause()`, `resume()`, `seek(to:)`
+- [x] **Apple Music Service Layer**:
+  - [x] Create `AppleMusicService` with MusicKit integration providing:
+    - [x] `requestAuthorization() -> MusicAuthorization.Status`
+    - [x] `currentSubscription() -> MusicSubscription?`
+    - [x] `song(fromAppleMusicID:) async throws -> Song?`
+    - [x] `searchSong(title:artist:) async throws -> Song?` (fallback)
+    - [x] `previewURL(for:) async throws -> URL?`
+    - [x] Playback control: `playPreview(url:)`, `pause()`, `resume()`
+    - [ ] Playback control: `playFull(song:)`, `seek(to:)`
     - [ ] Observable playback state (isPlaying, position, duration, source: preview/full, current item)
+    - [x] Publish `isPlayingPreview` for preview play/pause UI
   - [ ] Handle authorization states (denied, authorized, restricted) and subscription capability.
 
 - [ ] **Playback Implementation**:
   - [ ] **Preview Playback** (Non‑subscribers):
-    - [ ] Fetch preview assets using `Song.previewAssets`.
-    - [ ] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
+    - [x] Fetch preview assets using `Song.previewAssets`.
+    - [x] Implement 30‑second preview playback with `AVPlayer` (auto‑stop at 30s).
     - [ ] Handle DRM‑free preview audio streams and errors.
-    - [ ] Preview controls: play/pause and seek (optional seek for MVP).
+    - [x] Preview controls: play/pause (seek optional - deferred).
+    - [x] SwiftUI binding to live playback state via `@EnvironmentObject` service
   - [ ] **Full Playback** (Subscribers):
     - [ ] Use `ApplicationMusicPlayer` for full track playback.
     - [ ] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.
@@ -401,9 +404,9 @@ Build an iOS app under the Music Nerd brand that:
 - ✅ Advanced filtering system with enrichment status and date range filtering
 - ⏳ Remaining: UI testing suite, export functionality
 
-**Next:** Complete Phase 6, then Phase 7 (Apple Music Integration) for playback features
+**Next:** Complete Phase 6, then continue Phase 7 (Apple Music Integration) focusing on preview UX polish (progress indicator, denied authorization UX) and full playback scaffolding
 
-**New Phase:** Phase 7 (Apple Music Integration) - 0% complete
+**New Phase:** Phase 7 (Apple Music Integration) - 25% complete
 - 🎵 **Core Value**: Transform TrackNerd from recognition-only to full playback experience
 - 🔑 **Key Features**: Preview playback (non-subscribers), full playback (subscribers)
 - 📱 **Foundation Ready**: ShazamKit already captures `appleMusicID` for seamless integration
