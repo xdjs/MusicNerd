@@ -22,6 +22,9 @@ protocol AppleMusicServiceProtocol: AnyObject {
     func playFull(song: Song) async
     func canPlayFullTracks() async -> Bool
     var isPlayingFull: Bool { get }
+    var fullProgress: Double { get }
+    // Fallback preview via iTunes Search (no auth)
+    func fallbackPreviewURL(title: String, artist: String) async -> URL?
 }
 
 @MainActor
@@ -32,9 +35,12 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     private var boundaryObserver: Any?
     private var periodicObserver: Any?
     private var endObserverCancellable: AnyCancellable?
+    private var fullProgressTimer: AnyCancellable?
+    private var fullDurationSeconds: Double = 0
     @Published private(set) var isPlayingPreview: Bool = false
     @Published private(set) var previewProgress: Double = 0
     @Published private(set) var isPlayingFull: Bool = false
+    @Published private(set) var fullProgress: Double = 0
 
     func requestAuthorization() async -> MusicAuthorization.Status {
         // If already determined, return current status
@@ -170,6 +176,10 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
             appPlayer.queue = ApplicationMusicPlayer.Queue(for: [song])
             try await appPlayer.play()
             isPlayingFull = true
+            fullProgress = 0
+            // Capture expected duration if available
+            fullDurationSeconds = song.duration ?? 0
+            startFullProgressUpdates()
         } catch {
             isPlayingFull = false
         }
@@ -180,12 +190,64 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
         if isPlayingFull {
             ApplicationMusicPlayer.shared.pause()
             isPlayingFull = false
+            stopFullProgressUpdates()
         }
     }
 
     func resumeFullIfNeeded() {
         if !isPlayingFull {
-            Task { try? await ApplicationMusicPlayer.shared.play(); self.isPlayingFull = true }
+            Task { try? await ApplicationMusicPlayer.shared.play(); self.isPlayingFull = true; self.startFullProgressUpdates() }
+        }
+    }
+
+    private func startFullProgressUpdates() {
+        stopFullProgressUpdates()
+        fullProgressTimer = Timer.publish(every: 0.2, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                let player = ApplicationMusicPlayer.shared
+                let current = player.playbackTime
+                let duration = self.fullDurationSeconds
+                if duration > 0 {
+                    let progress = max(0, min(1, current / duration))
+                    self.fullProgress = progress
+                    if progress >= 0.999 {
+                        // Consider track ended
+                        self.isPlayingFull = false
+                        self.stopFullProgressUpdates()
+                    }
+                } else {
+                    self.fullProgress = 0
+                }
+            }
+    }
+
+    private func stopFullProgressUpdates() {
+        fullProgressTimer?.cancel()
+        fullProgressTimer = nil
+    }
+
+    // MARK: - iTunes Search Fallback (No Auth Required)
+    struct ITunesSearchResponse: Decodable { let results: [ITunesTrack] }
+    struct ITunesTrack: Decodable { let previewUrl: String? }
+    
+    func fallbackPreviewURL(title: String, artist: String) async -> URL? {
+        let term = "\(title) \(artist)"
+        guard let encoded = term.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "https://itunes.apple.com/search?term=\(encoded)&entity=song&limit=1") else {
+            return nil
+        }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+            let decoded = try JSONDecoder().decode(ITunesSearchResponse.self, from: data)
+            if let preview = decoded.results.first?.previewUrl, let previewURL = URL(string: preview) {
+                return previewURL
+            }
+            return nil
+        } catch {
+            return nil
         }
     }
 }
