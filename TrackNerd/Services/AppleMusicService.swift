@@ -237,6 +237,31 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
         fullProgressTimer = nil
     }
 
+    // MARK: - Stop All Playback
+    func stopAllPlayback() {
+        // Stop preview player
+        if let boundaryObserver {
+            player?.removeTimeObserver(boundaryObserver)
+            self.boundaryObserver = nil
+        }
+        if let periodicObserver {
+            player?.removeTimeObserver(periodicObserver)
+            self.periodicObserver = nil
+        }
+        endObserverCancellable?.cancel()
+        endObserverCancellable = nil
+        player?.pause()
+        player = nil
+        isPlayingPreview = false
+        previewProgress = 0
+        
+        // Stop full playback
+        ApplicationMusicPlayer.shared.pause()
+        isPlayingFull = false
+        fullProgress = 0
+        stopFullProgressUpdates()
+    }
+
     // MARK: - iTunes Search Fallback (No Auth Required)
     struct ITunesSearchResponse: Decodable { let results: [ITunesTrack] }
     struct ITunesTrack: Decodable { let previewUrl: String? }

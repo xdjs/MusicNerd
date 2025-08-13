@@ -115,27 +115,29 @@ struct MatchDetailView: View {
         VStack(spacing: CGFloat.MusicNerd.sm) {
             HStack(spacing: CGFloat.MusicNerd.sm) {
                 MusicNerdButton(
-                    title: (appleMusic.isPlayingPreview || appleMusic.isPlayingFull)
-                        ? "Pause"
-                        : (isEligibleForFull ? "Play" : "Play Preview"),
+                    title: currentMatchIsActive ? (appleMusic.isPlayingPreview || appleMusic.isPlayingFull ? "Pause" : "Play") : (isEligibleForFull ? "Play" : "Play Preview"),
                     action: {
-                        if appleMusic.isPlayingPreview {
-                            services.appleMusicService.pause()
-                        } else if appleMusic.isPlayingFull {
-                            appleMusic.pauseFullIfNeeded()
-                        } else {
-                            // Resume if we have progress, otherwise start fresh
-                            if appleMusic.fullProgress > 0 {
-                                appleMusic.resumeFullIfNeeded()
-                            } else if appleMusic.previewProgress > 0 {
-                                appleMusic.resume()
+                        if currentMatchIsActive {
+                            if appleMusic.isPlayingPreview {
+                                services.appleMusicService.pause()
+                            } else if appleMusic.isPlayingFull {
+                                appleMusic.pauseFullIfNeeded()
                             } else {
-                                Task {
-                                    if isEligibleForFull {
-                                        await playFullIfPossible()
-                                    } else {
-                                        await playPreview()
-                                    }
+                                // Resume within current match
+                                if appleMusic.fullProgress > 0 {
+                                    appleMusic.resumeFullIfNeeded()
+                                } else if appleMusic.previewProgress > 0 {
+                                    appleMusic.resume()
+                                }
+                            }
+                        } else {
+                            // Not the active match: stop current and start fresh for this match
+                            appleMusic.stopAllPlayback()
+                            Task {
+                                if isEligibleForFull {
+                                    await playFullIfPossible()
+                                } else {
+                                    await playPreview()
                                 }
                             }
                         }
@@ -148,24 +150,29 @@ struct MatchDetailView: View {
             }
             .padding(.top, CGFloat.MusicNerd.sm)
 
-            // Progress + status
-            VStack(spacing: CGFloat.MusicNerd.xs) {
-                // Full track progress (visible when playing full or when progress has started)
-                if appleMusic.isPlayingFull || appleMusic.fullProgress > 0 {
-                    ProgressView(value: appleMusic.fullProgress)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
-                } else {
-                    // Preview progress (visible when playing preview or when progress has started)
-                    ProgressView(value: appleMusic.previewProgress)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
-                        .opacity(appleMusic.isPlayingPreview || appleMusic.previewProgress > 0 ? 1 : 0)
-                }
-                if !isPreviewAvailable {
-                    Text("Preview not available for this track")
-                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+            // Progress + status only if this is the active match
+            if currentMatchIsActive {
+                VStack(spacing: CGFloat.MusicNerd.xs) {
+                    if appleMusic.isPlayingFull || appleMusic.fullProgress > 0 {
+                        ProgressView(value: appleMusic.fullProgress)
+                            .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
+                    } else {
+                        ProgressView(value: appleMusic.previewProgress)
+                            .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
+                            .opacity(appleMusic.isPlayingPreview || appleMusic.previewProgress > 0 ? 1 : 0)
+                    }
+                    if !isPreviewAvailable {
+                        Text("Preview not available for this track")
+                            .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                    }
                 }
             }
         }
+    }
+
+    private var currentMatchIsActive: Bool {
+        if let active = appleMusic.currentMatch { return active.id == match.id }
+        return false
     }
 
     @State private var isResolvingPreview: Bool = false
