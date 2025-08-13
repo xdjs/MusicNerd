@@ -193,6 +193,7 @@ struct MatchDetailView: View {
         }
         
         // Play preview
+        appleMusic.setCurrentMatch(match)
         services.appleMusicService.playPreview(url: finalURL)
         await MainActor.run { isResolvingPreview = false; isPreviewAvailable = true }
     }
@@ -217,6 +218,7 @@ struct MatchDetailView: View {
         let canFull = await services.appleMusicService.canPlayFullTracks()
         await MainActor.run { isEligibleForFull = canFull }
         guard canFull else { return }
+        appleMusic.setCurrentMatch(match)
         await services.appleMusicService.playFull(song: resolved)
     }
     
