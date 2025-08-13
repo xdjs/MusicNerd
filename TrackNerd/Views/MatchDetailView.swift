@@ -98,6 +98,15 @@ struct MatchDetailView: View {
             
             Text("Matched \(match.formattedMatchDate)")
                 .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+
+            // Debug: Show Music Nerd Artist ID when enabled and available
+            if AppSettings.shared.showDebugInfo,
+               let artistId = match.enrichmentData?.musicNerdArtistId,
+               !artistId.isEmpty {
+                Text("Artist ID: \(artistId)")
+                    .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                    .accessibilityIdentifier("debug-artist-id")
+            }
         }
     }
     
