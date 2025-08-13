@@ -18,6 +18,10 @@ protocol AppleMusicServiceProtocol: AnyObject {
     func resume()
     var isPlayingPreview: Bool { get }
     var previewProgress: Double { get }
+    // Full playback
+    func playFull(song: Song) async
+    func canPlayFullTracks() async -> Bool
+    var isPlayingFull: Bool { get }
 }
 
 @MainActor
@@ -30,6 +34,7 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     private var endObserverCancellable: AnyCancellable?
     @Published private(set) var isPlayingPreview: Bool = false
     @Published private(set) var previewProgress: Double = 0
+    @Published private(set) var isPlayingFull: Bool = false
 
     func requestAuthorization() async -> MusicAuthorization.Status {
         // If already determined, return current status
@@ -141,5 +146,46 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     func resume() {
         player?.play()
         isPlayingPreview = true
+    }
+
+    // MARK: - Full Playback (Subscribers)
+    func canPlayFullTracks() async -> Bool {
+        let sub = await currentSubscription()
+        return sub?.canPlayCatalogContent ?? false
+    }
+
+    func playFull(song: Song) async {
+        // Stop any preview playback
+        if isPlayingPreview {
+            player?.pause()
+            isPlayingPreview = false
+            previewProgress = 0
+        }
+        // Configure audio session for playback
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        // Set queue and play
+        let appPlayer = ApplicationMusicPlayer.shared
+        do {
+            appPlayer.queue = ApplicationMusicPlayer.Queue(for: [song])
+            try await appPlayer.play()
+            isPlayingFull = true
+        } catch {
+            isPlayingFull = false
+        }
+    }
+
+    // Extend pause/resume to affect full playback as well
+    func pauseFullIfNeeded() {
+        if isPlayingFull {
+            ApplicationMusicPlayer.shared.pause()
+            isPlayingFull = false
+        }
+    }
+
+    func resumeFullIfNeeded() {
+        if !isPlayingFull {
+            Task { try? await ApplicationMusicPlayer.shared.play(); self.isPlayingFull = true }
+        }
     }
 }

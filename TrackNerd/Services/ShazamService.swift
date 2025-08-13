@@ -116,10 +116,19 @@ class ShazamService: NSObject, ShazamServiceProtocol {
             audioEngine.stop()
         }
         audioEngine.inputNode.removeTap(onBus: 0)
+        audioEngine.reset()
         
         session = nil
         signatureGenerator = nil
         currentState = .idle
+        
+        // Deactivate audio session to release input and allow other audio to resume
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            logWithTimestamp("Audio session deactivated after listening")
+        } catch {
+            logWithTimestamp("Failed to deactivate audio session: \(error)")
+        }
     }
     
     // MARK: - Private Methods
@@ -128,7 +137,7 @@ class ShazamService: NSObject, ShazamServiceProtocol {
         logWithTimestamp("Setting up audio session...")
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.record, mode: .measurement, options: [])
+            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.defaultToSpeaker])
             try audioSession.setActive(true)
             logWithTimestamp("Audio session setup successful")
         } catch {

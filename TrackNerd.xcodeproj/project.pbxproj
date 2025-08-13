@@ -471,7 +471,7 @@
 				INFOPLIST_FILE = TrackNerd/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Music Nerd ID";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Music Nsrd ID uses Apple Music to play previews or full tracks of songs you recognize.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Music Nerd ID uses Apple Music to play song previews and full tracks.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Music Nerd ID needs microphone access to listen to music and identify songs using Shazam technology.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -505,7 +505,7 @@
 				INFOPLIST_FILE = TrackNerd/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Music Nerd ID";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Music Nsrd ID uses Apple Music to play previews or full tracks of songs you recognize.";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Music Nerd ID uses Apple Music to play song previews and full tracks.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Music Nerd ID needs microphone access to listen to music and identify songs using Shazam technology.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

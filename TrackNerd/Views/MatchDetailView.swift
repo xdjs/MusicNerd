@@ -61,6 +61,13 @@ struct MatchDetailView: View {
         } message: {
             Text("Please allow Apple Music access to play previews.")
         }
+        .task {
+            // Precompute if full playback is available to show the button
+            let status = await services.appleMusicService.requestAuthorization()
+            guard status == .authorized else { return }
+            let canFull = await services.appleMusicService.canPlayFullTracks()
+            await MainActor.run { canShowFullButton = canFull }
+        }
     }
     
     private var headerSection: some View {
@@ -122,7 +129,21 @@ struct MatchDetailView: View {
                     isLoading: isResolvingPreview
                 )
                 
-                // Removed Resume button (not needed)
+                if canShowFullButton {
+                    MusicNerdButton(
+                        title: appleMusic.isPlayingFull ? "Pause Full" : "Play Full",
+                        action: {
+                            if appleMusic.isPlayingFull {
+                                appleMusic.pauseFullIfNeeded()
+                            } else {
+                                Task { await playFullIfPossible() }
+                            }
+                        },
+                        style: .outline,
+                        size: .medium,
+                        isEnabled: !isResolvingPreview
+                    )
+                }
             }
             .padding(.top, CGFloat.MusicNerd.sm)
 
@@ -142,16 +163,10 @@ struct MatchDetailView: View {
     @State private var isResolvingPreview: Bool = false
     @State private var isPreviewAvailable: Bool = true
     @State private var showAuthDeniedAlert: Bool = false
+    @State private var canShowFullButton: Bool = false
 
     private func playPreview() async {
-        // 1) Authorize
-        let status = await services.appleMusicService.requestAuthorization()
-        guard status == .authorized else {
-            await MainActor.run { showAuthDeniedAlert = true }
-            return
-        }
-        
-        // 2) Resolve song via appleMusicID or search
+        // Resolve song via appleMusicID or search (no auth required for previews)
         await MainActor.run { isResolvingPreview = true }
         var song: Song?
         if let id = match.appleMusicID {
@@ -168,9 +183,32 @@ struct MatchDetailView: View {
             return
         }
         
-        // 3) Play preview
+        // Play preview
         services.appleMusicService.playPreview(url: url)
         await MainActor.run { isResolvingPreview = false; isPreviewAvailable = true }
+    }
+    
+    private func playFullIfPossible() async {
+        // Authorization reused from MusicKit
+        let status = await services.appleMusicService.requestAuthorization()
+        guard status == .authorized else {
+            await MainActor.run { showAuthDeniedAlert = true }
+            return
+        }
+        // Resolve song
+        var song: Song?
+        if let id = match.appleMusicID {
+            song = await services.appleMusicService.song(fromAppleMusicID: id)
+        }
+        if song == nil {
+            song = await services.appleMusicService.searchSong(title: match.title, artist: match.artist)
+        }
+        guard let resolved = song else { return }
+        // Check subscription capability
+        let canFull = await services.appleMusicService.canPlayFullTracks()
+        await MainActor.run { canShowFullButton = canFull }
+        guard canFull else { return }
+        await services.appleMusicService.playFull(song: resolved)
     }
     
     private func enrichmentSections(_ enrichmentData: EnrichmentData) -> some View {
