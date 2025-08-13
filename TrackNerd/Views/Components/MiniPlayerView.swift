@@ -47,15 +47,14 @@ struct MiniPlayerView: View {
                 }
                 .padding(.horizontal, CGFloat.MusicNerd.md)
                 .padding(.vertical, CGFloat.MusicNerd.sm)
+                .frame(maxWidth: .infinity)
                 .background(.ultraThinMaterial)
-                .cornerRadius(CGFloat.BorderRadius.md)
-                .overlay(
+                .overlay(alignment: .top) {
                     ProgressView(value: appleMusic.isPlayingFull ? appleMusic.fullProgress : appleMusic.previewProgress)
                         .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
                         .frame(height: 2)
-                        .padding(.top, 48)
-                    , alignment: .top
-                )
+                        .offset(y: -1)
+                }
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("mini-player")

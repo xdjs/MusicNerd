@@ -67,8 +67,8 @@ private struct MiniPlayerInset: View {
             MiniPlayerView {
                 isShowingDetail = true
             }
-            .padding(.horizontal, CGFloat.MusicNerd.screenMargin)
-            .padding(.bottom, 4)
+            .padding(.horizontal, 0)
+            .padding(.bottom, 0)
         }
         .sheet(isPresented: $isShowingDetail) {
             if let match = appleMusic.currentMatch {
