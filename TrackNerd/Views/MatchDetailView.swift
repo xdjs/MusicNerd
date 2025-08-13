@@ -265,9 +265,14 @@ struct MatchDetailView: View {
                 )
             }
             
-            // Display categorized fun facts (with fallbacks)
-            if !enrichmentData.funFacts.isEmpty || !enrichmentData.funFactErrors.isEmpty {
-                funFactSectionsWithFallbacks(enrichmentData.funFacts, errors: enrichmentData.funFactErrors)
+            // Display categorized fun facts (with fallbacks) + Grapevine
+            let hasArtistId = (enrichmentData.musicNerdArtistId?.isEmpty == false)
+            if !enrichmentData.funFacts.isEmpty || !enrichmentData.funFactErrors.isEmpty || hasArtistId {
+                funFactSectionsWithFallbacks(
+                    enrichmentData.funFacts,
+                    errors: enrichmentData.funFactErrors,
+                    hasArtistId: hasArtistId
+                )
             } else if let funFact = enrichmentData.funFact, !funFact.isEmpty {
                 // Fallback for legacy single fun fact
                 EnrichmentSectionView(
@@ -365,27 +370,33 @@ struct MatchDetailView: View {
         }
     }
     
-    private func funFactSectionsWithFallbacks(_ funFacts: [String: String], errors: [String: EnrichmentError]) -> some View {
-        let funFactConfig: [(type: String, title: String, icon: String)] = [
+    private func funFactSectionsWithFallbacks(_ funFacts: [String: String], errors: [String: EnrichmentError], hasArtistId: Bool) -> some View {
+        // Insert Grapevine connections between Lore and BTS
+        let sections: [(type: String, title: String, icon: String)] = [
             ("lore", "Artist Lore", "book.closed"),
+            ("grapevine", "Grapevine connections", "link"),
             ("bts", "Behind the Scenes", "eye"),
             ("activity", "Artist Activity", "music.note.list"),
             ("surprise", "Surprise Fact", "sparkles")
         ]
         
         return LazyVStack(spacing: CGFloat.MusicNerd.lg) {
-            ForEach(funFactConfig, id: \.type) { config in
-                if let fact = funFacts[config.type], !fact.isEmpty {
+            ForEach(sections, id: \.type) { section in
+                if section.type == "grapevine" {
+                    if hasArtistId {
+                        grapevineSection(title: section.title, icon: section.icon)
+                    } // else skip
+                } else if let fact = funFacts[section.type], !fact.isEmpty {
                     EnrichmentSectionView(
-                        title: config.title,
+                        title: section.title,
                         content: fact,
-                        icon: config.icon
+                        icon: section.icon
                     )
-                } else if let error = errors[config.type] {
+                } else if let error = errors[section.type] {
                     FallbackSectionView(
-                        title: config.title,
+                        title: section.title,
                         errorMessage: error.fallbackMessage,
-                        icon: config.icon,
+                        icon: section.icon,
                         isRetryable: error.isRetryable,
                         isRetrying: isRetrying,
                         onRetry: { retryEnrichment() }
@@ -393,6 +404,29 @@ struct MatchDetailView: View {
                 }
             }
         }
+    }
+
+    private func grapevineSection(title: String, icon: String) -> some View {
+        Button(action: {
+            // TODO: Wire up Grapevine connections navigation/action
+        }) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(Color.MusicNerd.primary)
+                Text(title)
+                    .musicNerdStyle(.headlineSmall())
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(Color.MusicNerd.textSecondary)
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(CGFloat.MusicNerd.md)
+            .background(Color.MusicNerd.cardBackground)
+            .cornerRadius(CGFloat.BorderRadius.md)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .accessibilityIdentifier("grapevine-button")
     }
     
     private func retryEnrichment() {
