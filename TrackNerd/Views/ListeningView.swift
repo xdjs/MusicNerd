@@ -102,7 +102,7 @@ struct ListeningView: View {
                         }
                         
                         // Recognition Result
-                        if let match = lastMatch {
+                        if let match = lastMatch, case .success(let recognized) = recognitionState, recognized.id == match.id {
                             VStack(spacing: CGFloat.MusicNerd.md) {
                                 SongMatchCard(match: match) {
                                     showingMatchDetail = true
@@ -151,9 +151,9 @@ struct ListeningView: View {
                             
                             ForEach(recentMatches.prefix(5)) { match in
                                 SongMatchCard(match: match) {
-                                    // Navigate to match detail
-                                    lastMatch = match
+                                    // Navigate to match detail without surfacing card above the button
                                     showingMatchDetail = true
+                                    // Do not mutate lastMatch here to avoid rendering beneath Start Listening
                                 }
                                 .accessibilityIdentifier("recent-match-\(match.id)")
                             }
