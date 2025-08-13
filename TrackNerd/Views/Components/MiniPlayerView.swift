@@ -3,9 +3,14 @@ import SwiftUI
 struct MiniPlayerView: View {
     @EnvironmentObject private var appleMusic: AppleMusicService
     var onTap: (() -> Void)?
+    @State private var hasFullSubscription: Bool = false
     
     private var isVisible: Bool {
         appleMusic.currentMatch != nil || appleMusic.isPlayingPreview || appleMusic.isPlayingFull
+    }
+    
+    private var isAppleMusicCapable: Bool {
+        appleMusic.authorizationStatus == .authorized && hasFullSubscription
     }
     
     var body: some View {
@@ -24,7 +29,7 @@ struct MiniPlayerView: View {
                             Text(appleMusic.currentMatch?.artist ?? "")
                                 .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
                                 .lineLimit(1)
-                            SourceBadge(isFull: appleMusic.isPlayingFull)
+                            SourceBadge(isAppleMusic: isAppleMusicCapable)
                         }
                     }
                     
@@ -59,19 +64,28 @@ struct MiniPlayerView: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("mini-player")
             .transition(.move(edge: .bottom).combined(with: .opacity))
+            .task { await refreshSubscriptionCapability() }
+            .onChange(of: appleMusic.authorizationStatus) { _ in
+                Task { await refreshSubscriptionCapability() }
+            }
         }
+    }
+    
+    private func refreshSubscriptionCapability() async {
+        let canFull = await appleMusic.canPlayFullTracks()
+        await MainActor.run { hasFullSubscription = canFull }
     }
 }
 
 private struct SourceBadge: View {
-    let isFull: Bool
+    let isAppleMusic: Bool
     var body: some View {
-        Text(isFull ? "Apple Music" : "Preview")
+        Text(isAppleMusic ? "Apple Music" : "Preview")
             .musicNerdStyle(.caption())
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background((isFull ? Color.MusicNerd.primary : Color.MusicNerd.accent).opacity(0.15))
-            .foregroundColor(isFull ? Color.MusicNerd.primary : Color.MusicNerd.accent)
+            .background((isAppleMusic ? Color.MusicNerd.primary : Color.MusicNerd.accent).opacity(0.15))
+            .foregroundColor(isAppleMusic ? Color.MusicNerd.primary : Color.MusicNerd.accent)
             .cornerRadius(CGFloat.BorderRadius.xs)
     }
 }
