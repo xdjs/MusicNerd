@@ -124,11 +124,18 @@ struct MatchDetailView: View {
                         } else if appleMusic.isPlayingFull {
                             appleMusic.pauseFullIfNeeded()
                         } else {
-                            Task {
-                                if isEligibleForFull {
-                                    await playFullIfPossible()
-                                } else {
-                                    await playPreview()
+                            // Resume if we have progress, otherwise start fresh
+                            if appleMusic.fullProgress > 0 {
+                                appleMusic.resumeFullIfNeeded()
+                            } else if appleMusic.previewProgress > 0 {
+                                appleMusic.resume()
+                            } else {
+                                Task {
+                                    if isEligibleForFull {
+                                        await playFullIfPossible()
+                                    } else {
+                                        await playPreview()
+                                    }
                                 }
                             }
                         }
