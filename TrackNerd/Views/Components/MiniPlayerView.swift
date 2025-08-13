@@ -14,61 +14,70 @@ struct MiniPlayerView: View {
     }
     
     var body: some View {
-        if isVisible {
-            Button(action: { onTap?() }) {
-                HStack(spacing: CGFloat.MusicNerd.sm) {
-                    // Artwork
-                    AlbumArtworkView(url: appleMusic.currentMatch?.albumArtURL, size: 40)
-                    
-                    // Title/artist + source badge
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(appleMusic.currentMatch?.title ?? "Now Playing")
-                            .musicNerdStyle(.bodyMedium())
-                            .lineLimit(1)
-                        HStack(spacing: 6) {
-                            Text(appleMusic.currentMatch?.artist ?? "")
-                                .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
-                                .lineLimit(1)
-                            SourceBadge(isAppleMusic: isAppleMusicCapable)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // Play/Pause
-                    Button(action: {
-                        if appleMusic.isPlayingFull {
-                            appleMusic.pauseFullIfNeeded()
-                        } else if appleMusic.isPlayingPreview {
-                            appleMusic.pause()
-                        } else {
-                            // No-op: playback initiation happens from detail card/buttons
-                        }
-                    }) {
-                        Image(systemName: (appleMusic.isPlayingFull || appleMusic.isPlayingPreview) ? "pause.fill" : "play.fill")
-                            .foregroundColor(Color.MusicNerd.primary)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, CGFloat.MusicNerd.md)
-                .padding(.vertical, CGFloat.MusicNerd.sm)
-                .frame(maxWidth: .infinity)
-                .background(.ultraThinMaterial)
-                .overlay(alignment: .top) {
-                    ProgressView(value: appleMusic.isPlayingFull ? appleMusic.fullProgress : appleMusic.previewProgress)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
-                        .frame(height: 2)
-                        .offset(y: -1)
-                }
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("mini-player")
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-            .task { await refreshSubscriptionCapability() }
-            .onChange(of: appleMusic.authorizationStatus) { _ in
-                Task { await refreshSubscriptionCapability() }
+        Group {
+            if isVisible {
+                barView
             }
         }
+        .task { await refreshSubscriptionCapability() }
+        .onChange(of: appleMusic.authorizationStatus) { _, _ in
+            Task { await refreshSubscriptionCapability() }
+        }
+    }
+
+    @ViewBuilder
+    private var barView: some View {
+        HStack(spacing: CGFloat.MusicNerd.sm) {
+            // Artwork
+            AlbumArtworkView(url: appleMusic.currentMatch?.albumArtURL, size: 40)
+
+            // Title/artist + source badge
+            VStack(alignment: .leading, spacing: 2) {
+                Text(appleMusic.currentMatch?.title ?? "Now Playing")
+                    .musicNerdStyle(.bodyMedium())
+                    .lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(appleMusic.currentMatch?.artist ?? "")
+                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                        .lineLimit(1)
+                    SourceBadge(isAppleMusic: isAppleMusicCapable)
+                }
+            }
+
+            Spacer()
+
+            // Play/Pause
+            Button(action: {
+                if appleMusic.isPlayingFull {
+                    appleMusic.pauseFullIfNeeded()
+                } else if appleMusic.isPlayingPreview {
+                    appleMusic.pause()
+                } else {
+                    if appleMusic.fullProgress > 0 {
+                        appleMusic.resumeFullIfNeeded()
+                    } else if appleMusic.previewProgress > 0 {
+                        appleMusic.resume()
+                    }
+                }
+            }) {
+                Image(systemName: (appleMusic.isPlayingFull || appleMusic.isPlayingPreview) ? "pause.fill" : "play.fill")
+                    .foregroundColor(Color.MusicNerd.primary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, CGFloat.MusicNerd.md)
+        .padding(.vertical, CGFloat.MusicNerd.sm)
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .top) {
+            ProgressView(value: appleMusic.isPlayingFull ? appleMusic.fullProgress : appleMusic.previewProgress)
+                .progressViewStyle(LinearProgressViewStyle(tint: Color.MusicNerd.primary))
+                .frame(height: 2)
+                .offset(y: -1)
+        }
+        .onTapGesture { onTap?() }
+        .accessibilityIdentifier("mini-player")
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
     
     private func refreshSubscriptionCapability() async {
