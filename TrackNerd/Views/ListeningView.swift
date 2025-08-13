@@ -189,7 +189,7 @@ struct ListeningView: View {
                 openAppSettings()
             }
         } message: {
-            Text("TrackNerd needs microphone access to identify songs. Please enable it in Settings.")
+            Text("Music Nerd ID needs microphone access to identify songs. Please enable it in Settings.")
         }
         .sheet(item: $selectedMatchForDetail, onDismiss: { selectedMatchForDetail = nil }) { match in
             MatchDetailView(match: match)

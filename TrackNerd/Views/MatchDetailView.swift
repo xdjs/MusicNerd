@@ -435,7 +435,7 @@ struct MatchDetailView: View {
             }
         }
         
-        text += "\n\nShared from TrackNerd 🎧"
+        text += "\n\nShared from Music Nerd ID 🎧"
         return text
     }
 }

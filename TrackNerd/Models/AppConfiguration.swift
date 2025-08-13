@@ -68,8 +68,8 @@ struct AppConfiguration {
     }
     
     struct Privacy {
-        static let microphoneUsageDescription = "TrackNerd needs microphone access to identify music playing around you."
-        static let networkUsageDescription = "TrackNerd connects to the internet to provide rich information about your music discoveries."
+        static let microphoneUsageDescription = "Music Nerd ID needs microphone access to identify music playing around you."
+        static let networkUsageDescription = "Music Nerd ID connects to the internet to provide rich information about your music discoveries."
     }
     
     struct Features {
