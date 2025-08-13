@@ -25,7 +25,7 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5.0), "Tab bar should be visible with proper contrast")
         
         // Test that main text in listening view is visible
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Main title should be visible with proper contrast")
         XCTAssertTrue(whatPlayingText.exists, "Text should be present")
     }
@@ -47,7 +47,7 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertGreaterThan(textElements.count, 0, "Should have text elements with typography applied")
         
         // Test that key text elements are readable and accessible
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
         XCTAssertTrue(whatPlayingText.exists, "Main title should be present")
         
@@ -59,7 +59,7 @@ final class DesignSystemUITests: XCTestCase {
     
     func testTextReadability() throws {
         // Test that text elements are properly sized and readable
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
         
         // Text should have reasonable frame dimensions
@@ -98,7 +98,7 @@ final class DesignSystemUITests: XCTestCase {
     // MARK: - Spacing and Layout Tests
     func testLayoutSpacing() throws {
         // Test that elements have proper spacing
-        let textElement = app.staticTexts["What's Playing?"]
+        let textElement = app.staticTexts["Hear. ID. Nerd out."]
         let imageElements = app.images["waveform.circle"]
         
         XCTAssertTrue(textElement.waitForExistence(timeout: 5.0))
@@ -117,7 +117,7 @@ final class DesignSystemUITests: XCTestCase {
         let mainWindow = app.windows.firstMatch
         XCTAssertTrue(mainWindow.waitForExistence(timeout: 5.0), "Main window should exist")
         
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0))
         
         let screenFrame = mainWindow.frame
@@ -132,7 +132,7 @@ final class DesignSystemUITests: XCTestCase {
     // MARK: - Accessibility Tests
     func testVoiceOverSupport() throws {
         // Test that elements support VoiceOver
-        let textElement = app.staticTexts["What's Playing?"]
+        let textElement = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(textElement.waitForExistence(timeout: 5.0))
         XCTAssertTrue(textElement.exists, "Text should be present for VoiceOver")
         
@@ -161,7 +161,7 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(app.exists)
         
         // Content should still be visible and properly laid out
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Content should be visible in portrait")
         XCTAssertTrue(whatPlayingText.exists, "Content should be present in portrait")
     }
@@ -173,7 +173,7 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(app.exists)
         
         // Content should still be visible and properly laid out
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Content should be visible in landscape")
         XCTAssertTrue(whatPlayingText.exists, "Content should be present in landscape")
         
@@ -200,7 +200,7 @@ final class DesignSystemUITests: XCTestCase {
         // For now, test that the app continues to work regardless of system appearance
         XCTAssertTrue(app.exists, "App should work in all appearance modes")
         
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Text should be visible in all appearance modes")
     }
     
@@ -210,7 +210,7 @@ final class DesignSystemUITests: XCTestCase {
         XCTAssertTrue(app.exists)
         
         // Key elements should be present
-        let whatPlayingText = app.staticTexts["What's Playing?"]
+        let whatPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         let waveformImages = app.images["waveform.circle"]
         
         XCTAssertTrue(whatPlayingText.waitForExistence(timeout: 5.0), "Main text should be present")

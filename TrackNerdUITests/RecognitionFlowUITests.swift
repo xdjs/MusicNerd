@@ -92,7 +92,7 @@ final class RecognitionFlowUITests: XCTestCase {
     
     func testRecentMatches_showSampleData() throws {
         // Wait for UI to load completely before checking elements
-        let mainHeading = app.staticTexts["What's Playing?"]
+        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(mainHeading.waitForExistence(timeout: 3.0), "Main UI should load first")
         
         // Check Recent Matches section exists
@@ -115,7 +115,7 @@ final class RecognitionFlowUITests: XCTestCase {
     
     func testListeningViewAccessibility() throws {
         // Wait for UI to fully load
-        let mainHeading = app.staticTexts["What's Playing?"]
+        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(mainHeading.waitForExistence(timeout: 3.0), "Main UI should load")
         
         // Test listen button accessibility (should be interactive when enabled)

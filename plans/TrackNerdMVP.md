@@ -46,7 +46,7 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Settings view (SettingsView with toggles and preferences)
 - [x] **Base view components with proper accessibility:**
   - [x] TabView navigation with accessibility identifiers
-  - [x] Listening interface with "What's Playing?" UI
+  - [x] Listening interface with "Hear. ID. Nerd out." UI
   - [x] History with search functionality and match cards
   - [x] Settings with toggle controls and sections
 - [x] **Unit Testing:**

@@ -40,7 +40,7 @@ final class EnrichmentUITests: XCTestCase {
         // This validates our Phase 5 implementation without depending on Phase 6 navigation
         
         // Wait for main UI to load
-        let mainHeading = app.staticTexts["What's Playing?"]
+        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(mainHeading.waitForExistence(timeout: 5.0), "Main UI should load")
         
         // Check that sample matches exist (these will have enrichment data in Phase 6)

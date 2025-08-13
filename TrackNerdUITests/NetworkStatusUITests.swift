@@ -14,7 +14,7 @@ final class NetworkStatusUITests: XCTestCase {
         app.launch()
         
         // Wait for the app to load
-        _ = app.staticTexts["What's Playing?"].waitForExistence(timeout: 5.0)
+        _ = app.staticTexts["Hear. ID. Nerd out."].waitForExistence(timeout: 5.0)
     }
     
     override func tearDownWithError() throws {
@@ -75,7 +75,7 @@ final class NetworkStatusUITests: XCTestCase {
         }
         
         // Core test: UI should remain stable and functional
-        XCTAssertTrue(app.staticTexts["What's Playing?"].exists, "Main UI should remain functional")
+        XCTAssertTrue(app.staticTexts["Hear. ID. Nerd out."].exists, "Main UI should remain functional")
         XCTAssertTrue(app.tabBars.firstMatch.exists, "Navigation should remain functional")
     }
     
@@ -180,7 +180,7 @@ final class NetworkStatusUITests: XCTestCase {
         listeningTab.tap()
         
         // Wait for all UI elements to load
-        let whatIsPlayingText = app.staticTexts["What's Playing?"]
+        let whatIsPlayingText = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(whatIsPlayingText.waitForExistence(timeout: 3.0))
         
         let networkIndicator = app.otherElements["networkStatusIndicator"]
@@ -270,7 +270,7 @@ final class NetworkStatusUITests: XCTestCase {
         }
         
         // Test system resilience: Core UI elements should remain functional
-        XCTAssertTrue(app.staticTexts["What's Playing?"].exists, 
+        XCTAssertTrue(app.staticTexts["Hear. ID. Nerd out."].exists, 
                      "Main UI should remain functional during network indicator lifecycle")
         XCTAssertTrue(app.tabBars.firstMatch.exists, 
                      "Navigation should remain functional during network indicator lifecycle")
@@ -284,7 +284,7 @@ final class NetworkStatusUITests: XCTestCase {
             
             // Return to listening view to verify round-trip navigation
             listeningTab.tap()
-            XCTAssertTrue(app.staticTexts["What's Playing?"].waitForExistence(timeout: 3.0),
+            XCTAssertTrue(app.staticTexts["Hear. ID. Nerd out."].waitForExistence(timeout: 3.0),
                          "Should be able to return to Listen view")
         }
     }
@@ -470,7 +470,7 @@ final class NetworkStatusUITests: XCTestCase {
         listeningTab.tap()
         
         // Use a more generous timeout and check multiple indicators of successful navigation
-        let mainHeading = app.staticTexts["What's Playing?"]
+        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
         XCTAssertTrue(mainHeading.waitForExistence(timeout: 5.0), 
                      "Should return to listening view successfully")
         

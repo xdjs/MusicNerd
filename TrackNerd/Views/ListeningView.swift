@@ -35,7 +35,7 @@ struct ListeningView: View {
                             .font(.system(size: 80))
                             .foregroundColor(Color.MusicNerd.primary)
                         
-                        Text("What's Playing?")
+                        Text("Hear. ID. Nerd out.")
                             .musicNerdStyle(.displayLarge())
                         
                         Text("Tap to identify any song around you")
