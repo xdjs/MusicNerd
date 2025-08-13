@@ -37,6 +37,7 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
     private var endObserverCancellable: AnyCancellable?
     private var fullProgressTimer: AnyCancellable?
     private var fullDurationSeconds: Double = 0
+    @Published private(set) var currentMatch: SongMatch?
     @Published private(set) var isPlayingPreview: Bool = false
     @Published private(set) var previewProgress: Double = 0
     @Published private(set) var isPlayingFull: Bool = false
@@ -121,6 +122,7 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
             self.player?.pause()
             self.isPlayingPreview = false
             self.previewProgress = 0
+            self.currentMatch = nil
         }
 
         // Periodic progress updates (normalize to 30s max)
@@ -140,6 +142,7 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
                 guard let self else { return }
                 self.isPlayingPreview = false
                 self.previewProgress = 0
+                self.currentMatch = nil
             }
     }
 
@@ -215,6 +218,7 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
                     if progress >= 0.999 {
                         // Consider track ended
                         self.isPlayingFull = false
+                        self.currentMatch = nil
                         self.stopFullProgressUpdates()
                     }
                 } else {
@@ -223,9 +227,39 @@ final class AppleMusicService: AppleMusicServiceProtocol, ObservableObject {
             }
     }
 
+    // MARK: - Current Match Tracking
+    func setCurrentMatch(_ match: SongMatch?) {
+        currentMatch = match
+    }
+
     private func stopFullProgressUpdates() {
         fullProgressTimer?.cancel()
         fullProgressTimer = nil
+    }
+
+    // MARK: - Stop All Playback
+    func stopAllPlayback() {
+        // Stop preview player
+        if let boundaryObserver {
+            player?.removeTimeObserver(boundaryObserver)
+            self.boundaryObserver = nil
+        }
+        if let periodicObserver {
+            player?.removeTimeObserver(periodicObserver)
+            self.periodicObserver = nil
+        }
+        endObserverCancellable?.cancel()
+        endObserverCancellable = nil
+        player?.pause()
+        player = nil
+        isPlayingPreview = false
+        previewProgress = 0
+        
+        // Stop full playback
+        ApplicationMusicPlayer.shared.pause()
+        isPlayingFull = false
+        fullProgress = 0
+        stopFullProgressUpdates()
     }
 
     // MARK: - iTunes Search Fallback (No Auth Required)

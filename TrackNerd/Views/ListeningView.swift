@@ -18,8 +18,8 @@ struct ListeningView: View {
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var isEnriching: Bool = false
-    @State private var showingMatchDetail: Bool = false
     @State private var recentMatches: [SongMatch] = []
+    @State private var selectedMatchForDetail: SongMatch? = nil
     @StateObject private var reachabilityService = NetworkReachabilityService.shared
     
     private let services = DefaultServiceContainer.shared
@@ -102,10 +102,10 @@ struct ListeningView: View {
                         }
                         
                         // Recognition Result
-                        if let match = lastMatch {
+                        if let match = lastMatch, case .success(let recognized) = recognitionState, recognized.id == match.id {
                             VStack(spacing: CGFloat.MusicNerd.md) {
                                 SongMatchCard(match: match) {
-                                    showingMatchDetail = true
+                                    selectedMatchForDetail = match
                                 }
                                 .accessibilityIdentifier("recognition-result")
                                 
@@ -123,7 +123,7 @@ struct ListeningView: View {
                                         Image(systemName: "sparkles")
                                             .foregroundColor(Color.MusicNerd.primary)
                                             .font(.caption)
-                                        Text("Enhanced with music nerd insights!")
+                                        Text("Enhanced with Music Nerd insights!")
                                             .musicNerdStyle(.caption(color: Color.MusicNerd.primary))
                                     }
                                     .transition(.opacity)
@@ -151,9 +151,8 @@ struct ListeningView: View {
                             
                             ForEach(recentMatches.prefix(5)) { match in
                                 SongMatchCard(match: match) {
-                                    // Navigate to match detail
-                                    lastMatch = match
-                                    showingMatchDetail = true
+                                    // Navigate to match detail without surfacing card above the button
+                                    selectedMatchForDetail = match
                                 }
                                 .accessibilityIdentifier("recent-match-\(match.id)")
                             }
@@ -190,12 +189,10 @@ struct ListeningView: View {
                 openAppSettings()
             }
         } message: {
-            Text("TrackNerd needs microphone access to identify songs. Please enable it in Settings.")
+            Text("Music Nerd ID needs microphone access to identify songs. Please enable it in Settings.")
         }
-        .sheet(isPresented: $showingMatchDetail) {
-            if let match = lastMatch {
-                MatchDetailView(match: match)
-            }
+        .sheet(item: $selectedMatchForDetail, onDismiss: { selectedMatchForDetail = nil }) { match in
+            MatchDetailView(match: match)
         }
     }
     
@@ -315,7 +312,7 @@ struct ListeningView: View {
                             }
                             
                             // Present the detail view immediately
-                            showingMatchDetail = true
+                            selectedMatchForDetail = match
                             
                             // Automatically start enrichment in background
                             Task {

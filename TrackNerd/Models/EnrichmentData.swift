@@ -12,6 +12,8 @@ final class EnrichmentData {
     var genres: [String]
     var releaseYear: Int?
     var albumName: String?
+    // MusicNerd Artist ID for debugging/traceability
+    var musicNerdArtistId: String?
     var enrichedAt: Date
     
     // Error tracking for fallback content (stored as JSON strings for SwiftData compatibility)
@@ -28,6 +30,7 @@ final class EnrichmentData {
         genres: [String] = [],
         releaseYear: Int? = nil,
         albumName: String? = nil,
+        musicNerdArtistId: String? = nil,
         bioError: EnrichmentError? = nil,
         funFactErrors: [String: EnrichmentError] = [:]
     ) {
@@ -40,6 +43,7 @@ final class EnrichmentData {
         self.genres = genres
         self.releaseYear = releaseYear
         self.albumName = albumName
+        self.musicNerdArtistId = musicNerdArtistId
         self.enrichedAt = Date()
         
         // Encode errors as JSON data for SwiftData storage

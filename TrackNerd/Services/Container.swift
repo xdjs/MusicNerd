@@ -182,6 +182,7 @@ class OpenAIService: OpenAIServiceProtocol {
                 genres: [],
                 releaseYear: nil,
                 albumName: match.album,
+                musicNerdArtistId: artistId,
                 bioError: bioError,
                 funFactErrors: funFactErrors
             )
