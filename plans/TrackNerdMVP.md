@@ -322,7 +322,7 @@ Build an iOS app under the Music Nerd brand that:
     - AC: Auth prompt appears once; status reflects; denied state includes Settings CTA.
   - [ ] 7.2 Preview playback
     - AC: 30s preview plays with play/pause and progress; resilient to network toggles.
-  - [ ] 7.3 Full playback
+  - [x] 7.3 Full playback
     - AC: Subscribers can play a full track via `ApplicationMusicPlayer`; non‑subs fall back to preview with clear notice.
   - [ ] 7.4 UI integration
     - AC: Controls on `SongMatchCard`; persistent mini‑player functions across tabs; optional Apple Music link if required.
