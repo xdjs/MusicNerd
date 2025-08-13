@@ -123,7 +123,7 @@ struct ListeningView: View {
                                         Image(systemName: "sparkles")
                                             .foregroundColor(Color.MusicNerd.primary)
                                             .font(.caption)
-                                        Text("Enhanced with music nerd insights!")
+                                        Text("Enhanced with Music Nerd insights!")
                                             .musicNerdStyle(.caption(color: Color.MusicNerd.primary))
                                     }
                                     .transition(.opacity)

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import WebKit
 import MusicKit
 
 struct MatchDetailView: View {
@@ -50,6 +51,9 @@ struct MatchDetailView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(items: [shareText])
+        }
+        .sheet(item: $grapevineRoute) { route in
+            GrapevineSheetView(url: route.url, artistName: route.artistName)
         }
         .alert("Apple Music Access Needed", isPresented: $showAuthDeniedAlert) {
             Button("Cancel", role: .cancel) {}
@@ -408,7 +412,16 @@ struct MatchDetailView: View {
 
     private func grapevineSection(title: String, icon: String) -> some View {
         Button(action: {
-            // TODO: Wire up Grapevine connections navigation/action
+            guard let artistId = match.enrichmentData?.musicNerdArtistId, !artistId.isEmpty else { return }
+            // Safely append as path component
+            let base = URL(string: "https://grapevine.musicnerd.xyz")
+            let url = base?.appendingPathComponent(artistId, isDirectory: false)
+            if let url = url {
+                if AppSettings.shared.showDebugInfo {
+                    print("[Grapevine] URL: \(url.absoluteString)")
+                }
+                grapevineRoute = GrapevineRoute(url: url, artistName: match.artist)
+            }
         }) {
             HStack {
                 Image(systemName: icon)
@@ -463,6 +476,10 @@ struct MatchDetailView: View {
             isRetrying = false
         }
     }
+
+    // MARK: - Grapevine State
+    struct GrapevineRoute: Identifiable { let url: URL; let artistName: String; var id: String { url.absoluteString } }
+    @State private var grapevineRoute: GrapevineRoute? = nil
     
     private var shareText: String {
         var text = "🎵 I just discovered: \(match.title) by \(match.artist)"
@@ -605,6 +622,167 @@ struct FallbackSectionView: View {
 }
 
 
+struct GrapevineSheetView: View {
+    let url: URL
+    let artistName: String
+    @State private var loadError: String?
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                // Compact navigation bar
+                HStack {
+                    Text("\(artistName)'s Grapevine")
+                        .musicNerdStyle(.headlineSmall())
+                    Spacer()
+                }
+                .padding(.horizontal, CGFloat.MusicNerd.md)
+                .padding(.vertical, CGFloat.MusicNerd.sm)
+                .background(Color.MusicNerd.cardBackground)
+                
+                WebView(url: url, loadError: $loadError)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .ignoresSafeArea(.all)
+            }
+        }
+    }
+}
+
+private struct WebView: UIViewRepresentable {
+    let url: URL
+    @Binding var loadError: String?
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(loadError: $loadError)
+    }
+    
+    func makeUIView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration()
+        config.allowsInlineMediaPlayback = true
+        config.preferences.javaScriptEnabled = true
+        config.preferences.javaScriptCanOpenWindowsAutomatically = true
+        if #available(iOS 16.0, *) {
+            config.defaultWebpagePreferences.preferredContentMode = .mobile
+        }
+        let webView = WKWebView(frame: .zero, configuration: config)
+        // Use a mobile Safari-like user agent to match Safari behavior
+        webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+        webView.navigationDelegate = context.coordinator
+        webView.uiDelegate = context.coordinator
+        webView.allowsBackForwardNavigationGestures = true
+        var request = URLRequest(url: url)
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        webView.load(request)
+        return webView
+    }
+    
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        // No-op
+    }
+    
+    static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
+        // Cleanly stop and detach delegates to avoid stray process termination logs
+        webView.stopLoading()
+        webView.navigationDelegate = nil
+        webView.uiDelegate = nil
+    }
+    
+    final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
+        @Binding var loadError: String?
+        
+        init(loadError: Binding<String?>) {
+            _loadError = loadError
+        }
+        
+        private func log(_ message: String) {
+            let timestamp = DateFormatter.logFormatter.string(from: Date())
+            print("[\(timestamp)] Grapevine[WebView]: \(message)")
+        }
+        
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+            log("didStartProvisionalNavigation -> URL=\(webView.url?.absoluteString ?? "nil")")
+            // Clear previous errors on new navigation
+            loadError = nil
+        }
+        
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            log("didFinish -> URL=\(webView.url?.absoluteString ?? "nil") title=\(webView.title ?? "")")
+            // Heuristic: if body text is empty after load, treat as load issue
+            webView.evaluateJavaScript("document.body.innerText.length") { result, _ in
+                if let length = result as? Int, length == 0 {
+                    self.loadError = "Empty page content"
+                    self.log("Heuristic detected empty content")
+                }
+            }
+        }
+        
+        func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+            log("didCommit -> URL=\(webView.url?.absoluteString ?? "nil")")
+        }
+        
+        func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+            log("didReceiveServerRedirectForProvisionalNavigation -> URL=\(webView.url?.absoluteString ?? "nil")")
+        }
+        
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            log("webContentProcessDidTerminate (sheet likely dismissed or memory pressure)")
+        }
+        
+        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            log("decidePolicyFor navigationAction -> URL=\(navigationAction.request.url?.absoluteString ?? "nil") targetFrameIsMain=\(navigationAction.targetFrame?.isMainFrame ?? false)")
+            decisionHandler(.allow)
+        }
+        
+        func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+            if let url = (navigationResponse.response as? HTTPURLResponse)?.url?.absoluteString,
+               let status = (navigationResponse.response as? HTTPURLResponse)?.statusCode {
+                log("decidePolicyFor navigationResponse -> URL=\(url) status=\(status)")
+            }
+            decisionHandler(.allow)
+        }
+        
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            log("didFail -> error=\(error.localizedDescription)")
+            loadError = error.localizedDescription
+        }
+        
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            log("didFailProvisionalNavigation -> error=\(error.localizedDescription)")
+            loadError = error.localizedDescription
+        }
+        
+        func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+            log("didReceive AuthChallenge -> method=\(challenge.protectionSpace.authenticationMethod) host=\(challenge.protectionSpace.host)")
+            completionHandler(.performDefaultHandling, nil)
+        }
+        
+        // MARK: - WKUIDelegate (JS dialogs, new windows)
+        func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+            // Handle target=_blank by loading in the same webview
+            if navigationAction.targetFrame == nil, let url = navigationAction.request.url {
+                log("createWebViewWith -> handling target=_blank for URL=\(url.absoluteString)")
+                webView.load(URLRequest(url: url))
+            }
+            return nil
+        }
+        
+        func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+            log("JS alert: \(message)")
+            completionHandler()
+        }
+        
+        func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+            log("JS confirm: \(message)")
+            completionHandler(true)
+        }
+        
+        func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+            log("JS prompt: \(prompt)")
+            completionHandler(defaultText)
+        }
+    }
+}
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
     
