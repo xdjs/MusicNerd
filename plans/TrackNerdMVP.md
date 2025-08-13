@@ -166,6 +166,8 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Add navigation from SongMatchCard to detail view
   - [x] Format and style enriched content with Music Nerd branding
   - [x] Fix fun facts parsing (API returns "text" field, not "funFact")
+  - [x] Debug-only display of Music Nerd Artist ID in Match Detail (when enabled)
+  - [x] "Grapevine connections" section/button (visible when Artist ID exists) that opens web sheet
 - [x] **Enhanced UI Features**:
   - [x] Expandable content sections in detail view
   - [x] Share enriched content functionality
@@ -174,6 +176,7 @@ Build an iOS app under the Music Nerd brand that:
   - [x] Fallback content for API failures (FallbackSectionView with user-friendly error messages)
   - [x] Content caching for offline viewing
   - [x] Retry mechanism for failed enrichment (retryEnrichment() with exponential backoff)
+  - [x] Persist and expose `musicNerdArtistId` in `EnrichmentData` for Grapevine
 - [x] **Error Handling**:
   - [x] No match scenarios
   - [x] Network failure recovery (null ID handling, API error parsing)
@@ -285,7 +288,10 @@ Build an iOS app under the Music Nerd brand that:
 
 - [ ] **UI Integration**:
   - [ ] Add playback controls to `SongMatchCard` components (play/pause, progress, source badge: Preview/Apple Music).
-  - [ ] Implement a persistent mini‑player (sticky across tabs) showing artwork, title/artist, play/pause, progress; optional 15s skip.
+  - [x] Implement a persistent mini‑player (sticky across tabs) showing artwork, title/artist, play/pause, progress
+    - [x] Align to tab bar width/position; avoid tab bar occlusion
+    - [x] Enable tap-to-resume; avoid nested button gesture conflicts
+    - [x] Active-only pause/progress tied to `currentMatch`
   - [ ] Add "Listen on Apple Music" deep link only if required by Apple.
 
 - [ ] **Subscription Management**:
@@ -399,7 +405,7 @@ Build an iOS app under the Music Nerd brand that:
   - ✅ NetworkStatusUITests: 100% pass rate (17/17 tests)
   - ✅ RecognitionFlowUITests: 100% pass rate after timing fixes
 
-**Currently:** Phase 7 (Apple Music Integration) - in progress (40%)
+**Currently:** Phase 7 (Apple Music Integration) - in progress (55%)
 - ✅ Complete SwiftData setup with SongMatch and EnrichmentData persistence
 - ✅ Enrichment cache migration to persistent SwiftData storage with expiration
 - ✅ Full history UI implementation with search, filtering, and real-time updates
@@ -408,7 +414,7 @@ Build an iOS app under the Music Nerd brand that:
 - ✅ Advanced filtering system with enrichment status and date range filtering
 - ⏳ Remaining: UI testing suite, export functionality
 
-**Next:** Continue Phase 7 — mini‑player, background/lock‑screen controls, interruption handling, broader UI integration (SongMatchCard controls)
+**Next:** Continue Phase 7 — background/lock‑screen controls, audio session + interruption handling, broader UI integration (SongMatchCard controls), and testing
 
 **New Phase:** Phase 7 (Apple Music Integration) - 40% complete
 - 🎵 **Core Value**: Transform TrackNerd from recognition-only to full playback experience
