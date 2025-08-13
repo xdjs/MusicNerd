@@ -261,11 +261,11 @@ Build an iOS app under the Music Nerd brand that:
     - [x] `searchSong(title:artist:) async throws -> Song?` (fallback)
     - [x] `previewURL(for:) async throws -> URL?`
     - [x] Playback control: `playPreview(url:)`, `pause()`, `resume()`
-    - [ ] Playback control: `playFull(song:)`, `seek(to:)`
-    - [ ] Observable playback state (isPlaying, position, duration, source: preview/full, current item)
-    - [x] Publish `isPlayingPreview` for preview play/pause UI
-    - [x] Publish `previewProgress` (0–1) for progress UI
-  - [ ] Handle authorization states (denied, authorized, restricted) and subscription capability.
+    - [x] Playback control: `playFull(song:)` (MVP)
+    - [ ] Seek support: `seek(to:)`
+    - [ ] Observable playback state (position, duration, source: preview/full, current item)
+    - [x] Publish `isPlayingPreview`, `previewProgress`, `isPlayingFull`, and `fullProgress`
+  - [x] Handle authorization states (denied, authorized, restricted) and subscription capability.
 
 - [ ] **Playback Implementation**:
   - [ ] **Preview Playback** (Non‑subscribers):
@@ -278,9 +278,9 @@ Build an iOS app under the Music Nerd brand that:
     - [x] Denied authorization UX with Settings CTA
     - [x] Unavailable preview messaging and disabled button state while resolving
   - [ ] **Full Playback** (Subscribers):
-    - [ ] Use `ApplicationMusicPlayer` for full track playback.
-    - [ ] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.
-    - [ ] Single‑item queue for MVP; manage playback states and progress.
+    - [x] Use `ApplicationMusicPlayer` for full track playback (MVP).
+    - [x] Convert ShazamKit `appleMusicID` to `MusicItemID` and load `Song`.
+    - [x] Single‑item queue for MVP; manage playback states and progress (`isPlayingFull`, `fullProgress`).
     - [ ] Configure `AVAudioSession` for `.playback`; handle route changes and interruptions.
 
 - [ ] **UI Integration**:
@@ -290,7 +290,7 @@ Build an iOS app under the Music Nerd brand that:
 
 - [ ] **Subscription Management**:
   - [ ] Reflect subscription status and capability in UI.
-  - [ ] Display appropriate playback options based on subscription status (full vs preview).
+  - [x] Display appropriate playback options based on subscription status in `MatchDetailView` (full vs preview).
   - [ ] Settings surface for managing Apple Music permissions (no upsell in MVP).
 
 - [ ] **Playback Features**:
@@ -399,7 +399,7 @@ Build an iOS app under the Music Nerd brand that:
   - ✅ NetworkStatusUITests: 100% pass rate (17/17 tests)
   - ✅ RecognitionFlowUITests: 100% pass rate after timing fixes
 
-**Currently:** Phase 6 (Data Persistence & History) - 75% complete
+**Currently:** Phase 7 (Apple Music Integration) - in progress (40%)
 - ✅ Complete SwiftData setup with SongMatch and EnrichmentData persistence
 - ✅ Enrichment cache migration to persistent SwiftData storage with expiration
 - ✅ Full history UI implementation with search, filtering, and real-time updates
@@ -408,9 +408,9 @@ Build an iOS app under the Music Nerd brand that:
 - ✅ Advanced filtering system with enrichment status and date range filtering
 - ⏳ Remaining: UI testing suite, export functionality
 
-**Next:** Complete Phase 6, then continue Phase 7 (Apple Music Integration) focusing on preview UX polish (progress indicator, denied authorization UX) and full playback scaffolding
+**Next:** Continue Phase 7 — mini‑player, background/lock‑screen controls, interruption handling, broader UI integration (SongMatchCard controls)
 
-**New Phase:** Phase 7 (Apple Music Integration) - 25% complete
+**New Phase:** Phase 7 (Apple Music Integration) - 40% complete
 - 🎵 **Core Value**: Transform TrackNerd from recognition-only to full playback experience
 - 🔑 **Key Features**: Preview playback (non-subscribers), full playback (subscribers)
 - 📱 **Foundation Ready**: ShazamKit already captures `appleMusicID` for seamless integration
