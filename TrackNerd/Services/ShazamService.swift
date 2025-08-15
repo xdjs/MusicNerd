@@ -297,13 +297,20 @@ class ShazamService: NSObject, ShazamServiceProtocol {
         logWithTimestamp("Match request sent to Shazam servers")
         logWithTimestamp("Waiting for SHSessionDelegate callbacks...")
         
-        // Add a timeout mechanism
+        // Add a timeout mechanism with enhanced network diagnostics
         Task { [weak self] in
             try? await Task.sleep(nanoseconds: 15_000_000_000) // 15 seconds timeout
             guard let self = self else { return }
             if case .processing = self.currentState {
-                self.logWithTimestamp("Recognition timeout after 15 seconds - check network connectivity")
-                let timeoutError = AppError.shazamError(.recognitionFailed("Network timeout - check internet connection"))
+                // Log current NWPath status to help diagnose connectivity vs endpoint reachability
+                let reachability = NetworkReachabilityService.shared
+                let status = reachability.status
+                self.logWithTimestamp("Recognition timeout after 15 seconds - network status: connected=\(status.isConnected), type=\(status.connectionType), expensive=\(status.isExpensive), constrained=\(status.isConstrained)")
+                self.logWithTimestamp("If connected, this may indicate an endpoint-specific issue, VPN/proxy interference, or temporary Apple service unreachability.")
+
+                // Provide a clearer, action-oriented message
+                let userMessage = "Recognition service timed out. If you're on VPN/proxy, disable it and try again. Otherwise, check your connection and try again."
+                let timeoutError = AppError.shazamError(.recognitionFailed(userMessage))
                 self.currentState = .failure(timeoutError)
                 self.recognitionContinuation?.resume(returning: .failure(timeoutError))
                 self.recognitionContinuation = nil
