@@ -277,6 +277,8 @@ struct ListeningView: View {
         do {
             permissionStatus = try await services.permissionService.requestMicrophonePermission()
             if permissionStatus == .granted {
+                // Ensure all playback is stopped before beginning microphone capture to avoid session conflicts
+                services.appleMusicService.stopAllPlayback()
                 if isListening {
                     // Stop current recognition
                     services.shazamService.stopListening()

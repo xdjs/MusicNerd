@@ -144,6 +144,20 @@ class ShazamService: NSObject, ShazamServiceProtocol {
             logWithTimestamp("Failed to setup audio session: \(error)")
         }
     }
+
+    /// Ensures the audio session is configured for microphone capture before starting recognition.
+    private func configureAudioSessionForCapture() throws {
+        let audioSession = AVAudioSession.sharedInstance()
+        // Switch category back to capture-friendly configuration in case playback changed it.
+        try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.defaultToSpeaker, .allowBluetooth])
+        try audioSession.setActive(true, options: [])
+        logWithTimestamp("Audio session configured for capture (playAndRecord, measurement)")
+        // Validate input availability to avoid 'Input HW format is invalid'
+        guard audioSession.isInputAvailable else {
+            logWithTimestamp("Audio input not available after configuration")
+            throw AppError.shazamError(.audioSessionFailed)
+        }
+    }
     
     private func requestMicrophonePermission() async throws {
         logWithTimestamp("Checking microphone permission...")
@@ -163,6 +177,9 @@ class ShazamService: NSObject, ShazamServiceProtocol {
         logWithTimestamp("Starting performRecognition()")
         return await withCheckedContinuation { continuation in
             do {
+                // Reconfigure audio session for capture in case playback altered it
+                try configureAudioSessionForCapture()
+
                 logWithTimestamp("Setting state to listening...")
                 currentState = .listening
                 
@@ -177,6 +194,9 @@ class ShazamService: NSObject, ShazamServiceProtocol {
                 
                 // Setup audio engine
                 logWithTimestamp("Setting up audio engine...")
+                // Ensure a clean engine state before configuring input to avoid invalid formats
+                if audioEngine.isRunning { audioEngine.stop() }
+                audioEngine.reset()
                 let inputNode = audioEngine.inputNode
                 let recordingFormat = inputNode.outputFormat(forBus: 0)
                 logWithTimestamp("Recording format: \(recordingFormat)")
