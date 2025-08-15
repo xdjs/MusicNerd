@@ -19,7 +19,9 @@ class AppSettings {
     var sampleDuration: TimeInterval {
         get {
             let saved = userDefaults.double(forKey: Keys.sampleDuration)
-            return saved > 0 ? saved : 3.0 // Default to 3 seconds
+            // Enforce a minimum of 5 seconds and default to 5 if unset
+            let value = saved > 0 ? saved : 5.0
+            return max(value, 5.0)
         }
         set {
             userDefaults.set(newValue, forKey: Keys.sampleDuration)
@@ -93,7 +95,7 @@ class AppSettings {
 
 // MARK: - Sample Duration Options
 extension AppSettings {
-    static let sampleDurationOptions: [TimeInterval] = [3, 5, 10, 15, 20]
+    static let sampleDurationOptions: [TimeInterval] = [5, 10, 15, 20]
     
     static func formatDuration(_ duration: TimeInterval) -> String {
         let seconds = Int(duration)
