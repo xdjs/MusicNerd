@@ -23,6 +23,8 @@ protocol AppleMusicServiceProtocol: AnyObject {
     func canPlayFullTracks() async -> Bool
     var isPlayingFull: Bool { get }
     var fullProgress: Double { get }
+    // Global stop to avoid session conflicts with recording
+    func stopAllPlayback()
     // Fallback preview via iTunes Search (no auth)
     func fallbackPreviewURL(title: String, artist: String) async -> URL?
 }
