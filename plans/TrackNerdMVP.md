@@ -303,6 +303,7 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Lock screen playback controls integration (Now Playing info, remote commands).
   - [ ] Background playback support (continues when app goes to background).
   - [ ] Audio session management with interruption handling (calls, other apps) and route changes.
+  - [ ] Centralize audio session coordination (single coordinator to switch between playback and capture, ensure safe category/route transitions)
 
 - [ ] **Error Handling & Edge Cases**:
   - [ ] Handle songs not available on Apple Music or region‑restricted.
