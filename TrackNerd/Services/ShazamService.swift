@@ -299,13 +299,13 @@ class ShazamService: NSObject, ShazamServiceProtocol {
         
         // Add a timeout mechanism with enhanced network diagnostics
         Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 15_000_000_000) // 15 seconds timeout
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds timeout
             guard let self = self else { return }
             if case .processing = self.currentState {
                 // Log current NWPath status to help diagnose connectivity vs endpoint reachability
                 let reachability = NetworkReachabilityService.shared
                 let status = reachability.status
-                self.logWithTimestamp("Recognition timeout after 15 seconds - network status: connected=\(status.isConnected), type=\(status.connectionType), expensive=\(status.isExpensive), constrained=\(status.isConstrained)")
+                self.logWithTimestamp("Recognition timeout after 10 seconds - network status: connected=\(status.isConnected), type=\(status.connectionType), expensive=\(status.isExpensive), constrained=\(status.isConstrained)")
                 self.logWithTimestamp("If connected, this may indicate an endpoint-specific issue, VPN/proxy interference, or temporary Apple service unreachability.")
 
                 // Provide a clearer, action-oriented message
