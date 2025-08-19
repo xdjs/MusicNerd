@@ -111,25 +111,8 @@ class ShazamService: NSObject, ShazamServiceProtocol {
     
     func stopListening() {
         logWithTimestamp("stopListening() called")
-        
-        // Remove any existing audio tap first
-        if audioEngine.isRunning {
-            audioEngine.stop()
-        }
-        audioEngine.inputNode.removeTap(onBus: 0)
-        audioEngine.reset()
-        
-        session = nil
+        teardownAudioResources()
         currentState = .idle
-        recognitionStartDate = nil
-        
-        // Deactivate audio session to release input and allow other audio to resume
-        do {
-            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
-            logWithTimestamp("Audio session deactivated after listening")
-        } catch {
-            logWithTimestamp("Failed to deactivate audio session: \(error)")
-        }
     }
     
     // MARK: - Private Methods
@@ -169,6 +152,28 @@ class ShazamService: NSObject, ShazamServiceProtocol {
         if status != .granted {
             logWithTimestamp("Permission denied, throwing error")
             throw AppError.shazamError(.noMicrophonePermission)
+        }
+    }
+    
+    /// Stops audio engine, removes taps, clears session, and deactivates audio session.
+    /// Does not mutate `currentState`. Use when handling success/failure to avoid idle flicker.
+    private func teardownAudioResources() {
+        // Remove any existing audio tap first
+        if audioEngine.isRunning {
+            audioEngine.stop()
+        }
+        audioEngine.inputNode.removeTap(onBus: 0)
+        audioEngine.reset()
+
+        session = nil
+        recognitionStartDate = nil
+
+        // Deactivate audio session to release input and allow other audio to resume
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            logWithTimestamp("Audio session deactivated after listening")
+        } catch {
+            logWithTimestamp("Failed to deactivate audio session: \(error)")
         }
     }
     
@@ -234,12 +239,15 @@ class ShazamService: NSObject, ShazamServiceProtocol {
                     // If still listening with no result, time out gracefully
                     if case .listening = self.currentState {
                         self.logWithTimestamp("Timed out after \(sampleDuration)s without a match")
-                        self.stopListening()
                         let userMessage = "No match within \(Int(sampleDuration))s. Try moving closer to the source or increasing volume."
                         let timeoutError = AppError.shazamError(.recognitionFailed(userMessage))
+                        // Avoid idle flicker: teardown without state change
+                        self.teardownAudioResources()
                         self.currentState = .failure(timeoutError)
-                        self.recognitionContinuation?.resume(returning: .failure(timeoutError))
-                        self.recognitionContinuation = nil
+                        if let continuation = self.recognitionContinuation {
+                            continuation.resume(returning: .failure(timeoutError))
+                            self.recognitionContinuation = nil
+                        }
                     }
                 }
 
@@ -270,7 +278,8 @@ extension ShazamService: SHSessionDelegate {
             let formatted = String(format: "%.2f", elapsed)
             logWithTimestamp("Matched in \(formatted)s after streaming started (buffers=\(audioBufferCount))")
         }
-        stopListening()
+        // Avoid idle flicker before we publish success
+        teardownAudioResources()
         
         guard let mediaItem = match.mediaItems.first else {
             logWithTimestamp("No media items in match")
@@ -286,19 +295,24 @@ extension ShazamService: SHSessionDelegate {
         let songMatch = parseSongMatch(from: mediaItem)
         logWithTimestamp("Successfully matched: \(songMatch.title) by \(songMatch.artist)")
         currentState = .success(songMatch)
-        recognitionContinuation?.resume(returning: .success(songMatch))
-        recognitionContinuation = nil
+        if let continuation = recognitionContinuation {
+            continuation.resume(returning: .success(songMatch))
+            recognitionContinuation = nil
+        }
     }
     
     func session(_ session: SHSession, didNotFindMatchFor signature: SHSignature) {
         logWithTimestamp("❌ SHSessionDelegate: didNotFindMatchFor called")
         logWithTimestamp("No match found for signature")
-        stopListening()
+        // Avoid idle flicker; just tear down audio
+        teardownAudioResources()
         
         let error = AppError.shazamError(.noMatch)
         currentState = .failure(error)
-        recognitionContinuation?.resume(returning: .failure(error))
-        recognitionContinuation = nil
+        if let continuation = recognitionContinuation {
+            continuation.resume(returning: .failure(error))
+            recognitionContinuation = nil
+        }
     }
     
     func session(_ session: SHSession, didFailWithError error: Error) {
@@ -306,12 +320,14 @@ extension ShazamService: SHSessionDelegate {
         logWithTimestamp("Recognition failed with error: \(error)")
         logWithTimestamp("Error type: \(type(of: error))")
         logWithTimestamp("Error domain: \(error.localizedDescription)")
-        stopListening()
+        teardownAudioResources()
         
         let appError = AppError.shazamError(.recognitionFailed(error.localizedDescription))
         currentState = .failure(appError)
-        recognitionContinuation?.resume(returning: .failure(appError))
-        recognitionContinuation = nil
+        if let continuation = recognitionContinuation {
+            continuation.resume(returning: .failure(appError))
+            recognitionContinuation = nil
+        }
     }
     
     // MARK: - Metadata Parsing
