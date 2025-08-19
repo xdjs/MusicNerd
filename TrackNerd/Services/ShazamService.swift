@@ -111,8 +111,19 @@ class ShazamService: NSObject, ShazamServiceProtocol {
     
     func stopListening() {
         logWithTimestamp("stopListening() called")
-        teardownAudioResources()
-        currentState = .idle
+        // If a recognition is in-flight, cancel it gracefully
+        if case .listening = currentState {
+            let cancelError = AppError.shazamError(.canceled)
+            teardownAudioResources()
+            currentState = .failure(cancelError)
+            if let continuation = recognitionContinuation {
+                continuation.resume(returning: .failure(cancelError))
+                recognitionContinuation = nil
+            }
+        } else {
+            teardownAudioResources()
+            currentState = .idle
+        }
     }
     
     // MARK: - Private Methods

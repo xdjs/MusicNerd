@@ -54,6 +54,7 @@ enum ShazamError: LocalizedError, Equatable {
     case audioSessionFailed
     case recognitionFailed(String)
     case invalidSignature
+    case canceled
     
     var errorDescription: String? {
         switch self {
@@ -67,6 +68,8 @@ enum ShazamError: LocalizedError, Equatable {
             return "Recognition failed: \(message)"
         case .invalidSignature:
             return "Invalid audio signature"
+        case .canceled:
+            return "Recognition canceled"
         }
     }
     
@@ -82,6 +85,8 @@ enum ShazamError: LocalizedError, Equatable {
             return "Make sure you're in a quiet environment and try again."
         case .invalidSignature:
             return "Please try recording again."
+        case .canceled:
+            return "Tap to listen again when you’re ready."
         }
     }
 }
