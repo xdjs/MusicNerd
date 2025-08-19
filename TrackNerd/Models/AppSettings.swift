@@ -13,6 +13,7 @@ class AppSettings {
         static let showNetworkIndicator = "show_network_indicator"
         static let useProductionServer = "use_production_server"
         static let cacheExpirationHours = "cache_expiration_hours"
+        static let suppressMusicNerdLogs = "suppress_music_nerd_logs"
     }
     
     // MARK: - Sample Duration Setting
@@ -64,6 +65,16 @@ class AppSettings {
         return useProductionServer ? AppConfiguration.API.productionBaseURL : AppConfiguration.API.developmentBaseURL
     }
     
+    // MARK: - Logging Settings
+    var suppressMusicNerdLogs: Bool {
+        get {
+            userDefaults.bool(forKey: Keys.suppressMusicNerdLogs)
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.suppressMusicNerdLogs)
+        }
+    }
+    
     // MARK: - Cache Settings
     var cacheExpirationHours: Double {
         get {
@@ -90,6 +101,7 @@ class AppSettings {
         userDefaults.removeObject(forKey: Keys.showNetworkIndicator)
         userDefaults.removeObject(forKey: Keys.useProductionServer)
         userDefaults.removeObject(forKey: Keys.cacheExpirationHours)
+        userDefaults.removeObject(forKey: Keys.suppressMusicNerdLogs)
     }
 }
 

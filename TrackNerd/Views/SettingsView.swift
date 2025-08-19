@@ -14,6 +14,7 @@ struct SettingsView: View {
     @State private var sampleDuration: TimeInterval = AppSettings.shared.sampleDuration
     @State private var showDebugInfo: Bool = AppSettings.shared.showDebugInfo
     @State private var showNetworkIndicator: Bool = AppSettings.shared.showNetworkIndicator
+    @State private var suppressMusicNerdLogs: Bool = AppSettings.shared.suppressMusicNerdLogs
     @State private var useProductionServer: Bool = AppSettings.shared.useProductionServer
     @State private var showingCacheExpirationPicker = false
     @State private var cacheExpirationHours: Double = AppSettings.shared.cacheExpirationHours
@@ -197,6 +198,27 @@ struct SettingsView: View {
                 
                 // Debug Section
                 Section {
+                    HStack {
+                        Image(systemName: "speaker.slash")
+                            .foregroundColor(Color.MusicNerd.textSecondary)
+                            .frame(width: 24)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Suppress Music Nerd API Logs")
+                                .musicNerdStyle(.bodyLarge())
+                            Text("Reduce verbose network logging in console")
+                                .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                        }
+
+                        Spacer()
+
+                        Toggle("", isOn: $suppressMusicNerdLogs)
+                            .accessibilityIdentifier("suppress-musicnerd-logs-toggle")
+                            .onChange(of: suppressMusicNerdLogs) { _, newValue in
+                                settings.suppressMusicNerdLogs = newValue
+                            }
+                    }
+
                     HStack {
                         Image(systemName: "info.circle")
                             .foregroundColor(Color.MusicNerd.primary)
