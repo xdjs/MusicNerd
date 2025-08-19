@@ -12,6 +12,8 @@ final class SongMatch {
     var shazamID: String?
     var matchedAt: Date
     var enrichmentData: EnrichmentData?
+    // Elapsed seconds from listening start to match found (streaming)
+    var timeToMatchSeconds: Double?
     
     init(
         id: UUID = UUID(),
@@ -22,7 +24,8 @@ final class SongMatch {
         appleMusicID: String? = nil,
         shazamID: String? = nil,
         matchedAt: Date = Date(),
-        enrichmentData: EnrichmentData? = nil
+        enrichmentData: EnrichmentData? = nil,
+        timeToMatchSeconds: Double? = nil
     ) {
         self.id = id
         self.title = title
@@ -33,6 +36,7 @@ final class SongMatch {
         self.shazamID = shazamID
         self.matchedAt = matchedAt
         self.enrichmentData = enrichmentData
+        self.timeToMatchSeconds = timeToMatchSeconds
     }
     
     // Legacy init for backward compatibility
@@ -41,7 +45,8 @@ final class SongMatch {
         artist: String,
         artworkURL: String? = nil,
         appleMusicID: String? = nil,
-        enrichmentData: EnrichmentData? = nil
+        enrichmentData: EnrichmentData? = nil,
+        timeToMatchSeconds: Double? = nil
     ) {
         self.id = UUID()
         self.title = title
@@ -52,6 +57,7 @@ final class SongMatch {
         self.shazamID = nil
         self.matchedAt = Date()
         self.enrichmentData = enrichmentData
+        self.timeToMatchSeconds = timeToMatchSeconds
     }
 }
 
@@ -69,5 +75,10 @@ extension SongMatch {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: matchedAt)
+    }
+
+    var formattedTimeToMatch: String? {
+        guard let seconds = timeToMatchSeconds else { return nil }
+        return String(format: "%.2fs", seconds)
     }
 }

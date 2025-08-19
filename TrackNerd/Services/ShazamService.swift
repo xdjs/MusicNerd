@@ -292,7 +292,10 @@ extension ShazamService: SHSessionDelegate {
         
         // Parse metadata from ShazamKit response
         logWithTimestamp("Parsing song metadata...")
-        let songMatch = parseSongMatch(from: mediaItem)
+        var songMatch = parseSongMatch(from: mediaItem)
+        if let start = recognitionStartDate {
+            songMatch.timeToMatchSeconds = Date().timeIntervalSince(start)
+        }
         logWithTimestamp("Successfully matched: \(songMatch.title) by \(songMatch.artist)")
         currentState = .success(songMatch)
         if let continuation = recognitionContinuation {

@@ -126,12 +126,6 @@ struct ListeningView: View {
                         // Recognition Result
                         if let match = lastMatch, case .success(let recognized) = recognitionState, recognized.id == match.id {
                             VStack(spacing: CGFloat.MusicNerd.md) {
-                                // Under the matched result, show elapsed time listened until matched (debug only)
-                                if showDebugInfo, let matchedElapsedTime = matchedElapsedTime {
-                                    Text("Matched in: \(formatSeconds(matchedElapsedTime))")
-                                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
-                                        .accessibilityIdentifier("debug-elapsed-success")
-                                }
                                 SongMatchCard(match: match) {
                                     selectedMatchForDetail = match
                                 }

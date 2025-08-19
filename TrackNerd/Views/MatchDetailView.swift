@@ -100,8 +100,15 @@ struct MatchDetailView: View {
                     .multilineTextAlignment(.center)
             }
             
-            Text("Matched \(match.formattedMatchDate)")
-                .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+            VStack(spacing: 2) {
+                Text("Matched \(match.formattedMatchDate)")
+                    .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                if let ttm = match.formattedTimeToMatch {
+                    Text("Matched in: \(ttm)")
+                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                        .accessibilityIdentifier("detail-matched-time")
+                }
+            }
 
             // Debug: Show Music Nerd Artist ID when enabled and available
             if AppSettings.shared.showDebugInfo,
