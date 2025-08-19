@@ -273,11 +273,16 @@ extension ShazamService: SHSessionDelegate {
         logWithTimestamp("🎉 SHSessionDelegate: didFind match called!")
         logWithTimestamp("Match found! Processing result...")
 
-        if let start = recognitionStartDate {
-            let elapsed = Date().timeIntervalSince(start)
-            let formatted = String(format: "%.2f", elapsed)
-            logWithTimestamp("Matched in \(formatted)s after streaming started (buffers=\(audioBufferCount))")
-        }
+        // Capture elapsed before teardown clears start time
+        let elapsedSeconds: Double? = {
+            if let start = recognitionStartDate {
+                let elapsed = Date().timeIntervalSince(start)
+                let formatted = String(format: "%.2f", elapsed)
+                logWithTimestamp("Matched in \(formatted)s after streaming started (buffers=\(audioBufferCount))")
+                return elapsed
+            }
+            return nil
+        }()
         // Avoid idle flicker before we publish success
         teardownAudioResources()
         
@@ -293,8 +298,8 @@ extension ShazamService: SHSessionDelegate {
         // Parse metadata from ShazamKit response
         logWithTimestamp("Parsing song metadata...")
         var songMatch = parseSongMatch(from: mediaItem)
-        if let start = recognitionStartDate {
-            songMatch.timeToMatchSeconds = Date().timeIntervalSince(start)
+        if let elapsedSeconds = elapsedSeconds {
+            songMatch.timeToMatchSeconds = elapsedSeconds
         }
         logWithTimestamp("Successfully matched: \(songMatch.title) by \(songMatch.artist)")
         currentState = .success(songMatch)
