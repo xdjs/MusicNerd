@@ -311,7 +311,7 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Offline behavior: disable playback controls with clear messaging; auto‑recover when network returns.
 - [ ] Network connectivity issues during playback with retry guidance.
 
-- [ ] **ShazamKit Streaming Refactor**:
+- [ ] **ShazamKit Streaming Refactor (Top Priority)**:
   - [ ] Replace signature-based recognition with `matchStreamingBuffer(_:at:)`.
   - [ ] Stream audio buffers to `SHSession` directly within the audio tap.
   - [ ] Remove `SHSignatureGenerator` and related post-capture processing logic.
@@ -413,25 +413,18 @@ Build an iOS app under the Music Nerd brand that:
   - ✅ NetworkStatusUITests: 100% pass rate (17/17 tests)
   - ✅ RecognitionFlowUITests: 100% pass rate after timing fixes
 
-**Currently:** Phase 7 (Apple Music Integration) - in progress (55%)
-- ✅ Complete SwiftData setup with SongMatch and EnrichmentData persistence
-- ✅ Enrichment cache migration to persistent SwiftData storage with expiration
-- ✅ Full history UI implementation with search, filtering, and real-time updates
-- ✅ Unit testing: 18 tests for history logic, enrichment cache persistence
-- ✅ MVVM architecture with HistoryViewModel for proper data management
-- ✅ Advanced filtering system with enrichment status and date range filtering
-- ⏳ Remaining: UI testing suite, export functionality
+**Currently:** Phase 7 (Apple Music Integration) — in progress (40%)
+- ✅ Foundations: MusicKit capability/entitlements, authorization flow, subscription checks
+- ✅ Playback: 30s preview (with progress/controls) and full‑track playback (MVP)
+- ✅ UI: Persistent mini‑player integrated across tabs
+ - ⏳ Remaining: ShazamKit streaming refactor (replace signature‑based recognition) — top priority; DRM‑free preview error handling; audio session + interruption handling; broader UI integration on `SongMatchCard`; background/lock‑screen controls; unit/UI tests
 
-**Next:** Continue Phase 7 — background/lock‑screen controls, audio session + interruption handling, broader UI integration (SongMatchCard controls), and testing
+**Next:** Prioritize ShazamKit streaming refactor (replace signature‑based recognition), then continue Phase 7 — background/lock‑screen controls, audio session + interruption handling, broader UI integration (SongMatchCard controls), and testing
 
-**New Phase:** Phase 7 (Apple Music Integration) - 40% complete
-- 🎵 **Core Value**: Transform TrackNerd from recognition-only to full playback experience
-- 🔑 **Key Features**: Preview playback (non-subscribers), full playback (subscribers)
-- 📱 **Foundation Ready**: ShazamKit already captures `appleMusicID` for seamless integration
-- 🎯 **User Flow**: Recognize → Enrich → Play (preview or full based on subscription)
+ 
 
 **Previous Phase:**
-- ✅ Phase 5 (Enrichment & Intelligence) - 100% COMPLETE!
+- ✅ Phase 6 (Data Persistence & History) — mostly complete; remaining: export/share feature and history UI testing suite
 
 **Development Philosophy:**
 - Build solid architectural foundation before adding features
