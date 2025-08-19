@@ -309,7 +309,14 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Handle songs not available on Apple Music or region‑restricted.
   - [ ] Fallback when `appleMusicID` is unavailable -> search by title/artist; if not found, notify user.
   - [ ] Offline behavior: disable playback controls with clear messaging; auto‑recover when network returns.
-  - [ ] Network connectivity issues during playback with retry guidance.
+- [ ] Network connectivity issues during playback with retry guidance.
+
+- [ ] **ShazamKit Streaming Refactor**:
+  - [ ] Replace signature-based recognition with `matchStreamingBuffer(_:at:)`.
+  - [ ] Stream audio buffers to `SHSession` directly within the audio tap.
+  - [ ] Remove `SHSignatureGenerator` and related post-capture processing logic.
+  - [ ] Manage recognition lifecycle and timeout handling for streaming.
+  - [ ] Update `ShazamServiceProtocol` and tests for streaming recognition.
 
 - [ ] **Unit Testing:**
   - [ ] Test `AppleMusicService` authorization and subscription checks.
