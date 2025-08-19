@@ -21,6 +21,10 @@ struct ListeningView: View {
     @State private var recentMatches: [SongMatch] = []
     @State private var selectedMatchForDetail: SongMatch? = nil
     @StateObject private var reachabilityService = NetworkReachabilityService.shared
+    @State private var elapsedTime: TimeInterval = 0
+    @State private var lastElapsedTime: TimeInterval? = nil
+    @State private var matchedElapsedTime: TimeInterval? = nil
+    @State private var elapsedTimer: Timer? = nil
     
     private let services = DefaultServiceContainer.shared
     private let settings = AppSettings.shared
@@ -58,6 +62,17 @@ struct ListeningView: View {
                                 .background(Color.MusicNerd.accent.opacity(0.1))
                                 .cornerRadius(CGFloat.BorderRadius.xs)
                                 .accessibilityIdentifier("debug-sample-duration")
+
+                            // On failed match, show total time listened underneath the sample duration label
+                            if case .failure = recognitionState, let total = lastElapsedTime {
+                                Text("Listened: \(formatSeconds(total))")
+                                    .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                                    .padding(.horizontal, CGFloat.MusicNerd.md)
+                                    .padding(.vertical, CGFloat.MusicNerd.xs)
+                                    .background(Color.MusicNerd.accent.opacity(0.06))
+                                    .cornerRadius(CGFloat.BorderRadius.xs)
+                                    .accessibilityIdentifier("debug-elapsed-failure")
+                            }
                         }
                     }
                     .padding(.top, CGFloat.MusicNerd.xl)
@@ -91,6 +106,13 @@ struct ListeningView: View {
                                 )
                                 .frame(height: 60)
                                 .transition(.opacity)
+
+                                // Show live elapsed time during listening (debug only)
+                                if showDebugInfo {
+                                    Text("Elapsed: \(formatSeconds(elapsedTime))")
+                                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                                        .accessibilityIdentifier("debug-elapsed-listening")
+                                }
                                 
                                 if let errorMessage = errorMessage {
                                     Text(errorMessage)
@@ -104,6 +126,12 @@ struct ListeningView: View {
                         // Recognition Result
                         if let match = lastMatch, case .success(let recognized) = recognitionState, recognized.id == match.id {
                             VStack(spacing: CGFloat.MusicNerd.md) {
+                                // Under the matched result, show elapsed time listened until matched (debug only)
+                                if showDebugInfo, let matchedElapsedTime = matchedElapsedTime {
+                                    Text("Matched in: \(formatSeconds(matchedElapsedTime))")
+                                        .musicNerdStyle(.caption(color: Color.MusicNerd.textSecondary))
+                                        .accessibilityIdentifier("debug-elapsed-success")
+                                }
                                 SongMatchCard(match: match) {
                                     selectedMatchForDetail = match
                                 }
@@ -294,17 +322,23 @@ struct ListeningView: View {
                         lastMatch = nil
                         errorMessage = nil
                         recognitionState = .listening
+                        matchedElapsedTime = nil
+                        lastElapsedTime = nil
+                        startElapsedTimer()
                     }
                     
                     let result = await services.shazamService.startListening()
                     
                     await MainActor.run {
                         isListening = false
+                        stopElapsedTimer()
+                        lastElapsedTime = elapsedTime
                         
                         switch result {
                         case .success(let match):
                             lastMatch = match
                             recognitionState = .success(match)
+                            matchedElapsedTime = lastElapsedTime
                             
                             // Save the match immediately (before enrichment)
                             Task {
@@ -393,6 +427,25 @@ struct ListeningView: View {
             return
         }
         UIApplication.shared.open(settingsUrl)
+    }
+
+    // MARK: - Elapsed Time Helpers
+    private func startElapsedTimer() {
+        stopElapsedTimer()
+        elapsedTime = 0
+        elapsedTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            elapsedTime += 0.1
+        }
+        RunLoop.main.add(elapsedTimer!, forMode: .common)
+    }
+    
+    private func stopElapsedTimer() {
+        elapsedTimer?.invalidate()
+        elapsedTimer = nil
+    }
+    
+    private func formatSeconds(_ t: TimeInterval) -> String {
+        String(format: "%.2fs", t)
     }
 }
 
