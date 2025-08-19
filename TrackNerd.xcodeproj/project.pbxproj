@@ -33,6 +33,7 @@
 /* Begin PBXFileReference section */
 		2F08D5892E47C9DF00740CD6 /* DevTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DevTestPlan.xctestplan; sourceTree = "<group>"; };
 		2F8DCC3A2E4557830047D90F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		2F9264872E54EE88004840DA /* MusicNerdRename.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MusicNerdRename.md; sourceTree = "<group>"; };
 		2FA74DF72E41832E00575EFD /* TrackNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E042E41833000575EFD /* TrackNerdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E0E2E41833000575EFD /* TrackNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -139,6 +140,7 @@
 		2FA74E962E4184F600575EFD /* plans */ = {
 			isa = PBXGroup;
 			children = (
+				2F9264872E54EE88004840DA /* MusicNerdRename.md */,
 				2F08D58A2E47C9DF00740CD6 /* tests */,
 				2FA74E972E41850100575EFD /* TrackNerdMVP.md */,
 			);
