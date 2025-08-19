@@ -54,6 +54,7 @@ class ShazamService: NSObject, ShazamServiceProtocol {
             delegate?.shazamService(self, didChangeState: currentState)
         }
     }
+    private var recognitionStartDate: Date?
     
     override init() {
         super.init()
@@ -120,6 +121,7 @@ class ShazamService: NSObject, ShazamServiceProtocol {
         
         session = nil
         currentState = .idle
+        recognitionStartDate = nil
         
         // Deactivate audio session to release input and allow other audio to resume
         do {
@@ -181,6 +183,7 @@ class ShazamService: NSObject, ShazamServiceProtocol {
 
                 logWithTimestamp("Setting state to listening...")
                 currentState = .listening
+                recognitionStartDate = Date()
 
                 // Create and configure session
                 logWithTimestamp("Creating and configuring SHSession...")
@@ -261,6 +264,12 @@ extension ShazamService: SHSessionDelegate {
     func session(_ session: SHSession, didFind match: SHMatch) {
         logWithTimestamp("🎉 SHSessionDelegate: didFind match called!")
         logWithTimestamp("Match found! Processing result...")
+
+        if let start = recognitionStartDate {
+            let elapsed = Date().timeIntervalSince(start)
+            let formatted = String(format: "%.2f", elapsed)
+            logWithTimestamp("Matched in \(formatted)s after streaming started (buffers=\(audioBufferCount))")
+        }
         stopListening()
         
         guard let mediaItem = match.mediaItems.first else {
