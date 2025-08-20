@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import TrackNerd
+@testable import MusicNerd
 
 struct TrackNerdTests {
 

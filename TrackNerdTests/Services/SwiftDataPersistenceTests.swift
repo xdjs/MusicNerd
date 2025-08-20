@@ -1,6 +1,6 @@
 import XCTest
 import SwiftData
-@testable import TrackNerd
+@testable import MusicNerd
 
 @MainActor
 final class SwiftDataPersistenceTests: XCTestCase {

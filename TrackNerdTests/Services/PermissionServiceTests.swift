@@ -1,6 +1,6 @@
 import XCTest
 import AVFoundation
-@testable import TrackNerd
+@testable import MusicNerd
 
 final class PermissionServiceTests: XCTestCase {
     

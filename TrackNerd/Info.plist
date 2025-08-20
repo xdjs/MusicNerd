@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSAppleMusicUsageDescription</key>
-    <string>Music Nerd ID uses Apple Music to play song previews and full tracks.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -12,10 +10,10 @@
 			<key>CFBundleURLIconFile</key>
 			<string></string>
 			<key>CFBundleURLName</key>
-			<string>com.xdjs.TrackNerd</string>
+			<string>com.xdjs.musicnerd</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>tracknerd</string>
+				<string>musicnerd</string>
 			</array>
 		</dict>
 	</array>

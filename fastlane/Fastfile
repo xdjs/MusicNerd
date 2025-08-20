@@ -4,8 +4,8 @@ platform :ios do
   desc "Build the app for testing"
   lane :build do
     xcodebuild(
-      project: "TrackNerd.xcodeproj",
-      scheme: "TrackNerd",
+      project: "MusicNerd.xcodeproj",
+      scheme: "MusicNerd",
       destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
       build: true
     )
@@ -18,8 +18,8 @@ platform :ios do
     sh("xcrun simctl spawn booted launchctl setenv SIMULATOR_SLOW_MOTION_TIMEOUT 0")
     
     run_tests(
-      project: "TrackNerd.xcodeproj",
-      scheme: "TrackNerd",
+      project: "MusicNerd.xcodeproj",
+      scheme: "MusicNerd",
       destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
       testplan: "UnitTestPlan",
       output_style: "raw",
@@ -35,8 +35,8 @@ platform :ios do
     sh("xcrun simctl spawn booted launchctl setenv SIMULATOR_SLOW_MOTION_TIMEOUT 0")
     
     run_tests(
-      project: "TrackNerd.xcodeproj",
-      scheme: "TrackNerd",
+      project: "MusicNerd.xcodeproj",
+      scheme: "MusicNerd",
       destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
       testplan: "UITestPlan",
       output_style: "raw",
@@ -52,8 +52,8 @@ platform :ios do
     sh("xcrun simctl spawn booted launchctl setenv SIMULATOR_SLOW_MOTION_TIMEOUT 0")
     
     run_tests(
-      project: "TrackNerd.xcodeproj",
-      scheme: "TrackNerd",
+      project: "MusicNerd.xcodeproj",
+      scheme: "MusicNerd",
       destination: "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2",
       testplan: "DevTestPlan",
       output_style: "raw",

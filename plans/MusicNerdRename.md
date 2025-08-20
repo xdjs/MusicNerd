@@ -4,16 +4,16 @@ Renaming bundle identifier from com.xdjs.TrackNerd → com.xdjs.musicnerd.
 
 ## **1\) GitHub repo \+ local**
 
-* Rename repo on GitHub to MusicNerd (Settings → General → Repository name).  
-* Update local remote (if URL changed): git remote set-url origin git@github.com:\<org-or-user\>/MusicNerd.git  
-* Update README/title/badges to “MusicNerd”.
+✅ Rename repo on GitHub to MusicNerd (Settings → General → Repository name).  
+✅ Update local remote (if URL changed): git remote set-url origin git@github.com:\<org-or-user\>/MusicNerd.git  
+✅ Update README/title/badges to “MusicNerd”.
 
 ## **2\) Xcode project rename items**
 
-* Target display name (user-facing): Info.plist → CFBundleDisplayName \= Music Nerd.  
-* Scheme name: Product → Scheme → Manage Schemes → rename to MusicNerd.  
+✅ Target display name (user-facing): Info.plist → CFBundleDisplayName \= Music Nerd.  
+✅ Scheme name: Product → Scheme → Manage Schemes → rename to MusicNerd.  
 * Product Name: Target → Build Settings → Packaging → Product Name \= Music Nerd.  
-* Bundle Identifier: Target → Signing & Capabilities → com.xdjs.musicnerd (App/UITests/UnitTests/Extensions if present).
+✅ Bundle Identifier: Target → Signing & Capabilities → com.xdjs.musicnerd (App/UITests/UnitTests/Extensions if present).
 
 ## **3\) Apple developer / signing**
 
@@ -29,8 +29,8 @@ Renaming bundle identifier from com.xdjs.TrackNerd → com.xdjs.musicnerd.
 
 ## **5\) URL schemes & identifiers**
 
-* Update custom URL schemes (e.g., musicnerd://).  
-* Update Associated Domains, Push, Keychain Groups, App Groups if bundle-ID bound.
+✅ Update custom URL schemes (e.g., musicnerd://).  
+✅ Update Associated Domains, Push, Keychain Groups, App Groups if bundle-ID bound.
 
 ## **6\) Codebase find/replace**
 

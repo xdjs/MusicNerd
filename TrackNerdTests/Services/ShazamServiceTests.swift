@@ -1,7 +1,7 @@
 import XCTest
 import ShazamKit
 import AVFoundation
-@testable import TrackNerd
+@testable import MusicNerd
 
 final class ShazamServiceTests: XCTestCase {
     

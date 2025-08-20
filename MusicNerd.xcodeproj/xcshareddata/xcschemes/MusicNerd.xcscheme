@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2FA74DF62E41832E00575EFD"
-               BuildableName = "TrackNerd.app"
-               BlueprintName = "TrackNerd"
-               ReferencedContainer = "container:TrackNerd.xcodeproj">
+               BuildableName = "MusicNerd.app"
+               BlueprintName = "MusicNerd"
+               ReferencedContainer = "container:MusicNerd.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,9 +47,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2FA74E032E41833000575EFD"
-               BuildableName = "TrackNerdTests.xctest"
-               BlueprintName = "TrackNerdTests"
-               ReferencedContainer = "container:TrackNerd.xcodeproj">
+               BuildableName = "MusicNerdTests.xctest"
+               BlueprintName = "MusicNerdTests"
+               ReferencedContainer = "container:MusicNerd.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -58,9 +58,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2FA74E0D2E41833000575EFD"
-               BuildableName = "TrackNerdUITests.xctest"
-               BlueprintName = "TrackNerdUITests"
-               ReferencedContainer = "container:TrackNerd.xcodeproj">
+               BuildableName = "MusicNerdUITests.xctest"
+               BlueprintName = "MusicNerdUITests"
+               ReferencedContainer = "container:MusicNerd.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -68,9 +68,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2FA74E032E41833000575EFD"
-               BuildableName = "TrackNerdTests.xctest"
-               BlueprintName = "TrackNerdTests"
-               ReferencedContainer = "container:TrackNerd.xcodeproj">
+               BuildableName = "MusicNerdTests.xctest"
+               BlueprintName = "MusicNerdTests"
+               ReferencedContainer = "container:MusicNerd.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -90,9 +90,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2FA74DF62E41832E00575EFD"
-            BuildableName = "TrackNerd.app"
-            BlueprintName = "TrackNerd"
-            ReferencedContainer = "container:TrackNerd.xcodeproj">
+            BuildableName = "MusicNerd.app"
+            BlueprintName = "MusicNerd"
+            ReferencedContainer = "container:MusicNerd.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -107,9 +107,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2FA74DF62E41832E00575EFD"
-            BuildableName = "TrackNerd.app"
-            BlueprintName = "TrackNerd"
-            ReferencedContainer = "container:TrackNerd.xcodeproj">
+            BuildableName = "MusicNerd.app"
+            BlueprintName = "MusicNerd"
+            ReferencedContainer = "container:MusicNerd.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

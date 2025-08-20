@@ -1,6 +1,6 @@
 import XCTest
 import Network
-@testable import TrackNerd
+@testable import MusicNerd
 
 final class NetworkReachabilityServiceTests: XCTestCase {
     

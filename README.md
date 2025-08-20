@@ -1,4 +1,4 @@
-# TrackNerd
+# MusicNerd
 
 iOS app that identifies music using ShazamKit and provides AI-powered insights through the MusicNerd service.
 
@@ -19,7 +19,7 @@ iOS app that identifies music using ShazamKit and provides AI-powered insights t
 
 ## Setup
 
-1. Open `TrackNerd.xcodeproj` in Xcode
+1. Open `MusicNerd.xcodeproj` in Xcode
 2. Build and run on iOS Simulator or device
 3. Grant microphone permissions when prompted
 

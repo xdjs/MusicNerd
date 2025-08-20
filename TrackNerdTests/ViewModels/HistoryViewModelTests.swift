@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import TrackNerd
+@testable import MusicNerd
 
 @MainActor
 final class HistoryViewModelTests: XCTestCase {
