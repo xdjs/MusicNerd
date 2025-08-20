@@ -87,7 +87,7 @@ struct ListeningView: View {
                             action: handleListenTap,
                             style: .primary,
                             size: .large,
-                            isLoading: isListening,
+                            isLoading: false,
                             icon: isListening ? "waveform" : "mic"
                         )
                         .disabled(!reachabilityService.isConnected && !isListening)
@@ -219,6 +219,9 @@ struct ListeningView: View {
     }
     
     private var buttonTitle: String {
+        if isListening {
+            return "Stop Listening"
+        }
         // Check network connectivity first
         if !reachabilityService.isConnected && !isListening {
             return "No Internet Connection"
@@ -228,22 +231,7 @@ struct ListeningView: View {
         case .notDetermined:
             return "Start Listening"
         case .granted:
-            if isListening {
-                switch recognitionState {
-                case .idle:
-                    return "Start Listening"
-                case .listening:
-                    return "Listening..."
-                case .processing:
-                    return "Recognizing..."
-                case .success:
-                    return "Listen Again"
-                case .failure:
-                    return "Try Again"
-                }
-            } else {
-                return "Start Listening"
-            }
+            return "Start Listening"
         case .denied, .restricted:
             return "Enable Microphone"
         }
@@ -290,8 +278,18 @@ struct ListeningView: View {
             return
         }
         
-        Task {
-            await requestPermissionAndListen()
+        if isListening {
+            // Explicit cancel path
+            services.shazamService.stopListening()
+            stopElapsedTimer()
+            lastElapsedTime = elapsedTime
+            isListening = false
+            recognitionState = .idle
+            errorMessage = nil
+        } else {
+            Task {
+                await requestPermissionAndListen()
+            }
         }
     }
     
