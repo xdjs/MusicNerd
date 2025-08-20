@@ -311,12 +311,12 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Offline behavior: disable playback controls with clear messaging; auto‑recover when network returns.
 - [ ] Network connectivity issues during playback with retry guidance.
 
-- [ ] **ShazamKit Streaming Refactor (Top Priority)**:
-  - [ ] Replace signature-based recognition with `matchStreamingBuffer(_:at:)`.
-  - [ ] Stream audio buffers to `SHSession` directly within the audio tap.
-  - [ ] Remove `SHSignatureGenerator` and related post-capture processing logic.
-  - [ ] Manage recognition lifecycle and timeout handling for streaming.
-  - [ ] Update `ShazamServiceProtocol` and tests for streaming recognition.
+- [x] **ShazamKit Streaming Refactor (Top Priority)**:
+  - [x] Replace signature-based recognition with `matchStreamingBuffer(_:at:)`.
+  - [x] Stream audio buffers to `SHSession` directly within the audio tap.
+  - [x] Remove `SHSignatureGenerator` and related post-capture processing logic.
+  - [x] Manage recognition lifecycle, cancellation, and timeout handling for streaming.
+  - [x] Update tests for streaming recognition (cancel, timeout, failure path).
 
 - [ ] **Unit Testing:**
   - [ ] Test `AppleMusicService` authorization and subscription checks.
