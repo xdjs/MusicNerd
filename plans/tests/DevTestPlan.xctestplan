@@ -42,9 +42,9 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:TrackNerd.xcodeproj",
+        "containerPath" : "container:MusicNerd.xcodeproj",
         "identifier" : "2FA74E032E41833000575EFD",
-        "name" : "TrackNerdTests"
+        "name" : "MusicNerdTests"
       }
     },
     {
@@ -82,9 +82,9 @@
         "RecognitionFlowUITests\/testSeeAllButton_exists()"
       ],
       "target" : {
-        "containerPath" : "container:TrackNerd.xcodeproj",
+        "containerPath" : "container:MusicNerd.xcodeproj",
         "identifier" : "2FA74E0D2E41833000575EFD",
-        "name" : "TrackNerdUITests"
+        "name" : "MusicNerdUITests"
       }
     }
   ],
