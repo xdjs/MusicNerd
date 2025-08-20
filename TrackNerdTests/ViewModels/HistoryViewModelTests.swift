@@ -1,6 +1,6 @@
 //
 //  HistoryViewModelTests.swift
-//  TrackNerdTests
+//  MusicNerdTests
 //
 //  Created by Claude on 8/10/25.
 //

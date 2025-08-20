@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  TrackNerd
+//  MusicNerd
 //
 //  Created by Carl Tydingco on 8/4/25.
 //

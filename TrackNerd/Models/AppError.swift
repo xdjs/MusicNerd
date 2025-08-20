@@ -299,7 +299,7 @@ enum PermissionError: LocalizedError, Equatable {
     var recoverySuggestion: String? {
         switch self {
         case .microphoneDenied:
-            return "Please enable microphone access in Settings > Privacy & Security > Microphone > Music Nerd ID."
+            return "Please enable microphone access in Settings > Privacy & Security > Microphone > Music Nerd."
         case .microphoneRestricted:
             return "Microphone access is restricted by device policy."
         case .microphoneNotDetermined:

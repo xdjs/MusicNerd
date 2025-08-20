@@ -12,12 +12,12 @@ Renaming bundle identifier from com.xdjs.TrackNerd → com.xdjs.musicnerd.
 
 ✅ Target display name (user-facing): Info.plist → CFBundleDisplayName \= Music Nerd.  
 ✅ Scheme name: Product → Scheme → Manage Schemes → rename to MusicNerd.  
-* Product Name: Target → Build Settings → Packaging → Product Name \= Music Nerd.  
+✅ Product Name: Target → Build Settings → Packaging → Product Name \= Music Nerd.  
 ✅ Bundle Identifier: Target → Signing & Capabilities → com.xdjs.musicnerd (App/UITests/UnitTests/Extensions if present).
 
 ## **3\) Apple developer / signing**
 
-* If using Automatic Signing: let Xcode create new profiles for com.xdjs.musicnerd.  
+✅ If using Automatic Signing: let Xcode create new profiles for com.xdjs.musicnerd.  
 * If using fastlane match: run fastlane match appstore & fastlane match development.  
 * Verify the correct Team under Signing for all targets.
 

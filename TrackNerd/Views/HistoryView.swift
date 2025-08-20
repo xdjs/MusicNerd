@@ -1,6 +1,6 @@
 //
 //  HistoryView.swift
-//  TrackNerd
+//  MusicNerd
 //
 //  Created by Carl Tydingco on 8/5/25.
 //
