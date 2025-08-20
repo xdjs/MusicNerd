@@ -470,6 +470,7 @@ class MusicNerdService: MusicNerdServiceProtocol {
     // MARK: - Logging Helper
     
     private func logWithTimestamp(_ message: String) {
+        if AppSettings.shared.suppressMusicNerdLogs { return }
         let timestamp = DateFormatter.logFormatter.string(from: Date())
         print("[\(timestamp)] MusicNerdService: \(message)")
     }

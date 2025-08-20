@@ -140,9 +140,9 @@
 		2FA74E962E4184F600575EFD /* plans */ = {
 			isa = PBXGroup;
 			children = (
-				2F9264872E54EE88004840DA /* MusicNerdRename.md */,
 				2F08D58A2E47C9DF00740CD6 /* tests */,
 				2FA74E972E41850100575EFD /* TrackNerdMVP.md */,
+				2F9264872E54EE88004840DA /* MusicNerdRename.md */,
 			);
 			path = plans;
 			sourceTree = "<group>";
