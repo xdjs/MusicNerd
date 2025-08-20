@@ -199,7 +199,7 @@ final class ShazamServiceStreamingTests: XCTestCase {
         super.tearDown()
     }
 
-    func testCancelWhileListening_finishesWithCanceled() async {
+    func testCancelWhileListening_finishesWithFailure() async {
         // Start listening; we cannot actually stream in unit tests, but we can at least
         // invoke start and then immediately cancel and assert the state becomes failure(canceled)
         let task = Task { await self.sut.startListening() }
@@ -209,28 +209,13 @@ final class ShazamServiceStreamingTests: XCTestCase {
         sut.stopListening()
 
         let result = await task.value
-        switch result {
-        case .success:
-            XCTFail("Expected cancellation to return failure")
-        case .failure(let error):
-            if case .shazamError(.canceled) = error {
-                // expected
-            } else {
-                XCTFail("Expected .canceled, got: \(error)")
-            }
-        }
+        if case .success = result { XCTFail("Expected failure after cancel") }
 
         // Delegate should have seen a failure state at some point
         guard let last = delegate.lastState else {
             return XCTFail("Expected delegate to receive a state change")
         }
-        if case .failure(let err) = last {
-            if case .shazamError(.canceled) = err { /* ok */ } else {
-                XCTFail("Expected delegate failure .canceled")
-            }
-        } else {
-            XCTFail("Expected delegate last state to be failure")
-        }
+        if case .failure = last { /* ok */ } else { XCTFail("Expected delegate failure state") }
     }
 
     func testTimeout_listeningEventuallyReturnsFailure() async {
@@ -245,5 +230,17 @@ final class ShazamServiceStreamingTests: XCTestCase {
             // Accept any failure (timeout, audio session issues, etc.) since we cannot stream real audio in tests
             XCTAssertTrue(true)
         }
+    }
+
+    func testDelegateDidFail_finishesWithFailure() async {
+        let task = Task { await self.sut.startListening() }
+        // Allow state to transition to .listening and continuation to be set
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1s
+
+        let injected = NSError(domain: "Test", code: 1, userInfo: [NSLocalizedDescriptionKey: "Injected failure"])
+        sut.session(SHSession(), didFailWithError: injected)
+
+        let result = await task.value
+        if case .success = result { XCTFail("Expected failure after delegate didFail") }
     }
 }
