@@ -18,13 +18,13 @@ Renaming bundle identifier from com.xdjs.TrackNerd → com.xdjs.musicnerd.
 ## **3\) Apple developer / signing**
 
 ✅ If using Automatic Signing: let Xcode create new profiles for com.xdjs.musicnerd.  
-* If using fastlane match: run fastlane match appstore & fastlane match development.  
-* Verify the correct Team under Signing for all targets.
+✅ If using fastlane match: run fastlane match appstore & fastlane match development.  
+✅ Verify the correct Team under Signing for all targets.
 
 ## **4\) App Store Connect**
 
-* Create new app record for com.xdjs.musicnerd.  
-* Fill required metadata (subtitle, category, privacy policy, data collection).  
+✅ Create new app record for com.xdjs.musicnerd.  
+✅ Fill required metadata (subtitle, category, privacy policy, data collection).  
 * Reconfigure TestFlight (internal testers carry over; external testers need re-invite or new public link).
 
 ## **5\) URL schemes & identifiers**
