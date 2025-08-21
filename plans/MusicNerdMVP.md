@@ -417,9 +417,9 @@ Build an iOS app under the Music Nerd brand that:
 - ✅ Foundations: MusicKit capability/entitlements, authorization flow, subscription checks
 - ✅ Playback: 30s preview (with progress/controls) and full‑track playback (MVP)
 - ✅ UI: Persistent mini‑player integrated across tabs
- - ⏳ Remaining: ShazamKit streaming refactor (replace signature‑based recognition) — top priority; DRM‑free preview error handling; audio session + interruption handling; broader UI integration on `SongMatchCard`; background/lock‑screen controls; unit/UI tests
+ - ⏳ Remaining: DRM‑free preview error handling; audio session + interruption handling; broader UI integration on `SongMatchCard`; background/lock‑screen controls; unit/UI tests
 
-**Next:** Prioritize ShazamKit streaming refactor (replace signature‑based recognition), then continue Phase 7 — background/lock‑screen controls, audio session + interruption handling, broader UI integration (SongMatchCard controls), and testing
+**Next:** Continue Phase 7 — background/lock‑screen controls, audio session + interruption handling, broader UI integration (SongMatchCard controls), and testing
 
  
 
