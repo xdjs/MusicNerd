@@ -1,6 +1,6 @@
 //
 //  HistoryViewModel.swift
-//  TrackNerd
+//  MusicNerd
 //
 //  Created by Claude on 8/10/25.
 //

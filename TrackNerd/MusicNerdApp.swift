@@ -1,6 +1,6 @@
 //
-//  TrackNerdApp.swift
-//  TrackNerd
+//  MusicNerdApp.swift
+//  MusicNerd
 //
 //  Created by Carl Tydingco on 8/4/25.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct TrackNerdApp: App {
+struct MusicNerdApp: App {
     
     init() {
         // Disable animations during UI testing for faster and more reliable tests

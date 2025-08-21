@@ -1,6 +1,6 @@
 //
 //  ListeningView.swift
-//  TrackNerd
+//  MusicNerd
 //
 //  Created by Carl Tydingco on 8/5/25.
 //
@@ -211,7 +211,7 @@ struct ListeningView: View {
                 openAppSettings()
             }
         } message: {
-            Text("Music Nerd ID needs microphone access to identify songs. Please enable it in Settings.")
+            Text("Music Nerd needs microphone access to identify songs. Please enable it in Settings.")
         }
         .sheet(item: $selectedMatchForDetail, onDismiss: { selectedMatchForDetail = nil }) { match in
             MatchDetailView(match: match)

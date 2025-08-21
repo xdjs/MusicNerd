@@ -1,13 +1,13 @@
 //
-//  TrackNerdUITests.swift
-//  TrackNerdUITests
+//  MusicNerdUITests.swift
+//  MusicNerdUITests
 //
 //  Created by Carl Tydingco on 8/4/25.
 //
 
 import XCTest
 
-final class TrackNerdUITests: XCTestCase {
+final class MusicNerdUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

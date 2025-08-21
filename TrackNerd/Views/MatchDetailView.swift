@@ -1,6 +1,6 @@
 //
 //  MatchDetailView.swift
-//  TrackNerd
+//  MusicNerd
 //
 //  Created by Carl Tydingco on 8/7/25.
 //
@@ -502,7 +502,7 @@ struct MatchDetailView: View {
             }
         }
         
-        text += "\n\nShared from Music Nerd ID 🎧"
+        text += "\n\nShared from Music Nerd 🎧"
         return text
     }
 }

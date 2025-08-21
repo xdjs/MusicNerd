@@ -1,5 +1,5 @@
 import XCTest
-@testable import TrackNerd
+@testable import MusicNerd
 
 final class AppErrorTests: XCTestCase {
     
@@ -69,7 +69,7 @@ final class AppErrorTests: XCTestCase {
     func testPermissionErrorDescriptions() {
         let deniedError = AppError.permissionError(.microphoneDenied)
         XCTAssertEqual(deniedError.errorDescription, "Microphone access denied")
-        XCTAssertEqual(deniedError.recoverySuggestion, "Please enable microphone access in Settings > Privacy & Security > Microphone > Music Nerd ID.")
+        XCTAssertEqual(deniedError.recoverySuggestion, "Please enable microphone access in Settings > Privacy & Security > Microphone > Music Nerd.")
         
         let restrictedError = AppError.permissionError(.microphoneRestricted)
         XCTAssertEqual(restrictedError.errorDescription, "Microphone access restricted")

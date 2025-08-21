@@ -1,5 +1,5 @@
 import XCTest
-@testable import TrackNerd
+@testable import MusicNerd
 
 // MARK: - Mock Services for Error Testing
 

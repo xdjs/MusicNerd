@@ -1,6 +1,6 @@
 //
 //  SettingsView.swift
-//  TrackNerd
+//  MusicNerd
 //
 //  Created by Carl Tydingco on 8/5/25.
 //
@@ -152,7 +152,7 @@ struct SettingsView: View {
                             .foregroundColor(Color.MusicNerd.primary)
                             .frame(width: 24)
                         
-                        Text("About Music Nerd ID")
+                        Text("About Music Nerd")
                             .musicNerdStyle(.bodyLarge())
                         
                         Spacer()
@@ -167,7 +167,7 @@ struct SettingsView: View {
                             .foregroundColor(Color.MusicNerd.textSecondary)
                             .frame(width: 24)
                         
-                        Text("Rate Music Nerd ID")
+                        Text("Rate Music Nerd")
                             .musicNerdStyle(.bodyLarge(color: Color.MusicNerd.textSecondary))
                     }
                     .accessibilityIdentifier("rate-app-button")
@@ -383,8 +383,8 @@ struct SettingsView: View {
     
     private func contactSupport() {
         let email = "support@musicnerd.xyz"
-        let subject = "Music Nerd ID Support"
-        let body = "Hello Music Nerd ID Team,\n\n"
+        let subject = "Music Nerd Support"
+        let body = "Hello Music Nerd Team,\n\n"
         
         if let emailURL = URL(string: "mailto:\(email)?subject=\(subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&body=\(body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")") {
             UIApplication.shared.open(emailURL)

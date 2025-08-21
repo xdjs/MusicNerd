@@ -1,13 +1,13 @@
 //
-//  TrackNerdUITestsLaunchTests.swift
-//  TrackNerdUITests
+//  MusicNerdUITestsLaunchTests.swift
+//  MusicNerdUITests
 //
 //  Created by Carl Tydingco on 8/4/25.
 //
 
 import XCTest
 
-final class TrackNerdUITestsLaunchTests: XCTestCase {
+final class MusicNerdUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

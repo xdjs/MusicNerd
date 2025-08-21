@@ -1,6 +1,6 @@
 //
 //  HistoryUITests.swift
-//  TrackNerdUITests
+//  MusicNerdUITests
 //
 //  Created by Claude on 8/10/25.
 //

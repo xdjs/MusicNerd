@@ -1,12 +1,12 @@
 //
 //  FilterCriteriaTests.swift
-//  TrackNerdTests
+//  MusicNerdTests
 //
 //  Created by Claude on 8/10/25.
 //
 
 import XCTest
-@testable import TrackNerd
+@testable import MusicNerd
 
 final class FilterCriteriaTests: XCTestCase {
     

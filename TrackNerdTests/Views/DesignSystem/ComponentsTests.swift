@@ -1,6 +1,6 @@
 import XCTest
 import SwiftUI
-@testable import TrackNerd
+@testable import MusicNerd
 
 final class ComponentsTests: XCTestCase {
     

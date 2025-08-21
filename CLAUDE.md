@@ -1,7 +1,7 @@
-# TrackNerd - Music Nerd + Shazam iOS App
+# MusicNerd - Music Nerd + Shazam iOS App
 
 ## Project Overview
-TrackNerd is an iOS app that combines ShazamKit music recognition with OpenAI-powered insights to create a "Music Nerd" experience. The app identifies songs and provides deep, playful insights about tracks and artists.
+MusicNerd is an iOS app that combines ShazamKit music recognition with OpenAI-powered insights to create a "Music Nerd" experience. The app identifies songs and provides deep, playful insights about tracks and artists.
 
 ## Architecture
 - **Language**: Swift
@@ -25,10 +25,10 @@ TrackNerd is an iOS app that combines ShazamKit music recognition with OpenAI-po
 ### Build & Run
 ```bash
 # Open project in Xcode
-open TrackNerd.xcodeproj
+open MusicNerd.xcodeproj
 
 # Build from command line
-xcodebuild -project TrackNerd.xcodeproj -scheme TrackNerd -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2' build
+xcodebuild -project MusicNerd.xcodeproj -scheme MusicNerd -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2' build
 ```
 
 ### Fastlane Automation
@@ -79,10 +79,10 @@ xcrun simctl spawn booted launchctl setenv SIMULATOR_SLOW_MOTION_TIMEOUT 0
 #### Run Unit Tests
 ```bash
 xcodebuild test \
-  -project TrackNerd.xcodeproj \
-  -scheme TrackNerd \
+  -project MusicNerd.xcodeproj \
+  -scheme MusicNerd \
   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2' \
-  -only-testing:TrackNerdTests \
+  -only-testing:MusicNerdTests \
   -quiet \
   -resultBundlePath "testResults/$(date +%Y%m%d_%H%M%S)/UnitTests.xcresult"
 ```
@@ -90,10 +90,10 @@ xcodebuild test \
 #### Run UI Tests
 ```bash
 xcodebuild test \
-  -project TrackNerd.xcodeproj \
-  -scheme TrackNerd \
+  -project MusicNerd.xcodeproj \
+  -scheme MusicNerd \
   -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.2' \
-  -only-testing:TrackNerdUITests \
+  -only-testing:MusicNerdUITests \
   -quiet \
   -resultBundlePath "testResults/$(date +%Y%m%d_%H%M%S)/UITests.xcresult"
 ```
@@ -106,7 +106,7 @@ xcodebuild test \
 
 #### UI Testing Setup
 - UI tests include `app.launchArguments.append("--uitesting")` in setup
-- App disables animations during UI testing with conditional in `TrackNerdApp.swift`:
+- App disables animations during UI testing with conditional in `MusicNerdApp.swift`:
   ```swift
   if ProcessInfo.processInfo.arguments.contains("--uitesting") {
       UIView.setAnimationsEnabled(false)
@@ -114,16 +114,16 @@ xcodebuild test \
   ```
 
 ### Testing Structure
-- Unit tests: `TrackNerdTests/`
-- UI tests: `TrackNerdUITests/`
+- Unit tests: `MusicNerdTests/`
+- UI tests: `MusicNerdUITests/`
 
 ## Development Status
 Currently beginning Phase 3 (Music Recognition Core) - Phases 1 (Foundation & Architecture) and 2 (UI/UX Foundation) are complete. Current phase involves implementing ShazamKit integration for real-time music recognition.
 
 ## Key Files
-- `TrackNerdApp.swift` - Main app entry point
+- `MusicNerdApp.swift` - Main app entry point
 - `ContentView.swift` - Primary view (currently placeholder)
-- `plans/TrackNerdMVP.md` - Detailed project roadmap and phase breakdown
+- `plans/MusicNerdMVP.md` - Detailed project roadmap and phase breakdown
 
 ## Requirements
 - iOS 18.2+
