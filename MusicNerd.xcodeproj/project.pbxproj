@@ -37,7 +37,7 @@
 		2FA74DF72E41832E00575EFD /* MusicNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E042E41833000575EFD /* MusicNerdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicNerdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FA74E0E2E41833000575EFD /* MusicNerdUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicNerdUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2FA74E972E41850100575EFD /* TrackNerdMVP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TrackNerdMVP.md; sourceTree = "<group>"; };
+		2FA74E972E41850100575EFD /* MusicNerdMVP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MusicNerdMVP.md; sourceTree = "<group>"; };
 		2FA74ED82E41884700575EFD /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		2FDA9C602E47CB7F002BB007 /* UITestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UITestPlan.xctestplan; sourceTree = "<group>"; };
 		2FDA9C622E47CD27002BB007 /* UnitTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UnitTestPlan.xctestplan; sourceTree = "<group>"; };
@@ -141,7 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				2F08D58A2E47C9DF00740CD6 /* tests */,
-				2FA74E972E41850100575EFD /* TrackNerdMVP.md */,
+				2FA74E972E41850100575EFD /* MusicNerdMVP.md */,
 				2F9264872E54EE88004840DA /* MusicNerdRename.md */,
 			);
 			path = plans;
