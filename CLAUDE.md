@@ -1,4 +1,4 @@
-# MusicNerd - Music Nerd + Shazam iOS App
+# Music Nerd - Music Nerd + Shazam iOS App
 
 ## Project Overview
 MusicNerd is an iOS app that combines ShazamKit music recognition with OpenAI-powered insights to create a "Music Nerd" experience. The app identifies songs and provides deep, playful insights about tracks and artists.

@@ -1,6 +1,6 @@
-# MusicNerd
+# Music Nerd
 
-iOS app that identifies music using ShazamKit and provides AI-powered insights through the MusicNerd service.
+iOS app that identifies music using ShazamKit and provides AI-powered insights through the Music Nerd service.
 
 ## Features
 
