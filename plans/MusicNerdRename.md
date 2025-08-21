@@ -34,19 +34,19 @@ Renaming bundle identifier from com.xdjs.TrackNerd → com.xdjs.musicnerd.
 
 ## **6\) Codebase find/replace**
 
-* Search for TrackNerd → replace with MusicNerd where appropriate (logs, analytics, UI strings, configs).  
+✅ Search for TrackNerd → replace with MusicNerd where appropriate (logs, analytics, UI strings, configs).  
 * Keep class/type names unless full rename desired.
 
 ## **7\) Fastlane / CI**
 
-* Update Appfile: app\_identifier "com.xdjs.musicnerd".  
-* Update Fastfile: scheme: "MusicNerd", replace old bundle IDs.  
-* Run lanes: fastlane tests\_local, fastlane beta.
+✅ Update Appfile: app\_identifier "com.xdjs.musicnerd".  
+✅ Update Fastfile: scheme: "MusicNerd", replace old bundle IDs.  
+✅ Run lanes: fastlane tests\_local, fastlane beta.
 
 ## **8\) ShazamKit / MusicKit / Info.plist**
 
-* Verify usage strings still exist: NSMicrophoneUsageDescription, NSAppleMusicUsageDescription.  
-* No additional changes needed for APIs.
+✅ Verify usage strings still exist: NSMicrophoneUsageDescription, NSAppleMusicUsageDescription.  
+✅ No additional changes needed for APIs.
 
 ## **9\) Verify the archive**
 
