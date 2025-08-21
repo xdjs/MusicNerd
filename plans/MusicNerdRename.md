@@ -50,15 +50,15 @@ Renaming bundle identifier from com.xdjs.TrackNerd → com.xdjs.musicnerd.
 
 ## **9\) Verify the archive**
 
-* Archive in Xcode.  
-* Inspect archive Info.plist: CFBundleIdentifier \= com.xdjs.musicnerd, CFBundleDisplayName \= Music Nerd.  
-* Upload to App Store Connect, re-add external testers or regenerate public link.
+✅ Archive in Xcode.  
+✅ Inspect archive Info.plist: CFBundleIdentifier \= com.xdjs.musicnerd, CFBundleDisplayName \= Music Nerd.  
+✅ Upload to App Store Connect, re-add external testers or regenerate public link.
 
 ## **10\) Post-merge cleanup**
 
-* Update issues/PR templates with new name.  
-* Update TestFlight What to Test \+ Discord copy.  
-* Tag release noting rename \+ new bundle ID.
+✅ Update issues/PR templates with new name.  
+✅ Update TestFlight What to Test \+ Discord copy.  
+✅ Tag release noting rename \+ new bundle ID.
 
 ## **Quick rollback plan**
 
