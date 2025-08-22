@@ -357,6 +357,8 @@ Build an iOS app under the Music Nerd brand that:
   - [ ] Dark mode support
   - [ ] Haptic feedback and animations
   - [ ] Accessibility compliance (VoiceOver, Dynamic Type)
+- [ ] **Maintenance & Quality**:
+  - [ ] Analyze compiler warnings and clean up as necessary
 - [ ] **App Store Setup**:
   - [ ] App Store Connect project creation
   - [ ] Screenshots and metadata
