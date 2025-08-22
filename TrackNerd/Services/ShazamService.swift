@@ -111,8 +111,9 @@ class ShazamService: NSObject, ShazamServiceProtocol {
     
     func stopListening() {
         logWithTimestamp("stopListening() called")
-        // If a recognition is in-flight, cancel it gracefully
-        if case .listening = currentState {
+        switch currentState {
+        case .listening:
+            // Cancel the active recognition and surface a cancellation failure
             let cancelError = AppError.shazamError(.canceled)
             teardownAudioResources()
             currentState = .failure(cancelError)
@@ -120,7 +121,11 @@ class ShazamService: NSObject, ShazamServiceProtocol {
                 continuation.resume(returning: .failure(cancelError))
                 recognitionContinuation = nil
             }
-        } else {
+        case .success, .failure:
+            // Respect terminal states; just clean up resources
+            teardownAudioResources()
+        case .idle, .processing:
+            // Normalize to idle and notify delegate
             teardownAudioResources()
             currentState = .idle
         }
