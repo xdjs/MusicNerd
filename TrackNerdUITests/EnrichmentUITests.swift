@@ -317,8 +317,15 @@ final class EnrichmentUITests: XCTestCase {
             let section = expandableSections.element(boundBy: i)
             if section.exists && section.isHittable {
                 section.tap()
-                // Brief wait to ensure UI stability
-                Thread.sleep(forTimeInterval: 0.5)
+                
+                // Brief wait to ensure UI stability using proper expectation
+                let stabilityExpectation = XCTestExpectation(description: "UI stability after section tap \(i)")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if section.exists {
+                        stabilityExpectation.fulfill()
+                    }
+                }
+                _ = XCTWaiter().wait(for: [stabilityExpectation], timeout: 2.0)
             }
         }
         

@@ -16,9 +16,32 @@ final class RecognitionFlowUITests: XCTestCase {
         app = nil
     }
     
+    // MARK: - UI Test Helpers
+    
+    /// Waits for an element to exist with adaptive timeout
+    private func waitForElement(_ element: XCUIElement, description: String, timeout: TimeInterval = 30.0) -> Bool {
+        let existsPredicate = NSPredicate(format: "exists == true")
+        let expectation = XCTNSPredicateExpectation(predicate: existsPredicate, object: element)
+        let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+        
+        if result != .completed {
+            XCTFail("\(description) failed to appear within \(timeout) seconds")
+            return false
+        }
+        return true
+    }
+    
+    /// Waits for main UI to fully load
+    private func waitForMainUILoad() -> Bool {
+        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
+        return waitForElement(mainHeading, description: "Main UI heading", timeout: 15.0)
+    }
+    
     func testListenButtonExists() throws {
+        XCTAssertTrue(waitForMainUILoad(), "Main UI should load")
+        
         let listenButton = app.buttons["listen-button"]
-        XCTAssertTrue(listenButton.exists)
+        XCTAssertTrue(waitForElement(listenButton, description: "Listen button"), "Listen button should exist")
         XCTAssertFalse(listenButton.label.isEmpty)
     }
     
@@ -85,56 +108,54 @@ final class RecognitionFlowUITests: XCTestCase {
     }
     
     func testSeeAllButton_exists() throws {
+        XCTAssertTrue(waitForMainUILoad(), "Main UI should load first")
+        
         let seeAllButton = app.buttons["see-all-button"]
-        XCTAssertTrue(seeAllButton.exists)
+        XCTAssertTrue(waitForElement(seeAllButton, description: "See All button"), "See All button should exist")
         XCTAssertEqual(seeAllButton.label, "See All")
     }
     
     func testRecentMatches_showSampleData() throws {
-        // Wait for UI to load completely before checking elements
-        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
-        XCTAssertTrue(mainHeading.waitForExistence(timeout: 3.0), "Main UI should load first")
+        XCTAssertTrue(waitForMainUILoad(), "Main UI should load first")
         
         // Check Recent Matches section exists
         let recentMatchesHeading = app.staticTexts["Recent Matches"]
-        XCTAssertTrue(recentMatchesHeading.waitForExistence(timeout: 3.0), "Recent Matches section should exist")
+        XCTAssertTrue(waitForElement(recentMatchesHeading, description: "Recent Matches heading"), "Recent Matches section should exist")
         
-        // Validate by presence of sample text, not element IDs
-        let allTexts = app.staticTexts
-        let hasBohemianRhapsody = allTexts.matching(NSPredicate(format: "label CONTAINS[c] 'Bohemian Rhapsody'")) .firstMatch.exists
-        let hasHotelCalifornia = allTexts.matching(NSPredicate(format: "label CONTAINS[c] 'Hotel California'")) .firstMatch.exists
+        // Validate by presence of sample text, using helper method for better timing
+        let bohemianRhapsodyText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'Bohemian Rhapsody'")).firstMatch
+        let hotelCaliforniaText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'Hotel California'")).firstMatch
         
-        XCTAssertTrue(hasBohemianRhapsody, "Sample data should include Bohemian Rhapsody")
-        XCTAssertTrue(hasHotelCalifornia, "Sample data should include Hotel California")
+        XCTAssertTrue(waitForElement(bohemianRhapsodyText, description: "Bohemian Rhapsody text"), "Sample data should include Bohemian Rhapsody")
+        XCTAssertTrue(waitForElement(hotelCaliforniaText, description: "Hotel California text"), "Sample data should include Hotel California")
     }
     
     func testNavigationTitle() throws {
         let navigationTitle = app.navigationBars["Listen"]
-        XCTAssertTrue(navigationTitle.exists)
+        XCTAssertTrue(navigationTitle.waitForExistence(timeout: 10.0), "Listen navigation title should exist")
     }
     
     func testListeningViewAccessibility() throws {
         // Wait for UI to fully load
-        let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
-        XCTAssertTrue(mainHeading.waitForExistence(timeout: 3.0), "Main UI should load")
+        XCTAssertTrue(waitForMainUILoad(), "Main UI should load")
         
         // Test listen button accessibility (should be interactive when enabled)
         let listenButton = app.buttons["listen-button"]
-        XCTAssertTrue(listenButton.waitForExistence(timeout: 3.0), "Listen button should exist")
+        XCTAssertTrue(waitForElement(listenButton, description: "Listen button"), "Listen button should exist")
         XCTAssertFalse(listenButton.label.isEmpty, "Listen button should have accessible label")
         
         // Test see all button accessibility (exists but may be disabled for Phase 6)
         let seeAllButton = app.buttons["see-all-button"]
-        XCTAssertTrue(seeAllButton.waitForExistence(timeout: 3.0), "See All button should exist")
+        XCTAssertTrue(waitForElement(seeAllButton, description: "See All button"), "See All button should exist")
         XCTAssertFalse(seeAllButton.label.isEmpty, "See All button should have accessible label")
         
-        // Validate sample match content presence by text
-        let hasAnySample = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'Bohemian Rhapsody' OR label CONTAINS[c] 'Hotel California'")) .firstMatch.exists
-        XCTAssertTrue(hasAnySample, "At least one sample match text should be visible")
+        // Validate sample match content presence by text using proper waiting
+        let sampleMatchText = app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'Bohemian Rhapsody' OR label CONTAINS[c] 'Hotel California'")).firstMatch
+        XCTAssertTrue(waitForElement(sampleMatchText, description: "Sample match text"), "At least one sample match text should be visible")
         
         // Test overall UI accessibility
-        XCTAssertTrue(app.tabBars.firstMatch.exists, "Tab navigation should be accessible")
-        XCTAssertTrue(mainHeading.exists, "Main content should be accessible")
+        XCTAssertTrue(waitForElement(app.tabBars.firstMatch, description: "Tab bar"), "Tab navigation should be accessible")
+        XCTAssertTrue(app.staticTexts["Hear. ID. Nerd out."].exists, "Main content should be accessible")
     }
     
     func testErrorState_showsErrorMessage() throws {

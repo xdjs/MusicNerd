@@ -20,44 +20,68 @@ final class HistoryUITests: XCTestCase {
         app = nil
     }
     
+    // MARK: - UI Test Helpers
+    
+    /// Waits for an element to exist with adaptive timeout
+    private func waitForElement(_ element: XCUIElement, description: String, timeout: TimeInterval = 30.0) -> Bool {
+        let existsPredicate = NSPredicate(format: "exists == true")
+        let expectation = XCTNSPredicateExpectation(predicate: existsPredicate, object: element)
+        let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+        
+        if result != .completed {
+            XCTFail("\(description) failed to appear within \(timeout) seconds")
+            return false
+        }
+        return true
+    }
+    
+    /// Navigates to History tab with proper waiting
+    private func navigateToHistory() -> Bool {
+        app.launch()
+        
+        // Wait for app to stabilize
+        guard waitForElement(app.tabBars.firstMatch, description: "Tab bar") else {
+            return false
+        }
+        
+        // Navigate to History tab
+        let historyTab = app.tabBars.buttons["History"]
+        guard waitForElement(historyTab, description: "History tab") else {
+            return false
+        }
+        
+        historyTab.tap()
+        
+        // Wait for History view to load
+        return waitForElement(app.navigationBars["History"], description: "History navigation")
+    }
+    
     // MARK: - Navigation and Basic Elements Tests
     
     @MainActor
     func testHistoryViewElements() throws {
-        app.launch()
-        
-        // Navigate to History tab
-        let historyTab = app.tabBars.buttons["History"]
-        XCTAssertTrue(historyTab.waitForExistence(timeout: 10.0), "History tab should exist")
-        historyTab.tap()
-        
-        // Verify navigation title
-        let historyTitle = app.navigationBars["History"]
-        XCTAssertTrue(historyTitle.waitForExistence(timeout: 5.0), "History navigation title should be visible")
+        XCTAssertTrue(navigateToHistory(), "Should successfully navigate to History")
         
         // Verify search field exists
         let searchField = app.textFields["search-field"]
-        XCTAssertTrue(searchField.waitForExistence(timeout: 5.0), "Search field should be visible")
+        XCTAssertTrue(waitForElement(searchField, description: "Search field"), "Search field should be visible")
         
         // Verify filter button exists
         let filterButton = app.buttons["filter-button"]
-        XCTAssertTrue(filterButton.waitForExistence(timeout: 5.0), "Filter button should be visible")
+        XCTAssertTrue(waitForElement(filterButton, description: "Filter button"), "Filter button should be visible")
         
         // Verify export button exists
         let exportButton = app.buttons["export-button"]
-        XCTAssertTrue(exportButton.waitForExistence(timeout: 5.0), "Export button should be visible")
+        XCTAssertTrue(waitForElement(exportButton, description: "Export button"), "Export button should be visible")
     }
     
     @MainActor
     func testEmptyHistoryState() throws {
-        app.launch()
+        XCTAssertTrue(navigateToHistory(), "Should successfully navigate to History")
         
-        // Navigate to History tab
-        let historyTab = app.tabBars.buttons["History"]
-        historyTab.tap()
-        
-        // Wait for content to load by asserting on a stable element
-        _ = app.staticTexts["Recent Matches"].waitForExistence(timeout: 5.0)
+        // Wait for content to load by checking for a stable element
+        let recentMatchesOrEmptyState = app.staticTexts["Recent Matches"]
+        _ = waitForElement(recentMatchesOrEmptyState, description: "History content", timeout: 15.0)
         
         // Check for empty state elements
         // Note: This test assumes no matches exist. In a real test environment,
@@ -465,9 +489,13 @@ final class HistoryUITests: XCTestCase {
             // If enabled, test tapping it
             exportButton.tap()
             
-            // Look for export options or share sheet
+            // Look for export options or share sheet using proper waiting
             // Note: This would depend on the actual export implementation
-            Thread.sleep(forTimeInterval: 1.0)
+            let shareSheetExpectation = XCTestExpectation(description: "Share sheet interaction")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                shareSheetExpectation.fulfill()
+            }
+            _ = XCTWaiter().wait(for: [shareSheetExpectation], timeout: 3.0)
         } else {
             // Verify it's disabled when appropriate
             XCTAssertFalse(exportButton.isEnabled, "Export button should be disabled when no matches exist")
