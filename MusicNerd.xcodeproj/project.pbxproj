@@ -32,6 +32,7 @@
 
 /* Begin PBXFileReference section */
 		2F08D5892E47C9DF00740CD6 /* DevTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DevTestPlan.xctestplan; sourceTree = "<group>"; };
+		2F7030632E58CE5A004012BC /* xcode_cloud_setup_checklist.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = xcode_cloud_setup_checklist.md; sourceTree = "<group>"; };
 		2F8DCC3A2E4557830047D90F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		2F9264872E54EE88004840DA /* MusicNerdRename.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MusicNerdRename.md; sourceTree = "<group>"; };
 		2FA74DF72E41832E00575EFD /* MusicNerd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicNerd.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,6 +144,7 @@
 				2F08D58A2E47C9DF00740CD6 /* tests */,
 				2FA74E972E41850100575EFD /* MusicNerdMVP.md */,
 				2F9264872E54EE88004840DA /* MusicNerdRename.md */,
+				2F7030632E58CE5A004012BC /* xcode_cloud_setup_checklist.md */,
 			);
 			path = plans;
 			sourceTree = "<group>";
