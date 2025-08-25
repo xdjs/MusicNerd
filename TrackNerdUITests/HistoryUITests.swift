@@ -14,9 +14,11 @@ final class HistoryUITests: XCTestCase {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments.append("--uitesting")
+        app.launch()
     }
     
     override func tearDownWithError() throws {
+        app?.terminate()
         app = nil
     }
     
@@ -77,42 +79,43 @@ final class HistoryUITests: XCTestCase {
     
     @MainActor
     func testEmptyHistoryState() throws {
-        XCTAssertTrue(navigateToHistory(), "Should successfully navigate to History")
+        // Navigate to History tab directly
+        let historyTab = app.tabBars.buttons["History"]
+        XCTAssertTrue(waitForElement(historyTab, description: "History tab"))
+        historyTab.tap()
         
-        // Wait for History view content to load by checking for any of the possible states:
-        // 1. Empty state text, 2. Loading state, or 3. Match results
-        let possibleElements = [
-            app.staticTexts["No Matches Yet"],
-            app.staticTexts["Loading your matches..."],
-            app.otherElements.containing(.staticText, identifier: "history-match-0").firstMatch
-        ]
+        // Verify we're on History screen
+        let historyNavBar = app.navigationBars["History"]
+        XCTAssertTrue(waitForElement(historyNavBar, description: "History navigation bar"))
         
-        // Wait for at least one of these elements to appear (indicating view has loaded)
-        var contentLoaded = false
-        for element in possibleElements {
-            if waitForElement(element, description: "History content", timeout: 5.0) {
-                contentLoaded = true
-                break
-            }
-        }
-        
-        XCTAssertTrue(contentLoaded, "History view should load some content")
-        
-        // Check for empty state elements (only if they exist)
+        // Wait for one of the possible content states to load
         let emptyStateText = app.staticTexts["No Matches Yet"]
-        if emptyStateText.exists {
+        let loadingText = app.staticTexts["Loading your matches..."] 
+        let firstMatch = app.otherElements["history-match-0"]
+        
+        // Check for any state within reasonable time
+        var contentFound = false
+        if waitForElement(emptyStateText, description: "Empty state text", timeout: 10.0) {
+            contentFound = true
+            
+            // Verify empty state content
             XCTAssertTrue(emptyStateText.isHittable, "Empty state text should be visible")
             
             let emptyStateDescription = app.staticTexts["Start listening to music to build your collection"]
-            XCTAssertTrue(emptyStateDescription.exists, "Empty state description should be visible")
+            XCTAssertTrue(emptyStateDescription.waitForExistence(timeout: 5.0), "Empty state description should be visible")
             
-            // Look for the start listening button (it might have a different identifier)
-            let startListeningButton = app.buttons["Start Listening"]
+            // Check for start listening button
+            let startListeningButton = app.buttons["start-listening-button"]
             if startListeningButton.exists {
-                // This button should be enabled to allow navigation to listening tab
-                XCTAssertTrue(startListeningButton.isEnabled, "Start listening button should be enabled in empty state")
+                XCTAssertTrue(startListeningButton.isEnabled, "Start listening button should be enabled")
             }
+        } else if waitForElement(loadingText, description: "Loading text", timeout: 5.0) {
+            contentFound = true
+        } else if waitForElement(firstMatch, description: "First match", timeout: 5.0) {
+            contentFound = true
         }
+        
+        XCTAssertTrue(contentFound, "Should find some content state in History view")
     }
     
     // MARK: - Search Functionality Tests

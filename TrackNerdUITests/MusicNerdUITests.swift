@@ -20,6 +20,7 @@ final class MusicNerdUITests: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        // Note: These tests launch their own apps in individual methods, so no shared app to terminate
     }
     
     // MARK: - UI Test Helpers

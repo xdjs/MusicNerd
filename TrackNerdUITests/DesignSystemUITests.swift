@@ -12,6 +12,7 @@ final class DesignSystemUITests: XCTestCase {
     }
     
     override func tearDownWithError() throws {
+        app?.terminate()
         app = nil
     }
     
