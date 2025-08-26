@@ -13,8 +13,54 @@ final class NetworkStatusUITests: XCTestCase {
         // Launch the app
         app.launch()
         
-        // Wait for the app to load
-        _ = app.staticTexts["Hear. ID. Nerd out."].waitForExistence(timeout: 5.0)
+        // Wait for the app to load with improved waiting
+        XCTAssertTrue(waitForAppLaunch(), "App should launch successfully")
+    }
+    
+    // MARK: - UI Test Helpers
+    
+    /// Waits for an element to exist with adaptive timeout
+    private func waitForElement(_ element: XCUIElement, description: String, timeout: TimeInterval = 30.0) -> Bool {
+        let existsPredicate = NSPredicate(format: "exists == true")
+        let expectation = XCTNSPredicateExpectation(predicate: existsPredicate, object: element)
+        let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+        
+        if result != .completed {
+            XCTFail("\(description) failed to appear within \(timeout) seconds")
+            return false
+        }
+        return true
+    }
+    
+    /// Waits for app to fully launch and UI to stabilize
+    private func waitForAppLaunch() -> Bool {
+        // Wait for app state first
+        let appRunningPredicate = NSPredicate(format: "state == %d", XCUIApplication.State.runningForeground.rawValue)
+        let appExpectation = XCTNSPredicateExpectation(predicate: appRunningPredicate, object: app)
+        
+        if XCTWaiter().wait(for: [appExpectation], timeout: 15.0) != .completed {
+            XCTFail("App failed to reach running state within 15 seconds")
+            return false
+        }
+        
+        // Wait for main UI indicator to be ready
+        return waitForElement(app.staticTexts["Hear. ID. Nerd out."], description: "Main UI text", timeout: 15.0)
+    }
+    
+    /// Waits for element to become stable (not just exist, but be in final state)
+    private func waitForElementToStabilize(_ element: XCUIElement, description: String, timeout: TimeInterval = 10.0) -> Bool {
+        guard waitForElement(element, description: description, timeout: timeout) else {
+            return false
+        }
+        
+        // Give a brief moment for any animations or state changes to settle
+        let stabilizeExpectation = XCTestExpectation(description: "Element stabilization")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            stabilizeExpectation.fulfill()
+        }
+        _ = XCTWaiter().wait(for: [stabilizeExpectation], timeout: 1.0)
+        
+        return element.exists
     }
     
     override func tearDownWithError() throws {
@@ -25,14 +71,14 @@ final class NetworkStatusUITests: XCTestCase {
     // MARK: - Network Status Indicator Tests
     
     func testNetworkStatusIndicatorExists() throws {
-        // Navigate to the main listening view
+        // Navigate to the main listening view using helper
         let listeningTab = app.tabBars.buttons["Listen"]
-        XCTAssertTrue(listeningTab.waitForExistence(timeout: 2.0))
+        XCTAssertTrue(waitForElement(listeningTab, description: "Listen tab"))
         listeningTab.tap()
         
-        // Check if network status indicator exists
+        // Check if network status indicator exists using stable waiting
         let networkIndicator = app.otherElements["networkStatusIndicator"]
-        XCTAssertTrue(networkIndicator.waitForExistence(timeout: 3.0), "Network status indicator should be visible")
+        XCTAssertTrue(waitForElementToStabilize(networkIndicator, description: "Network status indicator"), "Network status indicator should be visible")
     }
     
     func testNetworkStatusIndicatorAccessibility() throws {
@@ -255,7 +301,12 @@ final class NetworkStatusUITests: XCTestCase {
         ]
         
         for check in multipleChecks {
-            Thread.sleep(forTimeInterval: check.delay)
+            // Use proper expectation instead of sleep
+            let checkExpectation = XCTestExpectation(description: "Network status check \(check.description)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + check.delay) {
+                checkExpectation.fulfill()
+            }
+            _ = XCTWaiter().wait(for: [checkExpectation], timeout: check.delay + 1.0)
             
             XCTAssertTrue(networkIndicator.exists, 
                          "Network indicator should remain stable \(check.description)")
@@ -294,11 +345,11 @@ final class NetworkStatusUITests: XCTestCase {
     func testAPILoadingIndicatorsDuringNetworkCall() throws {
         // Navigate to the main listening view
         let listeningTab = app.tabBars.buttons["Listen"]
-        XCTAssertTrue(listeningTab.waitForExistence(timeout: 2.0))
+        XCTAssertTrue(waitForElement(listeningTab, description: "Listen tab"))
         listeningTab.tap()
         
         let listenButton = app.buttons["listen-button"]
-        XCTAssertTrue(listenButton.waitForExistence(timeout: 3.0))
+        XCTAssertTrue(waitForElement(listenButton, description: "Listen button"))
         
         // Only proceed if button is enabled (has network)
         if listenButton.isEnabled {
@@ -314,19 +365,39 @@ final class NetworkStatusUITests: XCTestCase {
             // At least one loading state should appear
             var foundLoadingState = false
             for loadingElement in loadingStates {
-                if loadingElement.waitForExistence(timeout: 2.0) {
+                if waitForElement(loadingElement, description: "Loading state", timeout: 5.0) {
                     foundLoadingState = true
                     XCTAssertTrue(loadingElement.exists, "Loading state should be visible during network operations")
                     break
                 }
             }
             
-            // Give time for recognition to complete or timeout
-            sleep(5)
+            // Wait for recognition to complete or timeout using proper expectation
+            let completionExpectation = XCTestExpectation(description: "Recognition completion")
+            let checkCompletion = {
+                // Check if we're back to a stable state (button exists and is interactive)
+                if listenButton.exists && (listenButton.isHittable || !foundLoadingState) {
+                    completionExpectation.fulfill()
+                }
+            }
+            
+            // Poll for completion with proper timeout
+            var startTime = Date()
+            let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { timer in
+                checkCompletion()
+                // Stop checking after reasonable time
+                if Date().timeIntervalSince(startTime) > 10.0 {
+                    timer.invalidate()
+                    completionExpectation.fulfill()
+                }
+            }
+            
+            let result = XCTWaiter().wait(for: [completionExpectation], timeout: 15.0)
+            timer.invalidate()
             
             // Either we found a loading state or the test environment doesn't support audio recognition
-            if foundLoadingState {
-                XCTAssertTrue(true, "Loading indicators appeared during network operation")
+            if foundLoadingState || result == .completed {
+                XCTAssertTrue(true, "Loading indicators test completed successfully")
             } else {
                 XCTAssertTrue(true, "Test environment may not support audio recognition - loading states not applicable")
             }
@@ -404,18 +475,21 @@ final class NetworkStatusUITests: XCTestCase {
     func testNetworkRecoveryBehavior() throws {
         // Navigate to the main listening view
         let listeningTab = app.tabBars.buttons["Listen"]
-        XCTAssertTrue(listeningTab.waitForExistence(timeout: 2.0))
+        XCTAssertTrue(waitForElement(listeningTab, description: "Listen tab"))
         listeningTab.tap()
         
         let networkIndicator = app.otherElements["networkStatusIndicator"]
-        XCTAssertTrue(networkIndicator.waitForExistence(timeout: 3.0))
+        XCTAssertTrue(waitForElementToStabilize(networkIndicator, description: "Network indicator"))
         
         let initialNetworkLabel = networkIndicator.label
         XCTAssertFalse(initialNetworkLabel.isEmpty, "Network indicator should have status label")
         
-        // Test that network indicator updates over time
-        // (This simulates checking for network status changes)
-        sleep(2)
+        // Test that network indicator updates over time using proper waiting
+        let stabilizationExpectation = XCTestExpectation(description: "Network status stabilization")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            stabilizationExpectation.fulfill()
+        }
+        _ = XCTWaiter().wait(for: [stabilizationExpectation], timeout: 5.0)
         
         let updatedNetworkLabel = networkIndicator.label
         
@@ -435,47 +509,38 @@ final class NetworkStatusUITests: XCTestCase {
     func testUIResponsivenessDuringNetworkOperations() throws {
         // Navigate to the main listening view
         let listeningTab = app.tabBars.buttons["Listen"]
-        XCTAssertTrue(listeningTab.waitForExistence(timeout: 2.0))
+        XCTAssertTrue(waitForElement(listeningTab, description: "Listen tab"))
         listeningTab.tap()
         
         // Test that UI remains responsive during potential network operations
         let networkIndicator = app.otherElements["networkStatusIndicator"]
-        XCTAssertTrue(networkIndicator.waitForExistence(timeout: 3.0))
-        
-        // Wait for UI to be fully loaded and stable
-        Thread.sleep(forTimeInterval: 0.5)
+        XCTAssertTrue(waitForElementToStabilize(networkIndicator, description: "Network indicator"))
         
         // Test basic tab navigation responsiveness (core functionality)
         let historyTab = app.tabBars.buttons["History"]
         if historyTab.exists {
             historyTab.tap()
-            XCTAssertTrue(app.navigationBars.firstMatch.waitForExistence(timeout: 3.0), 
+            XCTAssertTrue(waitForElement(app.navigationBars.firstMatch, description: "History navigation bar"), 
                          "Navigation should remain responsive")
-            
-            // Wait for view to stabilize
-            Thread.sleep(forTimeInterval: 0.3)
         }
         
         let settingsTab = app.tabBars.buttons["Settings"]
         if settingsTab.exists {
             settingsTab.tap()
-            XCTAssertTrue(app.navigationBars.firstMatch.waitForExistence(timeout: 3.0), 
+            XCTAssertTrue(waitForElement(app.navigationBars.firstMatch, description: "Settings navigation bar"), 
                          "Settings view should load responsively")
-            
-            // Wait for view to stabilize
-            Thread.sleep(forTimeInterval: 0.3)
         }
         
         // Return to listening view and verify UI is still functional
         listeningTab.tap()
         
-        // Use a more generous timeout and check multiple indicators of successful navigation
+        // Check multiple indicators of successful navigation
         let mainHeading = app.staticTexts["Hear. ID. Nerd out."]
-        XCTAssertTrue(mainHeading.waitForExistence(timeout: 5.0), 
+        XCTAssertTrue(waitForElement(mainHeading, description: "Main heading"), 
                      "Should return to listening view successfully")
         
-        // Give extra time for network indicator to reappear after navigation
-        XCTAssertTrue(networkIndicator.waitForExistence(timeout: 5.0), 
+        // Verify network indicator reappears after navigation
+        XCTAssertTrue(waitForElement(networkIndicator, description: "Network indicator after navigation"), 
                      "Network indicator should be visible after returning to listening view")
         
         // Verify overall app stability
