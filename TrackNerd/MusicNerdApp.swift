@@ -12,6 +12,11 @@ import SwiftData
 struct MusicNerdApp: App {
     
     init() {
+        MusicNerdAppShortcuts.updateAppShortcutParameters()
+        MusicNerdAppIntentDependencies.register(
+            coordinator: DefaultServiceContainer.shared.currentMusicQuestionCoordinator
+        )
+
         // Disable animations during UI testing for faster and more reliable tests
         if ProcessInfo.processInfo.arguments.contains("--uitesting") {
             UIView.setAnimationsEnabled(false)

@@ -62,13 +62,16 @@ class EnrichmentCache {
             
             try modelContext.save()
             
-            logWithTimestamp("Stored \(key.type) for artist \(key.artistId) in persistent cache (expires in \(Int(expiration/60/60))h)")
+            logWithTimestamp(
+                "Stored \(key.type) entry in persistent cache "
+                    + "(expires in \(Int(expiration / 60 / 60))h)"
+            )
             
             // Maintain cache size limit
             trimCacheIfNeeded()
             
         } catch {
-            logWithTimestamp("Failed to store cache entry: \(error)")
+            logFailure("Store cache entry", error: error)
         }
     }
     
@@ -83,22 +86,22 @@ class EnrichmentCache {
             let entries = try modelContext.fetch(descriptor)
             
             guard let entry = entries.first else {
-                logWithTimestamp("Cache MISS for \(key.type) - artist \(key.artistId)")
+                logWithTimestamp("Cache MISS for \(key.type) entry")
                 return nil
             }
             
             if entry.isExpired {
                 modelContext.delete(entry)
                 try modelContext.save()
-                logWithTimestamp("Cache EXPIRED for \(key.type) - artist \(key.artistId)")
+                logWithTimestamp("Cache EXPIRED for \(key.type) entry")
                 return nil
             }
             
-            logWithTimestamp("Cache HIT for \(key.type) - artist \(key.artistId)")
+            logWithTimestamp("Cache HIT for \(key.type) entry")
             return entry.data
             
         } catch {
-            logWithTimestamp("Failed to retrieve cache entry: \(error)")
+            logFailure("Retrieve cache entry", error: error)
             return nil
         }
     }
@@ -118,10 +121,10 @@ class EnrichmentCache {
             }
             
             try modelContext.save()
-            logWithTimestamp("Removed \(key.type) for artist \(key.artistId) from persistent cache")
+            logWithTimestamp("Removed \(key.type) entry from persistent cache")
             
         } catch {
-            logWithTimestamp("Failed to remove cache entry: \(error)")
+            logFailure("Remove cache entry", error: error)
         }
     }
     
@@ -139,7 +142,7 @@ class EnrichmentCache {
             logWithTimestamp("Cleared all persistent enrichment cache (\(allEntries.count) entries)")
             
         } catch {
-            logWithTimestamp("Failed to clear all cache entries: \(error)")
+            logFailure("Clear all cache entries", error: error)
         }
     }
     
@@ -164,7 +167,7 @@ class EnrichmentCache {
             logWithTimestamp("Expired cache cleanup completed - removed \(expiredCount) entries")
             
         } catch {
-            logWithTimestamp("Failed to clear expired cache entries: \(error)")
+            logFailure("Clear expired cache entries", error: error)
         }
     }
     
@@ -188,7 +191,7 @@ class EnrichmentCache {
             }
             
         } catch {
-            logWithTimestamp("Failed to trim cache: \(error)")
+            logFailure("Trim cache", error: error)
         }
     }
     
@@ -201,11 +204,20 @@ class EnrichmentCache {
         }
     }
     
-    private func logWithTimestamp(_ message: String) {
+    private func logFailure(_ operation: String, error: Error) {
+        let nsError = error as NSError
+        logWithTimestamp(
+            "\(operation) failed (domain: \(nsError.domain), code: \(nsError.code))"
+        )
+    }
+
+    private func logWithTimestamp(_ message: @autoclosure () -> String) {
+        guard !AppSettings.shared.suppressMusicNerdLogs else { return }
+
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSS"
         let timestamp = formatter.string(from: Date())
-        print("[\(timestamp)] EnrichmentCache: \(message)")
+        print("[\(timestamp)] EnrichmentCache: \(message())")
     }
     
     // MARK: - Cache Statistics
@@ -221,7 +233,7 @@ class EnrichmentCache {
             return (totalEntries: allEntries.count, expiredEntries: expiredCount)
             
         } catch {
-            logWithTimestamp("Failed to get cache stats: \(error)")
+            logFailure("Get cache statistics", error: error)
             return (totalEntries: 0, expiredEntries: 0)
         }
     }
@@ -239,4 +251,3 @@ extension EnrichmentCacheKey.EnrichmentDataType: CustomStringConvertible {
         }
     }
 }
-

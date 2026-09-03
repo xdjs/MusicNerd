@@ -30,6 +30,7 @@ final class Container: ObservableObject {
     private init() {}
 }
 
+@MainActor
 protocol ServiceContainer {
     var shazamService: ShazamServiceProtocol { get }
     var openAIService: OpenAIServiceProtocol { get }
@@ -37,6 +38,10 @@ protocol ServiceContainer {
     var storageService: StorageServiceProtocol { get }
     var permissionService: PermissionServiceProtocol { get }
     var appleMusicService: AppleMusicServiceProtocol { get }
+    var currentPlaybackResolver: any CurrentPlaybackResolving { get }
+    var musicIdentityResolver: any MusicIdentityResolving { get }
+    var musicKnowledgeService: any MusicKnowledgeServing { get }
+    var currentMusicQuestionCoordinator: any CurrentMusicQuestionCoordinating { get }
 }
 
 @MainActor
@@ -56,6 +61,25 @@ final class DefaultServiceContainer: ServiceContainer, ObservableObject {
     lazy var appleMusicService: AppleMusicServiceProtocol = _appleMusicServiceObject
     // Expose concrete type for EnvironmentObject injection
     var appleMusicServiceObject: AppleMusicService { _appleMusicServiceObject }
+    lazy var currentPlaybackResolver: any CurrentPlaybackResolving =
+        MusicKitCurrentPlaybackResolver()
+    private lazy var artistIdentityLookup: any ArtistIdentityLookingUp =
+        MusicNerdArtistIdentityLookup(musicNerdService: musicNerdService)
+    lazy var musicIdentityResolver: any MusicIdentityResolving = MusicIdentityResolver(
+        crosswalk: StaticMusicIdentityCrosswalk(),
+        artistLookup: artistIdentityLookup
+    )
+    private lazy var artistKnowledgeLoader: any ArtistKnowledgeLoading =
+        MusicNerdArtistKnowledgeLoader(musicNerdService: musicNerdService)
+    lazy var musicKnowledgeService: any MusicKnowledgeServing = MusicKnowledgeService(
+        artistLoader: artistKnowledgeLoader
+    )
+    lazy var currentMusicQuestionCoordinator: any CurrentMusicQuestionCoordinating =
+        CurrentMusicQuestionCoordinator(
+            playbackResolver: currentPlaybackResolver,
+            identityResolver: musicIdentityResolver,
+            knowledgeService: musicKnowledgeService
+        )
     
     private init() {}
 }

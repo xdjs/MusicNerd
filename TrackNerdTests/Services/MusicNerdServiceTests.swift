@@ -294,6 +294,47 @@ final class MusicNerdServiceTests: XCTestCase {
         XCTAssertEqual(noConnectionError.code, NSURLErrorNotConnectedToInternet)
         XCTAssertEqual(serverError.code, NSURLErrorBadServerResponse)
     }
+
+    func testRequestFailureMapsDecodingErrorToInvalidResponse() {
+        let context = DecodingError.Context(
+            codingPath: [],
+            debugDescription: "Malformed success payload"
+        )
+
+        let result = MusicNerdService.requestFailure(
+            for: DecodingError.dataCorrupted(context)
+        )
+
+        XCTAssertEqual(result, .networkError(.invalidResponse))
+    }
+
+    func testRequestFailureClassifiesTransportErrorsConservatively() {
+        let cases: [(URLError.Code, AppError)] = [
+            (.timedOut, .networkError(.timeout)),
+            (.cancelled, .networkError(.timeout)),
+            (.notConnectedToInternet, .networkError(.noConnection)),
+            (.networkConnectionLost, .networkError(.noConnection)),
+            (.badURL, .networkError(.invalidURL)),
+            (.unsupportedURL, .networkError(.invalidURL)),
+            (.cannotParseResponse, .networkError(.invalidResponse)),
+            (.cannotConnectToHost, .networkError(.invalidResponse))
+        ]
+
+        for (code, expected) in cases {
+            XCTAssertEqual(
+                MusicNerdService.requestFailure(for: URLError(code)),
+                expected,
+                "Unexpected classification for \(code)"
+            )
+        }
+    }
+
+    func testRequestFailureMapsCancellationToTimeout() {
+        XCTAssertEqual(
+            MusicNerdService.requestFailure(for: CancellationError()),
+            .networkError(.timeout)
+        )
+    }
     
     func testAppError_MusicNerdErrors() {
         // Test MusicNerd-specific error cases

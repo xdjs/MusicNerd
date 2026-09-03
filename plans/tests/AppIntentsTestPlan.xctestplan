@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "E3B5C05A-64AB-4BB1-9667-E0A8420698CB",
+      "name" : "iOS 27 App Intents",
+      "options" : {
+        "commandLineArgumentEntries" : [
+          {
+            "argument" : "--app-intents-testing"
+          }
+        ],
+        "uiTestingScreenshotsLifetime" : "keepNever"
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:MusicNerd.xcodeproj",
+        "identifier" : "90E0CE7C1BA5474B9A2854D7",
+        "name" : "MusicNerdAppIntentsTests"
+      }
+    }
+  ],
+  "version" : 1
+}

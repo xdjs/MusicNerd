@@ -35,6 +35,10 @@ final class ContainerTests: XCTestCase {
         XCTAssertNotNil(container.shazamService)
         XCTAssertNotNil(container.openAIService)
         XCTAssertNotNil(container.storageService)
+        XCTAssertNotNil(container.currentPlaybackResolver)
+        XCTAssertNotNil(container.musicIdentityResolver)
+        XCTAssertNotNil(container.musicKnowledgeService)
+        XCTAssertNotNil(container.currentMusicQuestionCoordinator)
         
         XCTAssertTrue(container.shazamService is ShazamService)
         XCTAssertTrue(container.openAIService is OpenAIService)

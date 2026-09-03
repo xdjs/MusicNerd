@@ -198,6 +198,26 @@ struct SettingsView: View {
                 
                 // Debug Section
                 Section {
+#if DEBUG
+                    NavigationLink {
+                        CurrentPlaybackDiagnosticView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "music.note.list")
+                                .foregroundColor(Color.MusicNerd.primary)
+                                .frame(width: 24)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Current Playback Diagnostic")
+                                    .musicNerdStyle(.bodyLarge())
+                                Text("Read the Apple Music system queue without changing playback")
+                                    .musicNerdStyle(.bodySmall(color: Color.MusicNerd.textSecondary))
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("current-playback-diagnostic-link")
+#endif
+
                     HStack {
                         Image(systemName: "speaker.slash")
                             .foregroundColor(Color.MusicNerd.textSecondary)
